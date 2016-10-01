@@ -1,16 +1,15 @@
 package yandere4j;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import javax.net.ssl.HttpsURLConnection;
-
+import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +21,7 @@ import yandere4j.data.Sample;
 
 public class Yandere{
 
-	private static String BASE_URL = "https://yande.re/";
+	private static String BASE_URL = "https://yande.re";
 
 	public Post[] getPosts() throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
 		return getPosts(getServer(BASE_URL + "/post.json"));
@@ -96,22 +95,11 @@ public class Yandere{
 				score, last_noted_at, last_commented_at);
 	}
 
-	public String getServer(String url) throws NoSuchAlgorithmException, KeyManagementException, IOException{
-		URL connectUrl = new URL(url);
-		InputStream is;
-		HttpsURLConnection https = (HttpsURLConnection)connectUrl.openConnection();
-		https.setRequestMethod("GET");
-		https.connect();
-		is = https.getInputStream();
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is, "utf8"));
-		String line;
-		StringBuilder sb = new StringBuilder();
-		while((line = reader.readLine()) != null)
-			sb.append(line);
-		reader.close();
-		https.disconnect();
-		is.close();
-		return sb.toString();
+	public String getServer(String url) throws ParseException, ClientProtocolException, IOException{
+		HttpGet httpGet = new HttpGet(url);
+		DefaultHttpClient httpClient = new DefaultHttpClient();
+		String result = EntityUtils.toString(httpClient.execute(httpGet).getEntity(), "UTF-8");
+		httpClient.getConnectionManager().shutdown();
+		return result;
 	}
 }
