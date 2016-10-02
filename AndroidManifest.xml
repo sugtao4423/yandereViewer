@@ -25,6 +25,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="PostDetail"
+            android:configChanges="orientation|screenSize" >
+        </activity>
+        <activity
+            android:name="ShowImage"
+            android:configChanges="orientation|screenSize"
+            android:theme="@style/Theme.TranslucentBackground" >
+        </activity>
     </application>
 
 </manifest>

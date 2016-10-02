@@ -1,6 +1,10 @@
 package yandere4j.data;
 
-public class Preview{
+import java.io.Serializable;
+
+public class Preview implements Serializable{
+
+	private static final long serialVersionUID = -7395446019135027666L;
 
 	private String url;
 	private int width;

@@ -17,4 +17,10 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <drawable name="transparameter">#bb000000</drawable>
+    <style name="Theme.TranslucentBackground" parent="android:style/Theme.Translucent">
+        <item name="android:windowBackground">@drawable/transparameter</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
 </resources>

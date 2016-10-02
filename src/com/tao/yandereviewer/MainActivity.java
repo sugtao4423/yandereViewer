@@ -7,20 +7,28 @@ import java.security.NoSuchAlgorithmException;
 import org.json.JSONException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
 import yandere4j.Yandere;
 import yandere4j.data.Post;
 
-public class MainActivity extends Activity implements OnRefreshListener{
+public class MainActivity extends Activity implements OnRefreshListener, OnItemClickListener{
 
 	private GridView grid;
 	private SwipeRefreshLayout swipeRefresh;
@@ -36,6 +44,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		grid.setVerticalSpacing(15);
 		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
+		grid.setOnItemClickListener(this);
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
 		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
@@ -89,6 +98,32 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	@Override
 	public void onRefresh(){
 		loadPosts(true);
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+		final Post post = (Post)parent.getItemAtPosition(position);
+		String[] items = new String[]{"表示", "フルサイズをブラウザで開く", "詳細"};
+		new AlertDialog.Builder(this)
+		.setItems(items, new OnClickListener(){
+
+			@Override
+			public void onClick(DialogInterface dialog, int which){
+				if(which == 0){
+					Intent i = new Intent(MainActivity.this, ShowImage.class);
+					i.putExtra("url", post.getFile().getUrl());
+					i.putExtra("filesize", post.getFile().getSize());
+					startActivity(i);
+				}else if(which == 1){
+					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
+					startActivity(i);
+				}else if(which == 2){
+					Intent i = new Intent(MainActivity.this, PostDetail.class);
+					i.putExtra("postdata", post);
+					startActivity(i);
+				}
+			}
+		}).show();
 	}
 
 	@Override
