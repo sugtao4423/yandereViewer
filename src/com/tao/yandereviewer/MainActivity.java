@@ -27,7 +27,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
-import yandere4j.Yandere;
+import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 
 public class MainActivity extends Activity implements OnRefreshListener, OnItemClickListener{
@@ -35,7 +35,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	private GridView grid;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
-	private Yandere yandere;
+	private Yandere4j yandere;
 
 	private SharedPreferences pref;
 	private boolean isShowFullSize;
@@ -58,7 +58,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		loadSettings();
 
-		yandere = new Yandere();
+		yandere = new Yandere4j();
 		loadPosts(false);
 	}
 

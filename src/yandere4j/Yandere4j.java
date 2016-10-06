@@ -19,7 +19,7 @@ import yandere4j.data.Post;
 import yandere4j.data.Preview;
 import yandere4j.data.Sample;
 
-public class Yandere{
+public class Yandere4j{
 
 	private static String BASE_URL = "https://yande.re";
 
