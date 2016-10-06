@@ -11,11 +11,13 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.Menu;
@@ -35,6 +37,9 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	private PostAdapter adapter;
 	private Yandere yandere;
 
+	private SharedPreferences pref;
+	private boolean isShowFullSize;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -49,6 +54,9 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
 		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
 		swipeRefresh.setOnRefreshListener(this);
+
+		pref = PreferenceManager.getDefaultSharedPreferences(this);
+		loadSettings();
 
 		yandere = new Yandere();
 		loadPosts(false);
@@ -103,7 +111,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 		final Post post = (Post)parent.getItemAtPosition(position);
-		String[] items = new String[]{"表示", "フルサイズをブラウザで開く", "詳細"};
+		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "詳細"};
 		new AlertDialog.Builder(this)
 		.setItems(items, new OnClickListener(){
 
@@ -111,8 +119,13 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			public void onClick(DialogInterface dialog, int which){
 				if(which == 0){
 					Intent i = new Intent(MainActivity.this, ShowImage.class);
-					i.putExtra("url", post.getFile().getUrl());
-					i.putExtra("filesize", post.getFile().getSize());
+					if(isShowFullSize){
+						i.putExtra("url", post.getFile().getUrl());
+						i.putExtra("filesize", post.getFile().getSize());
+					}else{
+						i.putExtra("url", post.getSample().getUrl());
+						i.putExtra("filesize", post.getSample().getSize());
+					}
 					startActivity(i);
 				}else if(which == 1){
 					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
@@ -126,13 +139,26 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 		}).show();
 	}
 
+	public void loadSettings(){
+		isShowFullSize = pref.getBoolean("isShowFullSize", true);
+	}
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		loadSettings();
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
+		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "設定").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);;
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
+		if(item.getItemId() == Menu.FIRST)
+			startActivity(new Intent(this, Settings.class));
 		return super.onOptionsItemSelected(item);
 	}
 }
