@@ -24,10 +24,16 @@ public class PostDetail extends Activity{
 		text = (TextView)findViewById(R.id.postDetail_text);
 		post = (Post)getIntent().getSerializableExtra("postdata");
 
+		String tags = "";
+		for(String s : post.getTags())
+			tags += s + " ";
+		tags = tags.substring(0, tags.length() - 1);
+
 		String str = "<p><strong>Statistics</strong><br />" +
 				"Id: " + post.getId() + "<br />" +
 				"Posted: " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.JAPANESE).format(post.getCreatedAt()) +
 							" by " + post.getAuthor() + "<br />" +
+				"Tags: " + tags + "<br />" +
 				"Size: " + post.getFile().getWidth() + "x" + post.getFile().getHeight() + "<br />" +
 				"Source: <a href=\"" + post.getSource() + "\">" + post.getSource() + "</a><br />" +
 				"Rating: " + post.getRating() + "<br />" +
