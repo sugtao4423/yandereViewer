@@ -1,6 +1,5 @@
 package com.tao.yandereviewer;
 
-import java.io.File;
 import java.text.DecimalFormat;
 
 import com.loopj.android.image.WebImageCache;
@@ -43,21 +42,10 @@ public class Settings extends PreferenceActivity{
 		}
 
 		public String getCacheSize(){
-			long fileSize = 0;
-			String diskCachePath = getCacheDir().getAbsolutePath() + "/web_image_cache/";
-			File cachedFileDir = new File(diskCachePath);
-			if(cachedFileDir.exists() && cachedFileDir.isDirectory()){
-				File[] cachedFiles = cachedFileDir.listFiles();
-				for(File f : cachedFiles){
-					if(f.exists() && f.isFile()){
-						fileSize += f.length();
-					}
-				}
-			}
 			DecimalFormat df = new DecimalFormat("#.#");
 			df.setMinimumFractionDigits(2);
 			df.setMaximumFractionDigits(2);
-			return df.format((double)fileSize / 1024 / 1024) + "MB";
+			return df.format((double)new WebImageCache(Settings.this).getCacheSize() / 1024 / 1024) + "MB";
 		}
 	}
 }
