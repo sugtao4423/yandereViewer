@@ -50,7 +50,7 @@ public class PostAdapter extends ArrayAdapter<Post>{
 			holder.imageSize.setText("Load More");
 			return convertView;
 		}
-		holder.image.setImageUrl(post.getPreview().getUrl());
+		holder.image.setImageUrl(post.getPreview().getUrl(), null, R.drawable.ic_action_refresh);
 		holder.imageSize.setText(post.getFile().getWidth() + "x" + post.getFile().getHeight());
 		return convertView;
 	}
