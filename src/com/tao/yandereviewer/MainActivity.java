@@ -65,6 +65,10 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	}
 
 	public void loadPosts(final boolean isRefresh){
+		if(isRefresh){
+			adapter.clear();
+			yanderePage = 1;
+		}
 		new AsyncTask<Void, Void, Post[]>(){
 			private ProgressDialog progDailog;
 
@@ -100,8 +104,6 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 					return;
 				}
 				yanderePage++;
-				if(isRefresh)
-					adapter.clear();
 				adapter.addAll(result);
 				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
