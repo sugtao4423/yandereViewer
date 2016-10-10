@@ -8,4 +8,8 @@
         android:summaryOn="フルサイズ"
         android:title="フルサイズの画像を表示する" />
 
+    <Preference
+        android:key="clearCache"
+        android:title="キャッシュクリア" />
+
 </PreferenceScreen>
