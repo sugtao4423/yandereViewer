@@ -36,6 +36,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
 	private Yandere4j yandere;
+	private int yanderePage;
 
 	private SharedPreferences pref;
 	private boolean isShowFullSize;
@@ -59,6 +60,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 		loadSettings();
 
 		yandere = new Yandere4j();
+		yanderePage = 1;
 		loadPosts(false);
 	}
 
@@ -81,7 +83,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			@Override
 			protected Post[] doInBackground(Void... params){
 				try{
-					return yandere.getPosts();
+					return yandere.getPosts(yanderePage);
 				}catch(KeyManagementException | NoSuchAlgorithmException | JSONException | IOException e){
 					return null;
 				}
@@ -97,8 +99,13 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 					Toast.makeText(MainActivity.this, "取得エラー", Toast.LENGTH_LONG).show();
 					return;
 				}
-				adapter.clear();
+				yanderePage++;
+				if(isRefresh)
+					adapter.clear();
 				adapter.addAll(result);
+				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
+						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
+				adapter.add(load);
 			}
 		}.execute();
 	}
@@ -111,6 +118,11 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
 		final Post post = (Post)parent.getItemAtPosition(position);
+		if(post.getMD5().equals("LOADMORE")){
+			adapter.remove(post);
+			loadPosts(false);
+			return;
+		}
 		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "詳細"};
 		new AlertDialog.Builder(this)
 		.setItems(items, new OnClickListener(){

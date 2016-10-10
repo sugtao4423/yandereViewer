@@ -23,8 +23,8 @@ public class Yandere4j{
 
 	private static String BASE_URL = "https://yande.re";
 
-	public Post[] getPosts() throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
-		return getPosts(getServer(BASE_URL + "/post.json"));
+	public Post[] getPosts(int page) throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
+		return getPosts(getServer(BASE_URL + "/post.json?page=" + page));
 	}
 
 	private Post[] getPosts(String json) throws JSONException{

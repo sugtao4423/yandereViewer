@@ -45,6 +45,11 @@ public class PostAdapter extends ArrayAdapter<Post>{
 		}else{
 			holder = (ViewHolder)convertView.getTag();
 		}
+		if(post.getMD5().equals("LOADMORE")){
+			holder.image.setImageResource(R.drawable.plus);
+			holder.imageSize.setText("Load More");
+			return convertView;
+		}
 		holder.image.setImageUrl(post.getPreview().getUrl());
 		holder.imageSize.setText(post.getFile().getWidth() + "x" + post.getFile().getHeight());
 		return convertView;
