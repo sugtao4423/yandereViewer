@@ -1,9 +1,13 @@
 package com.tao.yandereviewer;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
 import android.app.Activity;
@@ -17,6 +21,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
@@ -125,7 +130,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			loadPosts(false);
 			return;
 		}
-		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "詳細"};
+		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "フルサイズを保存", "詳細"};
 		new AlertDialog.Builder(this)
 		.setItems(items, new OnClickListener(){
 
@@ -145,6 +150,8 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 					startActivity(i);
 				}else if(which == 2){
+					saveImage(post);
+				}else if(which == 3){
 					Intent i = new Intent(MainActivity.this, PostDetail.class);
 					i.putExtra("postdata", post);
 					startActivity(i);
@@ -155,6 +162,67 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 
 	public void loadSettings(){
 		isShowFullSize = pref.getBoolean("isShowFullSize", true);
+	}
+
+	public void saveImage(final Post post){
+		new AsyncTask<Void, Integer, Boolean>(){
+			private ProgressDialog progDialog;
+
+			@Override
+			protected void onPreExecute(){
+				progDialog = new ProgressDialog(MainActivity.this);
+				progDialog.setMessage("Loading...");
+				progDialog.setIndeterminate(false);
+				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				progDialog.setCancelable(true);
+				progDialog.setMax(post.getFile().getSize());
+				progDialog.setProgress(0);
+				progDialog.show();
+			}
+
+			@Override
+			protected Boolean doInBackground(Void... params){
+				try{
+					String name = "/yande.re " + post.getId() + " ";
+					for(String s : post.getTags())
+						name += s + " ";
+					name = name.substring(0, name.length() - 1);
+					name += "." + post.getFile().getExt();
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Environment.DIRECTORY_DOWNLOADS + name;
+
+					HttpGet httpGet = new HttpGet(post.getFile().getUrl());
+					DefaultHttpClient httpClient = new DefaultHttpClient();
+	
+					InputStream is = httpClient.execute(httpGet).getEntity().getContent();
+					FileOutputStream fos = new FileOutputStream(path);
+					byte[] buffer = new byte[1024];
+					int len;
+					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
+						fos.write(buffer, 0, len);
+						publishProgress(i * 1024);
+					}
+					fos.close();
+					is.close();
+					return true;
+				}catch(IOException e){
+					return false;
+				}
+			}
+
+			@Override
+			protected void onProgressUpdate(Integer... val){
+				progDialog.setProgress(val[0]);
+			}
+
+			@Override
+			protected void onPostExecute(Boolean result){
+				progDialog.dismiss();
+				if(!result)
+					Toast.makeText(MainActivity.this, "保存に失敗しました...", Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(MainActivity.this, "保存しました", Toast.LENGTH_LONG).show();
+			}
+		}.execute();
 	}
 
 	@Override
