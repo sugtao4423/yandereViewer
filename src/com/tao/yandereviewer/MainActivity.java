@@ -10,8 +10,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
+import com.tao.icondialog.IconDialog;
+import com.tao.icondialog.IconItem;
+
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -130,9 +132,16 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			loadPosts(false);
 			return;
 		}
-		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "フルサイズを保存", "共有", "詳細"};
-		new AlertDialog.Builder(this)
-		.setItems(items, new OnClickListener(){
+
+		IconItem[] items = new IconItem[5];
+		items[0] = new IconItem((isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", android.R.drawable.ic_menu_gallery);
+		items[1] = new IconItem("フルサイズをブラウザで開く", android.R.drawable.ic_menu_set_as);
+		items[2] = new IconItem("フルサイズを保存", android.R.drawable.ic_menu_save);
+		items[3] = new IconItem("共有", android.R.drawable.ic_menu_share);
+		items[4] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+
+		IconDialog dialog = new IconDialog(this);
+		dialog.setItems(items, new OnClickListener(){
 
 			@Override
 			public void onClick(DialogInterface dialog, int which){
