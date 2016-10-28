@@ -116,7 +116,7 @@ public class PostDetail extends Activity{
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "共有").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);;
+		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "共有").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
 	}
 

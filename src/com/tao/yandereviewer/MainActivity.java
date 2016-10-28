@@ -235,7 +235,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "設定").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);;
+		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "設定").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
 	}
 
