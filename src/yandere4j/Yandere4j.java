@@ -27,6 +27,27 @@ public class Yandere4j{
 		return getPosts(getServer(BASE_URL + "/post.json?page=" + page));
 	}
 
+	public String getFileName(Post post){
+		String name = "yande.re " + post.getId() + " ";
+		for(String s : post.getTags())
+			name += s + " ";
+		name = name.substring(0, name.length() - 1);
+		return name + "." + post.getFile().getExt();
+	}
+
+	public String getShareText(Post post, boolean onlyURL){
+		String url = BASE_URL + "/post/show/" + post.getId();
+		if(onlyURL){
+			return url;
+		}else{
+			String tags = "";
+			for(String s : post.getTags())
+				tags += s + " ";
+			tags = tags.substring(0, tags.length() - 1);
+			return tags + " " + url;
+		}
+	}
+
 	private Post[] getPosts(String json) throws JSONException{
 		JSONArray arr = new JSONArray(json);
 		Post[] result = new Post[arr.length()];

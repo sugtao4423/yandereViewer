@@ -5,10 +5,14 @@ import java.text.SimpleDateFormat;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
+import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 
 public class PostDetail extends Activity{
@@ -58,5 +62,23 @@ public class PostDetail extends Activity{
 		df.setMinimumFractionDigits(2);
 		df.setMaximumFractionDigits(2);
 		return df.format((float)bytesize / 1024 / 1024) + "MB";
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu){
+		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "共有").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);;
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item){
+		if(item.getItemId() == Menu.FIRST){
+			Intent i = new Intent();
+			i.setAction(Intent.ACTION_SEND);
+			i.setType("text/plain");
+			i.putExtra(Intent.EXTRA_TEXT, new Yandere4j().getShareText(post, false));
+			startActivity(i);
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

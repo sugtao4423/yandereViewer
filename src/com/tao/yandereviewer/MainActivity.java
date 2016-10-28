@@ -130,7 +130,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			loadPosts(false);
 			return;
 		}
-		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "フルサイズを保存", "詳細"};
+		String[] items = new String[]{(isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", "フルサイズをブラウザで開く", "フルサイズを保存", "共有", "詳細"};
 		new AlertDialog.Builder(this)
 		.setItems(items, new OnClickListener(){
 
@@ -152,6 +152,12 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 				}else if(which == 2){
 					saveImage(post);
 				}else if(which == 3){
+					Intent i = new Intent();
+					i.setAction(Intent.ACTION_SEND);
+					i.setType("text/plain");
+					i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post, false));
+					startActivity(i);
+				}else if(which == 4){
 					Intent i = new Intent(MainActivity.this, PostDetail.class);
 					i.putExtra("postdata", post);
 					startActivity(i);
@@ -183,12 +189,8 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			@Override
 			protected Boolean doInBackground(Void... params){
 				try{
-					String name = "/yande.re " + post.getId() + " ";
-					for(String s : post.getTags())
-						name += s + " ";
-					name = name.substring(0, name.length() - 1);
-					name += "." + post.getFile().getExt();
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + Environment.DIRECTORY_DOWNLOADS + name;
+					String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+							Environment.DIRECTORY_DOWNLOADS + "/" + yandere.getFileName(post);
 
 					HttpGet httpGet = new HttpGet(post.getFile().getUrl());
 					DefaultHttpClient httpClient = new DefaultHttpClient();
