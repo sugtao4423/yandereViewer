@@ -30,18 +30,18 @@ public class ShowImage extends Activity{
 		final int size = i.getIntExtra("filesize", -1);
 
 		new AsyncTask<Void, Integer, Bitmap>(){
-			private ProgressDialog progDailog;
+			private ProgressDialog progDialog;
 
 			@Override
 			protected void onPreExecute(){
-				progDailog = new ProgressDialog(ShowImage.this);
-				progDailog.setMessage("Loading...");
-				progDailog.setIndeterminate(false);
-				progDailog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				progDailog.setCancelable(true);
-				progDailog.setMax(size);
-				progDailog.setProgress(0);
-				progDailog.show();
+				progDialog = new ProgressDialog(ShowImage.this);
+				progDialog.setMessage("Loading...");
+				progDialog.setIndeterminate(false);
+				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				progDialog.setCancelable(true);
+				progDialog.setMax(size);
+				progDialog.setProgress(0);
+				progDialog.show();
 			}
 
 			@Override
@@ -71,12 +71,12 @@ public class ShowImage extends Activity{
 
 			@Override
 			protected void onProgressUpdate(Integer... val){
-				progDailog.setProgress(val[0]);
+				progDialog.setProgress(val[0]);
 			}
 
 			@Override
 			protected void onPostExecute(Bitmap bmp){
-				progDailog.dismiss();
+				progDialog.dismiss();
 				if(bmp == null){
 					Toast.makeText(ShowImage.this, "開けませんでした...", Toast.LENGTH_LONG).show();
 					finish();

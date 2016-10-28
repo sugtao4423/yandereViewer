@@ -75,17 +75,17 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			yanderePage = 1;
 		}
 		new AsyncTask<Void, Void, Post[]>(){
-			private ProgressDialog progDailog;
+			private ProgressDialog progDialog;
 
 			@Override
 			protected void onPreExecute(){
 				if(!isRefresh){
-					progDailog = new ProgressDialog(MainActivity.this);
-					progDailog.setMessage("Loading...");
-					progDailog.setIndeterminate(false);
-					progDailog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					progDailog.setCancelable(true);
-					progDailog.show();
+					progDialog = new ProgressDialog(MainActivity.this);
+					progDialog.setMessage("Loading...");
+					progDialog.setIndeterminate(false);
+					progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					progDialog.setCancelable(true);
+					progDialog.show();
 				}
 			}
 
@@ -101,7 +101,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 			@Override
 			protected void onPostExecute(Post[] result){
 				if(!isRefresh)
-					progDailog.dismiss();
+					progDialog.dismiss();
 				else
 					swipeRefresh.setRefreshing(false);
 				if(result == null){
