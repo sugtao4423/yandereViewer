@@ -1,11 +1,22 @@
 package com.tao.yandereviewer;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -32,6 +43,9 @@ public class PostDetail extends Activity{
 		for(String s : post.getTags())
 			tags += s + " ";
 		tags = tags.substring(0, tags.length() - 1);
+
+		getActionBar().setTitle(tags);
+		setActionbarIcon();
 
 		String str = "<p><strong>Statistics</strong><br />" +
 				"Id: " + post.getId() + "<br />" +
@@ -62,6 +76,42 @@ public class PostDetail extends Activity{
 		df.setMinimumFractionDigits(2);
 		df.setMaximumFractionDigits(2);
 		return df.format((float)bytesize / 1024 / 1024) + "MB";
+	}
+
+	public void setActionbarIcon(){
+		final ActionBar actionBar = getActionBar();
+		actionBar.setIcon(R.drawable.ic_action_refresh);
+		String path = getApplicationContext().getCacheDir().getAbsolutePath() + "/web_image_cache/" +
+				post.getPreview().getUrl().replaceAll("[.:/,%?&=]", "+").replaceAll("[+]+", "+");
+		File img = new File(path);
+		if(img.exists()){
+			Drawable d = Drawable.createFromPath(path);
+			actionBar.setIcon(d);
+		}else{
+			new AsyncTask<Void, Void, Drawable>(){
+
+				@Override
+				protected Drawable doInBackground(Void... params){
+					try{
+						HttpURLConnection connection = (HttpURLConnection)new URL(post.getPreview().getUrl()).openConnection();
+						connection.connect();
+						InputStream is = connection.getInputStream();
+						Bitmap bmp = BitmapFactory.decodeStream(is);
+						is.close();
+						connection.disconnect();
+						return new BitmapDrawable(getResources(), bmp);
+					}catch(IOException e){
+						return null;
+					}
+				}
+
+				@Override
+				protected void onPostExecute(Drawable d){
+					if(d != null)
+						actionBar.setIcon(d);
+				}
+			}.execute();
+		}
 	}
 
 	@Override
