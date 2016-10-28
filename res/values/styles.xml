@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -18,9 +18,11 @@
     </style>
 
     <drawable name="transparameter">#bb000000</drawable>
-    <style name="Theme.TranslucentBackground" parent="android:style/Theme.Translucent">
+
+    <style name="Theme.TranslucentBackground" parent="android:Theme.Light.NoTitleBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowBackground">@drawable/transparameter</item>
-        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>
