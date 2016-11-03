@@ -1,57 +1,30 @@
 package com.tao.yandereviewer;
 
-import com.loopj.android.image.SmartImageView;
+import java.util.ArrayList;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.TextView;
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.CardGridArrayAdapter;
+import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
 import yandere4j.data.Post;
 
-public class PostAdapter extends ArrayAdapter<Post>{
+public class PostAdapter extends CardGridArrayAdapter{
 
-	private LayoutInflater mInflater;
+	private Context context;
 
 	public PostAdapter(Context context){
-		super(context, android.R.layout.simple_list_item_1);
-		mInflater = (LayoutInflater)context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
+		super(context, new ArrayList<Card>());
+		this.context = context;
 	}
-	
-	class ViewHolder{
-		SmartImageView image;
-		TextView imageSize;
+
+	public void add(Post post, OnCardClickListener listener){
+		PostCard card = new PostCard(context, post);
+		card.setOnClickListener(listener);
+		add(card);
 	}
-	
-	@SuppressLint("InflateParams")
-	@Override
-	public View getView(int position, View convertView, final ViewGroup parent){
-		final ViewHolder holder;
-		final Post post = getItem(position);
 
-		if(convertView == null) {
-			convertView = mInflater.inflate(R.layout.grid_item_layout, null);
-			SmartImageView image = (SmartImageView)convertView.findViewById(R.id.postImage);
-			TextView imageSize = (TextView)convertView.findViewById(R.id.imageSize);
-
-			holder = new ViewHolder();
-			holder.image = image;
-			holder.imageSize = imageSize;
-
-			convertView.setTag(holder);
-		}else{
-			holder = (ViewHolder)convertView.getTag();
-		}
-		if(post.getMD5().equals("LOADMORE")){
-			holder.image.setImageResource(R.drawable.plus);
-			holder.imageSize.setText("Load More");
-			return convertView;
-		}
-		holder.image.setImageUrl(post.getPreview().getUrl(), null, R.drawable.ic_action_refresh);
-		holder.imageSize.setText(post.getFile().getWidth() + "x" + post.getFile().getHeight());
-		return convertView;
+	public void addAll(Post[] post, OnCardClickListener listener){
+		for(Post p : post)
+			add(p, listener);
 	}
 }

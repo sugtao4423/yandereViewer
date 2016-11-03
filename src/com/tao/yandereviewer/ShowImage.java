@@ -3,9 +3,8 @@ package com.tao.yandereviewer;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import com.tenthbit.view.ZoomImageView;
 
@@ -47,21 +46,21 @@ public class ShowImage extends Activity{
 			@Override
 			protected Bitmap doInBackground(Void... params){
 				try{
-					HttpGet httpGet = new HttpGet(url);
-					DefaultHttpClient httpClient = new DefaultHttpClient();
-
-					InputStream input = httpClient.execute(httpGet).getEntity().getContent();
+					HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+					conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+					conn.connect();
+					InputStream is = conn.getInputStream();
 					ByteArrayOutputStream bout = new ByteArrayOutputStream();
 					byte[] buffer = new byte[1024];
 					int len;
-					for(int i = 0; (len = input.read(buffer)) > 0; ++i){
+					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
 						bout.write(buffer, 0, len);
 						publishProgress(i * 1024);
 					}
 					byte[] tmp = bout.toByteArray();
 					Bitmap myBitmap = BitmapFactory.decodeByteArray(tmp, 0, tmp.length);
-					input.close();
-					httpClient.getConnectionManager().shutdown();
+					is.close();
+					conn.disconnect();
 					return myBitmap;
 				}catch(IOException e){
 					e.printStackTrace();

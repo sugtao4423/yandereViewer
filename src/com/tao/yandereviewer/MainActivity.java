@@ -3,11 +3,10 @@ package com.tao.yandereviewer;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 
 import com.tao.icondialog.IconDialog;
@@ -30,16 +29,17 @@ import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.Toast;
+import it.gmariotti.cardslib.library.internal.Card;
+import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
+import it.gmariotti.cardslib.library.view.CardGridView;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 
-public class MainActivity extends Activity implements OnRefreshListener, OnItemClickListener{
+public class MainActivity extends Activity implements OnRefreshListener{
 
-	private GridView grid;
+	private CardGridView grid;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
 	private Yandere4j yandere;
@@ -52,12 +52,11 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		grid = (GridView)findViewById(R.id.grid);
+		grid = (CardGridView)findViewById(R.id.grid);
 		grid.setNumColumns(GridView.AUTO_FIT);
 		grid.setVerticalSpacing(15);
 		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
-		grid.setOnItemClickListener(this);
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
 		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
@@ -111,10 +110,10 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 					return;
 				}
 				yanderePage++;
-				adapter.addAll(result);
+				adapter.addAll(result, getCardClickListener());
 				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
-				adapter.add(load);
+				adapter.add(load, getCardClickListener());
 			}
 		}.execute();
 	}
@@ -124,55 +123,60 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 		loadPosts(true);
 	}
 
-	@Override
-	public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-		final Post post = (Post)parent.getItemAtPosition(position);
-		if(post.getMD5().equals("LOADMORE")){
-			adapter.remove(post);
-			loadPosts(false);
-			return;
-		}
-
-		IconItem[] items = new IconItem[5];
-		items[0] = new IconItem((isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", android.R.drawable.ic_menu_gallery);
-		items[1] = new IconItem("フルサイズをブラウザで開く", android.R.drawable.ic_menu_set_as);
-		items[2] = new IconItem("フルサイズを保存", android.R.drawable.ic_menu_save);
-		items[3] = new IconItem("共有", android.R.drawable.ic_menu_share);
-		items[4] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
-
-		IconDialog dialog = new IconDialog(this);
-		dialog.setItems(items, new OnClickListener(){
+	public OnCardClickListener getCardClickListener(){
+		return new OnCardClickListener(){
 
 			@Override
-			public void onClick(DialogInterface dialog, int which){
-				if(which == 0){
-					Intent i = new Intent(MainActivity.this, ShowImage.class);
-					if(isShowFullSize){
-						i.putExtra("url", post.getFile().getUrl());
-						i.putExtra("filesize", post.getFile().getSize());
-					}else{
-						i.putExtra("url", post.getSample().getUrl());
-						i.putExtra("filesize", post.getSample().getSize());
-					}
-					startActivity(i);
-				}else if(which == 1){
-					Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
-					startActivity(i);
-				}else if(which == 2){
-					saveImage(post);
-				}else if(which == 3){
-					Intent i = new Intent();
-					i.setAction(Intent.ACTION_SEND);
-					i.setType("text/plain");
-					i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post, false));
-					startActivity(i);
-				}else if(which == 4){
-					Intent i = new Intent(MainActivity.this, PostDetail.class);
-					i.putExtra("postdata", post);
-					startActivity(i);
+			public void onClick(Card c, View view){
+				final Post post = ((PostCard)c).getPost();
+				if(post.getMD5().equals("LOADMORE")){
+					adapter.remove(c);
+					loadPosts(false);
+					return;
 				}
+
+				IconItem[] items = new IconItem[5];
+				items[0] = new IconItem((isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", android.R.drawable.ic_menu_gallery);
+				items[1] = new IconItem("フルサイズをブラウザで開く", android.R.drawable.ic_menu_set_as);
+				items[2] = new IconItem("フルサイズを保存", android.R.drawable.ic_menu_save);
+				items[3] = new IconItem("共有", android.R.drawable.ic_menu_share);
+				items[4] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+
+				IconDialog dialog = new IconDialog(MainActivity.this);
+				dialog.setItems(items, new OnClickListener(){
+
+					@Override
+					public void onClick(DialogInterface dialog, int which){
+						if(which == 0){
+							Intent i = new Intent(MainActivity.this, ShowImage.class);
+							if(isShowFullSize){
+								i.putExtra("url", post.getFile().getUrl());
+								i.putExtra("filesize", post.getFile().getSize());
+							}else{
+								i.putExtra("url", post.getSample().getUrl());
+								i.putExtra("filesize", post.getSample().getSize());
+							}
+							startActivity(i);
+						}else if(which == 1){
+							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
+							startActivity(i);
+						}else if(which == 2){
+							saveImage(post);
+						}else if(which == 3){
+							Intent i = new Intent();
+							i.setAction(Intent.ACTION_SEND);
+							i.setType("text/plain");
+							i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post, false));
+							startActivity(i);
+						}else if(which == 4){
+							Intent i = new Intent(MainActivity.this, PostDetail.class);
+							i.putExtra("postdata", post);
+							startActivity(i);
+						}
+					}
+				}).show();
 			}
-		}).show();
+		};
 	}
 
 	public void loadSettings(){
@@ -201,10 +205,10 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 					String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 							Environment.DIRECTORY_DOWNLOADS + "/" + yandere.getFileName(post);
 
-					HttpGet httpGet = new HttpGet(post.getFile().getUrl());
-					DefaultHttpClient httpClient = new DefaultHttpClient();
-	
-					InputStream is = httpClient.execute(httpGet).getEntity().getContent();
+					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
+					conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+					conn.connect();
+					InputStream is = conn.getInputStream();
 					FileOutputStream fos = new FileOutputStream(path);
 					byte[] buffer = new byte[1024];
 					int len;
@@ -214,6 +218,7 @@ public class MainActivity extends Activity implements OnRefreshListener, OnItemC
 					}
 					fos.close();
 					is.close();
+					conn.disconnect();
 					return true;
 				}catch(IOException e){
 					return false;

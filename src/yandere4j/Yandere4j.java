@@ -1,15 +1,16 @@
 package yandere4j;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -116,11 +117,19 @@ public class Yandere4j{
 				score, last_noted_at, last_commented_at);
 	}
 
-	public String getServer(String url) throws ParseException, ClientProtocolException, IOException{
-		HttpGet httpGet = new HttpGet(url);
-		DefaultHttpClient httpClient = new DefaultHttpClient();
-		String result = EntityUtils.toString(httpClient.execute(httpGet).getEntity(), "UTF-8");
-		httpClient.getConnectionManager().shutdown();
-		return result;
+	public String getServer(String url) throws MalformedURLException, IOException{
+		HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+		conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+		conn.connect();
+		StringBuffer sb = new StringBuffer();
+		InputStream is = conn.getInputStream();
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String line = null;
+		while((line = br.readLine()) != null)
+			sb.append(line);
+		is.close();
+		br.close();
+		conn.disconnect();
+		return sb.toString();
 	}
 }
