@@ -18,6 +18,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -29,13 +32,19 @@ import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FilterQueryProvider;
 import android.widget.GridView;
+import android.widget.SearchView;
+import android.widget.SearchView.OnQueryTextListener;
+import android.widget.SearchView.OnSuggestionListener;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
 import it.gmariotti.cardslib.library.view.CardGridView;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
+import yandere4j.data.Tag;
 
 public class MainActivity extends Activity implements OnRefreshListener{
 
@@ -44,9 +53,11 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	private PostAdapter adapter;
 	private Yandere4j yandere;
 	private int yanderePage;
+	private String searchQuery;
 
 	private SharedPreferences pref;
 	private boolean isShowFullSize;
+	private SQLiteDatabase db;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -67,7 +78,21 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 		yandere = new Yandere4j();
 		yanderePage = 1;
-		loadPosts(false);
+		searchQuery = getIntent().getStringExtra("searchQuery");
+		if(searchQuery != null)
+			getActionBar().setTitle("Search: " + searchQuery);
+
+		db = new TagSQLiteHelper(this).getWritableDatabase();
+
+		if(!pref.getBoolean("tagSaved", false)){
+			Intent i = new Intent(MainActivity.this, SaveTagActivity.class);
+			i.putExtra("startMain", true);
+			startActivity(i);
+			finish();
+			return;
+		}else{
+			loadPosts(false);
+		}
 	}
 
 	public void loadPosts(final boolean isRefresh){
@@ -93,7 +118,10 @@ public class MainActivity extends Activity implements OnRefreshListener{
 			@Override
 			protected Post[] doInBackground(Void... params){
 				try{
-					return yandere.getPosts(yanderePage);
+					if(searchQuery == null)
+						return yandere.getPosts(yanderePage);
+					else
+						return yandere.searchPosts(searchQuery, yanderePage);
 				}catch(KeyManagementException | NoSuchAlgorithmException | JSONException | IOException e){
 					return null;
 				}
@@ -115,7 +143,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
 				adapter.add(load, getCardClickListener());
 			}
-		}.execute();
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 	@Override
@@ -249,14 +277,97 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "設定").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		return true;
+		if(searchQuery == null){
+			getMenuInflater().inflate(R.menu.menu_both, menu);
+			final SearchView searchView = (SearchView)menu.findItem(R.id.search_view).getActionView();
+			searchView.setEnabled(false);
+			new AsyncTask<Void, Void, Tag[]>(){
+
+				@Override
+				protected Tag[] doInBackground(Void... params){
+					return new DBUtils(db).loadTags();
+				}
+
+				@Override
+				protected void onPostExecute(Tag[] result){
+					prepareSuggest(result, searchView);
+					searchView.setEnabled(true);
+				}
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		}else{
+			getMenuInflater().inflate(R.menu.menu_settings, menu);
+		}
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	public void prepareSuggest(final Tag[] tags, final SearchView searchView){
+		FilterQueryProvider filter = new FilterQueryProvider(){
+			@Override
+			public Cursor runQuery(CharSequence constraint){
+				String constrain = (String)constraint;
+				if(constraint == null)
+					return null;
+				String[] columnNames = {"_id", "name"};
+				MatrixCursor c = new MatrixCursor(columnNames);
+				for(int i = 0; i < tags.length; i++){
+					if(tags[i].getName().contains(constrain))
+						c.newRow().add(i).add(tags[i].getName());
+				}
+				return c;
+			}
+		};
+		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(),
+				android.R.layout.simple_list_item_1, null,
+				new String[]{"name"}, new int[]{android.R.id.text1}, SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		adapter.setFilterQueryProvider(filter);
+
+		searchView.setQueryHint("Search post from tag");
+		searchView.setSuggestionsAdapter(adapter);
+		searchView.setOnQueryTextListener(new OnQueryTextListener(){
+
+			@Override
+			public boolean onQueryTextSubmit(String query){
+				Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				i.putExtra("searchQuery", query);
+				startActivity(i);
+				return true;
+			}
+
+			@Override
+			public boolean onQueryTextChange(String newText){
+				adapter.swapCursor(adapter.getFilterQueryProvider().runQuery(newText));
+				return true;
+			}
+		});
+		searchView.setOnSuggestionListener(new OnSuggestionListener(){
+
+			@Override
+			public boolean onSuggestionSelect(int position){
+				return false;
+			}
+
+			@Override
+			public boolean onSuggestionClick(int position){
+				String query = ((Cursor)searchView.getSuggestionsAdapter().getItem(position)).getString(1);
+				searchView.setQuery(query, false);
+				Intent i = new Intent(getApplicationContext(), MainActivity.class);
+				i.putExtra("searchQuery", query);
+				startActivity(i);
+				return true;
+			}
+		});
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item){
-		if(item.getItemId() == Menu.FIRST)
+		if(item.getOrder() == Menu.FIRST + 1)
 			startActivity(new Intent(this, Settings.class));
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onDestroy(){
+		super.onDestroy();
+		db.close();
 	}
 }

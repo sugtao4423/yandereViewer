@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/search_view"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="1"
+        android:showAsAction="always"
+        android:title="検索"/>
+    <item
+        android:orderInCategory="2"
+        android:showAsAction="ifRoom"
+        android:title="設定"/>
+
+</menu>

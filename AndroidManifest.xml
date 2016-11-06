@@ -39,6 +39,8 @@
             android:name="Settings"
             android:configChanges="orientation|screenSize" >
         </activity>
+        <activity android:name="SaveTagActivity" >
+        </activity>
     </application>
 
 </manifest>

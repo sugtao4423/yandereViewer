@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.json.JSONArray;
@@ -19,6 +20,7 @@ import yandere4j.data.File;
 import yandere4j.data.Post;
 import yandere4j.data.Preview;
 import yandere4j.data.Sample;
+import yandere4j.data.Tag;
 
 public class Yandere4j{
 
@@ -26,6 +28,17 @@ public class Yandere4j{
 
 	public Post[] getPosts(int page) throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
 		return getPosts(getServer(BASE_URL + "/post.json?page=" + page));
+	}
+
+	public Tag[] getTags(boolean sortWithId) throws MalformedURLException, JSONException, IOException{
+		Tag[] tags = getTags(getServer(BASE_URL + "/tag.json?limit=0"));
+		if(sortWithId)
+			Arrays.sort(tags);
+		return tags;
+	}
+
+	public Post[] searchPosts(String query, int page) throws MalformedURLException, JSONException, IOException{
+		return getPosts(getServer(BASE_URL + "/post.json?tags=" + query + "&page=" + page));
 	}
 
 	public String getFileName(Post post){
@@ -115,6 +128,24 @@ public class Yandere4j{
 				created_at, updated_at,
 				is_shown_in_index, is_rating_locked, has_children, is_pending, is_held, is_note_locked,
 				score, last_noted_at, last_commented_at);
+	}
+
+	private Tag[] getTags(String json) throws JSONException{
+		JSONArray arr = new JSONArray(json);
+		Tag[] result = new Tag[arr.length()];
+		for(int i = 0; i < arr.length(); i++)
+			result[i] = getTag(arr.getJSONObject(i));
+		return result;
+	}
+
+	private Tag getTag(JSONObject obj) throws JSONException{
+		int id = obj.getInt("id");
+		String name = obj.getString("name");
+		int count = obj.getInt("count");
+		int type = obj.getInt("type");
+		boolean ambiguous = obj.getBoolean("ambiguous");
+
+		return new Tag(id, name, count, type, ambiguous);
 	}
 
 	public String getServer(String url) throws MalformedURLException, IOException{
