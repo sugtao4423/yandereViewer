@@ -3,14 +3,14 @@
 
     <item
         android:id="@+id/search_view"
-        android:actionViewClass="android.widget.SearchView"
+        android:actionLayout="@layout/autocomplete_layout"
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="1"
-        android:showAsAction="always"
+        android:showAsAction="always|collapseActionView"
         android:title="検索"/>
     <item
         android:orderInCategory="2"
-        android:showAsAction="ifRoom"
+        android:showAsAction="always"
         android:title="設定"/>
 
 </menu>

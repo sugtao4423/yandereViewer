@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ public class Yandere4j{
 	}
 
 	public Post[] searchPosts(String query, int page) throws MalformedURLException, JSONException, IOException{
+		query = URLEncoder.encode(query, "UTF-8");
 		return getPosts(getServer(BASE_URL + "/post.json?tags=" + query + "&page=" + page));
 	}
 

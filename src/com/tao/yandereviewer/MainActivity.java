@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import org.json.JSONException;
 
 import com.tao.icondialog.IconDialog;
@@ -14,12 +15,11 @@ import com.tao.icondialog.IconItem;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.DialogInterface.OnClickListener;
-import android.database.Cursor;
-import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
@@ -29,19 +29,21 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FilterQueryProvider;
+import android.view.View.OnAttachStateChangeListener;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.GridView;
-import android.widget.SearchView;
-import android.widget.SearchView.OnQueryTextListener;
-import android.widget.SearchView.OnSuggestionListener;
-import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
 import it.gmariotti.cardslib.library.view.CardGridView;
+import jp.sfapps.partialmatchsearchinarrayadapter.SearchableArrayAdapter;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 import yandere4j.data.Tag;
@@ -279,8 +281,9 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	public boolean onCreateOptionsMenu(Menu menu){
 		if(searchQuery == null){
 			getMenuInflater().inflate(R.menu.menu_both, menu);
-			final SearchView searchView = (SearchView)menu.findItem(R.id.search_view).getActionView();
-			searchView.setEnabled(false);
+			final ClearableMultiAutoCompleteTextView cmactv =
+					(ClearableMultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
+			cmactv.setEnabled(false);
 			new AsyncTask<Void, Void, Tag[]>(){
 
 				@Override
@@ -290,8 +293,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 				@Override
 				protected void onPostExecute(Tag[] result){
-					prepareSuggest(result, searchView);
-					searchView.setEnabled(true);
+					prepareSuggest(result, cmactv);
+					cmactv.setEnabled(true);
 				}
 			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}else{
@@ -300,60 +303,37 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	public void prepareSuggest(final Tag[] tags, final SearchView searchView){
-		FilterQueryProvider filter = new FilterQueryProvider(){
+	public void prepareSuggest(final Tag[] tags, final ClearableMultiAutoCompleteTextView cmactv){
+		ArrayList<String> tagNames = new ArrayList<String>();
+		for(int i = 0; i < tags.length; i++)
+			tagNames.add(tags[i].getName());
+		SearchableArrayAdapter<String> adapter = new SearchableArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, tagNames);
+		adapter.setHighLightColor("#2196F3");
+		cmactv.setAdapter(adapter);
+		cmactv.setHint("Search post from tag");
+		cmactv.setTokenizer(new SpaceTokenizer());
+		cmactv.setOnEditorActionListener(new OnEditorActionListener(){
+
 			@Override
-			public Cursor runQuery(CharSequence constraint){
-				String constrain = (String)constraint;
-				if(constraint == null)
-					return null;
-				String[] columnNames = {"_id", "name"};
-				MatrixCursor c = new MatrixCursor(columnNames);
-				for(int i = 0; i < tags.length; i++){
-					if(tags[i].getName().contains(constrain))
-						c.newRow().add(i).add(tags[i].getName());
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
+				if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)){
+					String query = cmactv.getText().toString();
+					Intent i = new Intent(getApplicationContext(), MainActivity.class);
+					i.putExtra("searchQuery", query);
+					startActivity(i);
 				}
-				return c;
-			}
-		};
-		final SimpleCursorAdapter adapter = new SimpleCursorAdapter(getApplicationContext(),
-				android.R.layout.simple_list_item_1, null,
-				new String[]{"name"}, new int[]{android.R.id.text1}, SimpleCursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
-		adapter.setFilterQueryProvider(filter);
-
-		searchView.setQueryHint("Search post from tag");
-		searchView.setSuggestionsAdapter(adapter);
-		searchView.setOnQueryTextListener(new OnQueryTextListener(){
-
-			@Override
-			public boolean onQueryTextSubmit(String query){
-				Intent i = new Intent(getApplicationContext(), MainActivity.class);
-				i.putExtra("searchQuery", query);
-				startActivity(i);
-				return true;
-			}
-
-			@Override
-			public boolean onQueryTextChange(String newText){
-				adapter.swapCursor(adapter.getFilterQueryProvider().runQuery(newText));
-				return true;
-			}
-		});
-		searchView.setOnSuggestionListener(new OnSuggestionListener(){
-
-			@Override
-			public boolean onSuggestionSelect(int position){
 				return false;
 			}
+		});
+		cmactv.addOnAttachStateChangeListener(new OnAttachStateChangeListener(){
+			@Override
+			public void onViewDetachedFromWindow(View v){
+			}
 
 			@Override
-			public boolean onSuggestionClick(int position){
-				String query = ((Cursor)searchView.getSuggestionsAdapter().getItem(position)).getString(1);
-				searchView.setQuery(query, false);
-				Intent i = new Intent(getApplicationContext(), MainActivity.class);
-				i.putExtra("searchQuery", query);
-				startActivity(i);
-				return true;
+			public void onViewAttachedToWindow(View v){
+				InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+				inputMethodManager.showSoftInput(v, 0);
 			}
 		});
 	}
