@@ -51,17 +51,19 @@ public class Yandere4j{
 		return name + "." + post.getFile().getExt();
 	}
 
-	public String getShareText(Post post, boolean onlyURL){
-		String url = BASE_URL + "/post/show/" + post.getId();
-		if(onlyURL){
-			return url;
-		}else{
-			String tags = "";
-			for(String s : post.getTags())
-				tags += s + " ";
-			tags = tags.substring(0, tags.length() - 1);
-			return tags + " " + url;
-		}
+	public String getShareText(Post post){
+		return getShareTitle(post) + " " + getShareURL(post);
+	}
+
+	public String getShareTitle(Post post){
+		String tags = "";
+		for(String s : post.getTags())
+			tags += s + " ";
+		return tags.substring(0, tags.length() - 1);
+	}
+
+	public String getShareURL(Post post){
+		return BASE_URL + "/post/show/" + post.getId();
 	}
 
 	private Post[] getPosts(String json) throws JSONException{

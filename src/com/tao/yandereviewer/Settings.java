@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 
 import com.loopj.android.image.WebImageCache;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -31,7 +32,7 @@ public class Settings extends PreferenceActivity{
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.settings);
 
-			SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 			final ListPreference how_view = (ListPreference)findPreference("how_view");
 			how_view.setSummary(getHowViewSummary(pref.getString("how_view", "full")));
@@ -40,6 +41,33 @@ public class Settings extends PreferenceActivity{
 				@Override
 				public boolean onPreferenceChange(Preference preference, Object newValue){
 					how_view.setSummary(getHowViewSummary((String)newValue));
+					return true;
+				}
+			});
+
+			Preference twitter = findPreference("twitter");
+			final String username = pref.getString("twitter_username", "");
+			if(username.equals("")){
+				twitter.setTitle("Twitterと連携");
+			}else{
+				twitter.setTitle("連携を解除");
+				twitter.setSummary(username);
+			}
+			twitter.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+				
+				@Override
+				public boolean onPreferenceClick(Preference preference){
+					if(username.equals("")){
+						startActivity(new Intent(getActivity(), TwitterOAuth.class));
+					}else{
+						pref.edit()
+						.putString("twitter_username", "")
+						.putString("twitter_at", "")
+						.putString("twitter_ats", "")
+						.commit();
+						Toast.makeText(getActivity(), "連携を解除しました", Toast.LENGTH_SHORT).show();
+					}
+					finish();
 					return true;
 				}
 			});

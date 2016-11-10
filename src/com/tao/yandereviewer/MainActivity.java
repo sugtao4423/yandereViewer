@@ -48,6 +48,11 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
 import it.gmariotti.cardslib.library.view.CardGridView;
 import jp.sfapps.partialmatchsearchinarrayadapter.SearchableArrayAdapter;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.AccessToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 import yandere4j.data.Tag;
@@ -69,6 +74,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	private int howView;
 	private String howViewStr;
 	private SQLiteDatabase db;
+
+	private Twitter twitter;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -182,12 +189,21 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				else if(howView == FULL)
 					fileSize += getFileMB(post.getFile().getSize()) + ")";
 
-				IconItem[] items = new IconItem[5];
+				IconItem[] items;
+				if(twitter == null)
+					items = new IconItem[5];
+				else
+					items = new IconItem[6];
 				items[0] = new IconItem(howViewStr == null ? "開く" : howViewStr + fileSize, android.R.drawable.ic_menu_gallery);
 				items[1] = new IconItem("フルサイズをブラウザで開く", android.R.drawable.ic_menu_set_as);
 				items[2] = new IconItem("フルサイズを保存", android.R.drawable.ic_menu_save);
 				items[3] = new IconItem("共有", android.R.drawable.ic_menu_share);
-				items[4] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+				if(twitter != null){
+					items[4] = new IconItem("Twitterで共有", R.drawable.twitter_social_icon_blue);
+					items[5] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+				}else{
+					items[4] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+				}
 
 				IconDialog dialog = new IconDialog(MainActivity.this);
 				dialog.setItems(items, new OnClickListener(){
@@ -233,17 +249,34 @@ public class MainActivity extends Activity implements OnRefreshListener{
 							Intent i = new Intent();
 							i.setAction(Intent.ACTION_SEND);
 							i.setType("text/plain");
-							i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post, false));
+							i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post));
 							startActivity(i);
 						}else if(which == 4){
-							Intent i = new Intent(MainActivity.this, PostDetail.class);
-							i.putExtra("postdata", post);
+							if(twitter == null){
+								detail(post);
+								return;
+							}
+							Intent i = new Intent(MainActivity.this, TweetActivity.class);
+							i.putExtra("post", post);
 							startActivity(i);
+						}else if(which == 5){
+							detail(post);
 						}
 					}
 				}).show();
 			}
+			private void detail(Post post){
+				Intent i = new Intent(MainActivity.this, PostDetail.class);
+				i.putExtra("postdata", post);
+				startActivity(i);
+			}
 		};
+	}
+
+	@Override
+	public void onResume(){
+		super.onResume();
+		loadSettings();
 	}
 
 	public void loadSettings(){
@@ -260,6 +293,17 @@ public class MainActivity extends Activity implements OnRefreshListener{
 			howView = ASK;
 			howViewStr = null;
 			break;
+		}
+
+		if(!pref.getString("twitter_username", "").equals("")){
+			Configuration conf = new ConfigurationBuilder()
+					.setOAuthConsumerKey(getString(R.string.twitter_ck))
+					.setOAuthConsumerSecret(getString(R.string.twitter_cs))
+			.build();
+			AccessToken at = new AccessToken(pref.getString("twitter_at", null), pref.getString("twitter_ats", null));
+			twitter = new TwitterFactory(conf).getInstance(at);
+		}else{
+			twitter = null;
 		}
 	}
 
@@ -347,12 +391,6 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				Toast.makeText(MainActivity.this, "キャンセルしました", Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
-	}
-
-	@Override
-	public void onResume(){
-		super.onResume();
-		loadSettings();
 	}
 
 	@Override

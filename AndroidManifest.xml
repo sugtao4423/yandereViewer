@@ -39,7 +39,30 @@
             android:name="Settings"
             android:configChanges="orientation|screenSize" >
         </activity>
-        <activity android:name="SaveTagActivity" >
+        <activity
+            android:name="SaveTagActivity"
+            android:configChanges="orientation|screenSize" >
+        </activity>
+        <activity
+            android:name="TwitterOAuth"
+            android:configChanges="orientation|screenSize"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="twitter"
+                    android:scheme="yande.re-viewer" >
+                </data>
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="TweetActivity"
+            android:configChanges="orientation|screenSize"
+            android:windowSoftInputMode="adjustResize" >
         </activity>
     </application>
 

@@ -126,7 +126,7 @@ public class PostDetail extends Activity{
 			Intent i = new Intent();
 			i.setAction(Intent.ACTION_SEND);
 			i.setType("text/plain");
-			i.putExtra(Intent.EXTRA_TEXT, new Yandere4j().getShareText(post, false));
+			i.putExtra(Intent.EXTRA_TEXT, new Yandere4j().getShareText(post));
 			startActivity(i);
 		}
 		return super.onOptionsItemSelected(item);
