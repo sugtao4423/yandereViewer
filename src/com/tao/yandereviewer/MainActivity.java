@@ -1,5 +1,6 @@
 package com.tao.yandereviewer;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -278,9 +280,16 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				progDialog.setMessage("Loading...");
 				progDialog.setIndeterminate(false);
 				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				progDialog.setCancelable(true);
 				progDialog.setMax(post.getFile().getSize());
 				progDialog.setProgress(0);
+				progDialog.setCancelable(true);
+				progDialog.setCanceledOnTouchOutside(false);
+				progDialog.setOnCancelListener(new OnCancelListener(){
+					@Override
+					public void onCancel(DialogInterface dialog){
+						cancel(true);
+					}
+				});
 				progDialog.show();
 			}
 
@@ -298,6 +307,15 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					byte[] buffer = new byte[1024];
 					int len;
 					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
+						if(isCancelled()){
+							conn.disconnect();
+							is.close();
+							fos.close();
+							File file = new File(path);
+							if(file.exists())
+								file.delete();
+							break;
+						}
 						fos.write(buffer, 0, len);
 						publishProgress(i * 1024);
 					}
@@ -322,6 +340,11 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					Toast.makeText(MainActivity.this, "保存に失敗しました...", Toast.LENGTH_LONG).show();
 				else
 					Toast.makeText(MainActivity.this, "保存しました", Toast.LENGTH_LONG).show();
+			}
+
+			@Override
+			protected void onCancelled(){
+				Toast.makeText(MainActivity.this, "キャンセルしました", Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
 	}

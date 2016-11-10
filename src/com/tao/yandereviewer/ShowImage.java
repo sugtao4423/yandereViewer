@@ -10,6 +10,8 @@ import com.tenthbit.view.ZoomImageView;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -37,9 +39,17 @@ public class ShowImage extends Activity{
 				progDialog.setMessage("Loading...");
 				progDialog.setIndeterminate(false);
 				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				progDialog.setCancelable(true);
 				progDialog.setMax(size);
 				progDialog.setProgress(0);
+				progDialog.setCancelable(true);
+				progDialog.setCanceledOnTouchOutside(false);
+				progDialog.setOnCancelListener(new OnCancelListener(){
+					@Override
+					public void onCancel(DialogInterface dialog){
+						cancel(true);
+						finish();
+					}
+				});
 				progDialog.show();
 			}
 
@@ -54,6 +64,12 @@ public class ShowImage extends Activity{
 					byte[] buffer = new byte[1024];
 					int len;
 					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
+						if(isCancelled()){
+							conn.disconnect();
+							is.close();
+							bout.close();
+							break;
+						}
 						bout.write(buffer, 0, len);
 						publishProgress(i * 1024);
 					}
@@ -82,6 +98,11 @@ public class ShowImage extends Activity{
 					return;
 				}
 				image.setImageBitmap(bmp);
+			}
+
+			@Override
+			protected void onCancelled(){
+				Toast.makeText(ShowImage.this, "キャンセルしました", Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
 	}
