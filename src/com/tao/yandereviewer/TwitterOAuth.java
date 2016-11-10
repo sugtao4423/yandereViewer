@@ -54,6 +54,7 @@ public class TwitterOAuth extends Activity{
 
 			@Override
 			protected void onPostExecute(Boolean result){
+				progDialog.dismiss();
 				if(result)
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rt.getAuthenticationURL())));
 				else
@@ -95,6 +96,7 @@ public class TwitterOAuth extends Activity{
 
 			@Override
 			protected void onPostExecute(AccessToken accessToken){
+				progDialog.dismiss();
 				if(accessToken != null){
 					PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
 						.putString("twitter_at", accessToken.getToken())

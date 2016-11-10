@@ -29,6 +29,7 @@ import yandere4j.data.Post;
 public class PostDetail extends Activity{
 
 	private Post post;
+	private boolean onIntent;
 
 	private TextView text;
 
@@ -38,6 +39,7 @@ public class PostDetail extends Activity{
 		setContentView(R.layout.post_detail);
 		text = (TextView)findViewById(R.id.postDetail_text);
 		post = (Post)getIntent().getSerializableExtra("postdata");
+		onIntent = getIntent().getBooleanExtra("onIntent", false);
 
 		String tags = "";
 		for(String s : post.getTags())
@@ -117,6 +119,10 @@ public class PostDetail extends Activity{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "共有").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		if(onIntent){
+			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, "サンプルサイズを開く").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			menu.add(Menu.NONE, Menu.FIRST + 2, Menu.NONE, "フルサイズを開く").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+		}
 		return true;
 	}
 
@@ -127,6 +133,16 @@ public class PostDetail extends Activity{
 			i.setAction(Intent.ACTION_SEND);
 			i.setType("text/plain");
 			i.putExtra(Intent.EXTRA_TEXT, new Yandere4j().getShareText(post));
+			startActivity(i);
+		}else if(item.getItemId() == Menu.FIRST + 1){
+			Intent i = new Intent(PostDetail.this, ShowImage.class);
+			i.putExtra("url", post.getSample().getUrl());
+			i.putExtra("filesize", post.getSample().getSize());
+			startActivity(i);
+		}else if(item.getItemId() == Menu.FIRST + 2){
+			Intent i = new Intent(PostDetail.this, ShowImage.class);
+			i.putExtra("url", post.getFile().getUrl());
+			i.putExtra("filesize", post.getFile().getSize());
 			startActivity(i);
 		}
 		return super.onOptionsItemSelected(item);

@@ -31,6 +31,10 @@ public class Yandere4j{
 		return getPosts(getServer(BASE_URL + "/post.json?page=" + page));
 	}
 
+	public Post getPost(long id) throws MalformedURLException, IOException, JSONException{
+		return getPost(new JSONArray(getServer(BASE_URL + "/post.json?tags=id:" + id)).getJSONObject(0));
+	}
+
 	public Tag[] getTags(boolean sortWithId) throws MalformedURLException, JSONException, IOException{
 		Tag[] tags = getTags(getServer(BASE_URL + "/tag.json?limit=0"));
 		if(sortWithId)

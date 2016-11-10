@@ -64,6 +64,27 @@
             android:configChanges="orientation|screenSize"
             android:windowSoftInputMode="adjustResize" >
         </activity>
+        <activity
+            android:name="IntentActivity"
+            android:configChanges="orientation|screenSize" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="yande.re"
+                    android:pathPattern="/post/show/..*"
+                    android:scheme="http" >
+                </data>
+                <data
+                    android:host="yande.re"
+                    android:pathPattern="/post/show/..*"
+                    android:scheme="https" >
+                </data>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
