@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		grid = (CardGridView)findViewById(R.id.grid);
 		grid.setNumColumns(GridView.AUTO_FIT);
 		grid.setVerticalSpacing(15);
-		adapter = new PostAdapter(this);
+		adapter = new PostAdapter(this, getCardClickListener());
 		grid.setAdapter(adapter);
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
@@ -140,10 +140,10 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					return;
 				}
 				yanderePage++;
-				adapter.addAll(result, getCardClickListener());
+				adapter.addAll(result);
 				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
-				adapter.add(load, getCardClickListener());
+				adapter.add(load);
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}

@@ -11,20 +11,22 @@ import yandere4j.data.Post;
 public class PostAdapter extends CardGridArrayAdapter{
 
 	private Context context;
+	private OnCardClickListener listener;
 
-	public PostAdapter(Context context){
+	public PostAdapter(Context context, OnCardClickListener listener){
 		super(context, new ArrayList<Card>());
 		this.context = context;
+		this.listener = listener;
 	}
 
-	public void add(Post post, OnCardClickListener listener){
+	public void add(Post post){
 		PostCard card = new PostCard(context, post);
 		card.setOnClickListener(listener);
 		add(card);
 	}
 
-	public void addAll(Post[] post, OnCardClickListener listener){
+	public void addAll(Post[] post){
 		for(Post p : post)
-			add(p, listener);
+			add(p);
 	}
 }
