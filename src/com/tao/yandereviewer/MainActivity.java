@@ -81,8 +81,10 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		yandere = new Yandere4j();
 		yanderePage = 1;
 		searchQuery = getIntent().getStringExtra("searchQuery");
-		if(searchQuery != null)
-			getActionBar().setTitle("Search: " + searchQuery);
+		if(searchQuery != null){
+			getActionBar().setTitle(searchQuery);
+			getActionBar().setIcon(android.R.drawable.ic_menu_search);
+		}
 
 		db = new TagSQLiteHelper(this).getWritableDatabase();
 
