@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import org.json.JSONException;
 
@@ -14,6 +15,7 @@ import com.tao.icondialog.IconDialog;
 import com.tao.icondialog.IconItem;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,6 +52,10 @@ import yandere4j.data.Tag;
 
 public class MainActivity extends Activity implements OnRefreshListener{
 
+	private static final int SAMPLE = 0;
+	private static final int FULL = 1;
+	private static final int ASK = 2;
+
 	private CardGridView grid;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
@@ -58,7 +64,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	private String searchQuery;
 
 	private SharedPreferences pref;
-	private boolean isShowFullSize;
+	private int howView;
+	private String howViewStr;
 	private SQLiteDatabase db;
 
 	@Override
@@ -167,8 +174,14 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					return;
 				}
 
+				String fileSize = " (";
+				if(howView == SAMPLE)
+					fileSize += getFileMB(post.getSample().getSize()) + ")";
+				else if(howView == FULL)
+					fileSize += getFileMB(post.getFile().getSize()) + ")";
+
 				IconItem[] items = new IconItem[5];
-				items[0] = new IconItem((isShowFullSize ? "フルサイズ" : "サンプルサイズ") + "を表示", android.R.drawable.ic_menu_gallery);
+				items[0] = new IconItem(howViewStr == null ? "開く" : howViewStr + fileSize, android.R.drawable.ic_menu_gallery);
 				items[1] = new IconItem("フルサイズをブラウザで開く", android.R.drawable.ic_menu_set_as);
 				items[2] = new IconItem("フルサイズを保存", android.R.drawable.ic_menu_save);
 				items[3] = new IconItem("共有", android.R.drawable.ic_menu_share);
@@ -180,15 +193,35 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					@Override
 					public void onClick(DialogInterface dialog, int which){
 						if(which == 0){
-							Intent i = new Intent(MainActivity.this, ShowImage.class);
-							if(isShowFullSize){
-								i.putExtra("url", post.getFile().getUrl());
-								i.putExtra("filesize", post.getFile().getSize());
+							final Intent i = new Intent(MainActivity.this, ShowImage.class);
+							if(howViewStr == null){
+								String sampleSize = " (" + getFileMB(post.getSample().getSize()) + ")";
+								String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
+								new AlertDialog.Builder(MainActivity.this)
+								.setItems(new String[]{"サンプルサイズで開く" + sampleSize, "フルサイズで開く" + fullSize}, new OnClickListener(){
+
+									@Override
+									public void onClick(DialogInterface dialog, int which){
+										if(which == 0){
+											i.putExtra("url", post.getSample().getUrl());
+											i.putExtra("filesize", post.getSample().getSize());
+										}else if(which == 1){
+											i.putExtra("url", post.getFile().getUrl());
+											i.putExtra("filesize", post.getFile().getSize());
+										}
+										startActivity(i);
+									}
+								}).show();
 							}else{
-								i.putExtra("url", post.getSample().getUrl());
-								i.putExtra("filesize", post.getSample().getSize());
+								if(howView == SAMPLE){
+									i.putExtra("url", post.getSample().getUrl());
+									i.putExtra("filesize", post.getSample().getSize());
+								}else if(howView == FULL){
+									i.putExtra("url", post.getFile().getUrl());
+									i.putExtra("filesize", post.getFile().getSize());
+								}
+								startActivity(i);
 							}
-							startActivity(i);
 						}else if(which == 1){
 							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 							startActivity(i);
@@ -212,7 +245,27 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	}
 
 	public void loadSettings(){
-		isShowFullSize = pref.getBoolean("isShowFullSize", true);
+		switch(pref.getString("how_view", "full")){
+		case "sample":
+			howView = SAMPLE;
+			howViewStr = "サンプルサイズを表示";
+			break;
+		case "full":
+			howView = FULL;
+			howViewStr = "フルサイズを表示";
+			break;
+		case "ask":
+			howView = ASK;
+			howViewStr = null;
+			break;
+		}
+	}
+
+	public String getFileMB(int filesize){
+		DecimalFormat df = new DecimalFormat("#.#");
+		df.setMinimumFractionDigits(2);
+		df.setMaximumFractionDigits(2);
+		return df.format((double)filesize / 1024 / 1024) + "MB";
 	}
 
 	public void saveImage(final Post post){

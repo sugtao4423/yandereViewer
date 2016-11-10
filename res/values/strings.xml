@@ -3,4 +3,15 @@
 
     <string name="app_name">yande.re viewer</string>
 
+    <string-array name="how_view_entries">
+        <item>サンプルサイズ</item>
+        <item>フルサイズ</item>
+        <item>その都度確認</item>
+    </string-array>
+    <string-array name="how_view_values">
+        <item>sample</item>
+        <item>full</item>
+        <item>ask</item>
+    </string-array>
+
 </resources>
