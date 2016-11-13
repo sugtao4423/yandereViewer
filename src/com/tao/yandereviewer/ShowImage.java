@@ -57,7 +57,7 @@ public class ShowImage extends Activity{
 			protected Bitmap doInBackground(Void... params){
 				try{
 					HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
-					conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+					conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
 					conn.connect();
 					InputStream is = conn.getInputStream();
 					ByteArrayOutputStream bout = new ByteArrayOutputStream();

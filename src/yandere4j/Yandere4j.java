@@ -158,7 +158,7 @@ public class Yandere4j{
 
 	public String getServer(String url) throws MalformedURLException, IOException{
 		HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
-		conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+		conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
 		conn.connect();
 		StringBuffer sb = new StringBuffer();
 		InputStream is = conn.getInputStream();

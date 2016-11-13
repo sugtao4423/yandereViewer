@@ -344,7 +344,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 							Environment.DIRECTORY_DOWNLOADS + "/" + yandere.getFileName(post);
 
 					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
-					conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+					conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
 					conn.connect();
 					InputStream is = conn.getInputStream();
 					FileOutputStream fos = new FileOutputStream(path);
