@@ -8,6 +8,8 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -49,13 +51,19 @@ public class PostDetail extends Activity{
 		getActionBar().setTitle(tags);
 		setActionbarIcon();
 
+		Matcher pixivMatcher = Pattern.compile(
+				"http(s)?://i[0-9].pixiv.net/img-original/img/[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2}/([0-9]+)_p[0-9]+\\..+"
+				).matcher(post.getSource());
+		String source = pixivMatcher.find() ?
+				"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(2) : post.getSource();
+
 		String str = "<p><strong>Statistics</strong><br />" +
 				"Id: " + post.getId() + "<br />" +
 				"Posted: " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.JAPANESE).format(post.getCreatedAt()) +
 							" by " + post.getAuthor() + "<br />" +
 				"Tags: " + tags + "<br />" +
 				"Size: " + post.getFile().getWidth() + "x" + post.getFile().getHeight() + "<br />" +
-				"Source: <a href=\"" + post.getSource() + "\">" + post.getSource() + "</a><br />" +
+				"Source: <a href=\"" + source + "\">" + post.getSource() + "</a><br />" +
 				"Rating: " + post.getRating() + "<br />" +
 				"Score: " + post.getScore() + "<br /><br />" +
 				"<strong>Preview</strong><br />" +
