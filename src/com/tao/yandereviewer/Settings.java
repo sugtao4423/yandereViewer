@@ -23,7 +23,7 @@ public class Settings extends PreferenceActivity{
 		super.onCreate(savedInstanceState);
 
 		getFragmentManager().beginTransaction().replace(android.R.id.content, new MyPreferencesFragment()).commit();
-		getActionBar().setTitle("設定");
+		getActionBar().setTitle(getString(R.string.settings));
 	}
 
 	public class MyPreferencesFragment extends PreferenceFragment{
@@ -48,9 +48,9 @@ public class Settings extends PreferenceActivity{
 			Preference twitter = findPreference("twitter");
 			final String username = pref.getString("twitter_username", "");
 			if(username.equals("")){
-				twitter.setTitle("Twitterと連携");
+				twitter.setTitle(getString(R.string.cooperate_with_twitter));
 			}else{
-				twitter.setTitle("連携を解除");
+				twitter.setTitle(getString(R.string.cancel_collaboration));
 				twitter.setSummary(username);
 			}
 			twitter.setOnPreferenceClickListener(new OnPreferenceClickListener(){
@@ -65,7 +65,7 @@ public class Settings extends PreferenceActivity{
 						.putString("twitter_at", "")
 						.putString("twitter_ats", "")
 						.commit();
-						Toast.makeText(getActivity(), "連携を解除しました", Toast.LENGTH_SHORT).show();
+						Toast.makeText(getActivity(), getString(R.string.cancelled_collaboration), Toast.LENGTH_SHORT).show();
 					}
 					finish();
 					return true;
@@ -73,14 +73,14 @@ public class Settings extends PreferenceActivity{
 			});
 
 			Preference clearCache = findPreference("clearCache");
-			clearCache.setSummary("キャッシュ: " + getCacheSize());
+			clearCache.setSummary(getString(R.string.cache, getCacheSize()));
 			clearCache.setOnPreferenceClickListener(new OnPreferenceClickListener(){
 
 				@Override
 				public boolean onPreferenceClick(Preference preference){
 					new WebImageCache(Settings.this).clear();
-					preference.setSummary("キャッシュ: " + getCacheSize());
-					Toast.makeText(Settings.this, "キャッシュが削除されました", Toast.LENGTH_SHORT).show();
+					preference.setSummary(getString(R.string.cache, getCacheSize()));
+					Toast.makeText(Settings.this, getString(R.string.cache_cleared), Toast.LENGTH_SHORT).show();
 					return true;
 				}
 			});
@@ -96,11 +96,11 @@ public class Settings extends PreferenceActivity{
 		public String getHowViewSummary(String str){
 			switch(str){
 			case "sample":
-				return "サンプルサイズ";
+				return getString(R.string.sample_size);
 			case "full":
-				return "フルサイズ";
+				return getString(R.string.full_size);
 			case "ask":
-				return "その都度確認";
+				return getString(R.string.ask);
 			}
 			return null;
 		}

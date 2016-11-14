@@ -73,9 +73,9 @@ public class TweetActivity extends Activity{
 			@Override
 			protected void onPostExecute(Boolean result){
 				if(!result)
-					Toast.makeText(TweetActivity.this, "ツイートできませんでした", Toast.LENGTH_LONG).show();
+					Toast.makeText(TweetActivity.this, getString(R.string.tweet_failed), Toast.LENGTH_LONG).show();
 				else
-					Toast.makeText(TweetActivity.this, "ツイートしました", Toast.LENGTH_SHORT).show();
+					Toast.makeText(TweetActivity.this, getString(R.string.tweet_success), Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
 		finish();
@@ -101,8 +101,8 @@ public class TweetActivity extends Activity{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		if(editText.getText().toString().length() > 140){
-			menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "元に戻す").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, "短縮").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, getString(R.string.undo)).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, getString(R.string.shorten)).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		}
 		return super.onCreateOptionsMenu(menu);
 	}

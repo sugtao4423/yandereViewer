@@ -154,7 +154,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				else
 					swipeRefresh.setRefreshing(false);
 				if(result == null){
-					Toast.makeText(MainActivity.this, "取得エラー", Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
 					return;
 				}
 				yanderePage++;
@@ -194,15 +194,15 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					items = new IconItem[5];
 				else
 					items = new IconItem[6];
-				items[0] = new IconItem(howViewStr == null ? "開く" : howViewStr + fileSize, android.R.drawable.ic_menu_gallery);
-				items[1] = new IconItem("フルサイズをブラウザで開く", android.R.drawable.ic_menu_set_as);
-				items[2] = new IconItem("フルサイズを保存", android.R.drawable.ic_menu_save);
-				items[3] = new IconItem("共有", android.R.drawable.ic_menu_share);
+				items[0] = new IconItem(howViewStr == null ? getString(R.string.open) : howViewStr + fileSize, android.R.drawable.ic_menu_gallery);
+				items[1] = new IconItem(getString(R.string.open_full_size_on_browser), android.R.drawable.ic_menu_set_as);
+				items[2] = new IconItem(getString(R.string.save_full_size), android.R.drawable.ic_menu_save);
+				items[3] = new IconItem(getString(R.string.share), android.R.drawable.ic_menu_share);
 				if(twitter != null){
-					items[4] = new IconItem("Twitterで共有", R.drawable.twitter_social_icon_blue);
-					items[5] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+					items[4] = new IconItem(getString(R.string.share_on_twitter), R.drawable.twitter_social_icon_blue);
+					items[5] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
 				}else{
-					items[4] = new IconItem("詳細", android.R.drawable.ic_menu_info_details);
+					items[4] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
 				}
 
 				IconDialog dialog = new IconDialog(MainActivity.this);
@@ -216,7 +216,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 								String sampleSize = " (" + getFileMB(post.getSample().getSize()) + ")";
 								String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
 								new AlertDialog.Builder(MainActivity.this)
-								.setItems(new String[]{"サンプルサイズで開く" + sampleSize, "フルサイズで開く" + fullSize}, new OnClickListener(){
+								.setItems(new String[]{getString(R.string.open_sample_size) + sampleSize,
+										getString(R.string.open_full_size) + fullSize}, new OnClickListener(){
 
 									@Override
 									public void onClick(DialogInterface dialog, int which){
@@ -283,11 +284,11 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		switch(pref.getString("how_view", "full")){
 		case "sample":
 			howView = SAMPLE;
-			howViewStr = "サンプルサイズを表示";
+			howViewStr = getString(R.string.view_sample_size);
 			break;
 		case "full":
 			howView = FULL;
-			howViewStr = "フルサイズを表示";
+			howViewStr = getString(R.string.view_full_size);
 			break;
 		case "ask":
 			howView = ASK;
@@ -381,14 +382,14 @@ public class MainActivity extends Activity implements OnRefreshListener{
 			protected void onPostExecute(Boolean result){
 				progDialog.dismiss();
 				if(!result)
-					Toast.makeText(MainActivity.this, "保存に失敗しました...", Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, getString(R.string.save_failed), Toast.LENGTH_LONG).show();
 				else
-					Toast.makeText(MainActivity.this, "保存しました", Toast.LENGTH_LONG).show();
+					Toast.makeText(MainActivity.this, getString(R.string.save_success), Toast.LENGTH_LONG).show();
 			}
 
 			@Override
 			protected void onCancelled(){
-				Toast.makeText(MainActivity.this, "キャンセルしました", Toast.LENGTH_SHORT).show();
+				Toast.makeText(MainActivity.this, getString(R.string.cancelled), Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
 	}

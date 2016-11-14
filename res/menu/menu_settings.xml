@@ -4,6 +4,6 @@
     <item
         android:orderInCategory="2"
         android:showAsAction="ifRoom"
-        android:title="設定"/>
+        android:title="@string/settings"/>
 
 </menu>

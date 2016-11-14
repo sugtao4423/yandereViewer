@@ -7,10 +7,10 @@
         android:icon="@android:drawable/ic_menu_search"
         android:orderInCategory="1"
         android:showAsAction="always|collapseActionView"
-        android:title="検索"/>
+        android:title="@string/search"/>
     <item
         android:orderInCategory="2"
         android:showAsAction="always"
-        android:title="設定"/>
+        android:title="@string/settings"/>
 
 </menu>

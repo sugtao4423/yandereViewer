@@ -56,7 +56,7 @@ public class IntentActivity extends Activity{
 				protected void onPostExecute(Post post){
 					progDialog.dismiss();
 					if(post == null){
-						Toast.makeText(IntentActivity.this, "詳細の取得に失敗しました", Toast.LENGTH_LONG).show();
+						Toast.makeText(IntentActivity.this, getString(R.string.failed_acquire_details), Toast.LENGTH_LONG).show();
 						finish();
 						return;
 					}
@@ -68,7 +68,7 @@ public class IntentActivity extends Activity{
 				}
 			}.execute();
 		}else{
-			Toast.makeText(IntentActivity.this, "正規表現にマッチしませんでした", Toast.LENGTH_LONG).show();
+			Toast.makeText(IntentActivity.this, getString(R.string.did_not_match_regular_expression), Toast.LENGTH_LONG).show();
 			finish();
 		}
 	}

@@ -128,8 +128,8 @@ public class PostDetail extends Activity{
 	public boolean onCreateOptionsMenu(Menu menu){
 		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "共有").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		if(onIntent){
-			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, "サンプルサイズを開く").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
-			menu.add(Menu.NONE, Menu.FIRST + 2, Menu.NONE, "フルサイズを開く").setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, getString(R.string.open_sample_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			menu.add(Menu.NONE, Menu.FIRST + 2, Menu.NONE, getString(R.string.open_full_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		}
 		return true;
 	}

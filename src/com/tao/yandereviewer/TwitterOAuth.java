@@ -58,7 +58,7 @@ public class TwitterOAuth extends Activity{
 				if(result)
 					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rt.getAuthenticationURL())));
 				else
-					Toast.makeText(TwitterOAuth.this, "RequestTokenの取得に失敗しました", Toast.LENGTH_SHORT).show();
+					Toast.makeText(TwitterOAuth.this, getString(R.string.acquisition_of_request_token_failed), Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
 	}
@@ -103,9 +103,9 @@ public class TwitterOAuth extends Activity{
 						.putString("twitter_ats", accessToken.getTokenSecret())
 						.putString("twitter_username", "@" + accessToken.getScreenName())
 					.commit();
-					Toast.makeText(TwitterOAuth.this, "連携しました", Toast.LENGTH_LONG).show();
+					Toast.makeText(TwitterOAuth.this, getString(R.string.cooperated), Toast.LENGTH_LONG).show();
 				}else{
-					Toast.makeText(TwitterOAuth.this, "アクセストークンの取得に失敗しました", Toast.LENGTH_LONG).show();
+					Toast.makeText(TwitterOAuth.this, getString(R.string.acquisition_of_access_token_failed), Toast.LENGTH_LONG).show();
 				}
 				finish();
 			}

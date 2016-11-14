@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="search">検索</string>
+    <string name="settings">設定</string>
+    <string name="image_display_method">画像の表示方法</string>
+    <string name="cooperate_with_twitter">Twitterと連携</string>
+    <string name="cooperated">連携しました</string>
+    <string name="cancel_collaboration">連携を解除</string>
+    <string name="cancelled_collaboration">連携を解除しました</string>
+    <string name="cache">キャッシュ: %1$s</string>
+    <string name="cache_clear">キャッシュクリア</string>
+    <string name="cache_cleared">キャッシュが削除されました</string>
+    <string name="sample_size">サンプルサイズ</string>
+    <string name="full_size">フルサイズ</string>
+    <string name="ask">その都度確認</string>
+
+    <string-array name="how_view_entries">
+        <item>サンプルサイズ</item>
+        <item>フルサイズ</item>
+        <item>その都度確認</item>
+    </string-array>
+    <string-array name="how_view_values">
+        <item>sample</item>
+        <item>full</item>
+        <item>ask</item>
+    </string-array>
+
+    <string name="get_error">取得エラー</string>
+    <string name="open">開く</string>
+    <string name="open_full_size_on_browser">フルサイズをブラウザで開く</string>
+    <string name="save_full_size">フルサイズを保存</string>
+    <string name="share">共有</string>
+    <string name="share_on_twitter">Twitterで共有</string>
+    <string name="detail">詳細</string>
+    <string name="open_sample_size">サンプルサイズで開く</string>
+    <string name="open_full_size">フルサイズで開く</string>
+    <string name="view_sample_size">サンプルサイズを表示</string>
+    <string name="view_full_size">フルサイズを表示</string>
+    <string name="save_success">保存しました</string>
+    <string name="save_failed">保存に失敗しました…</string>
+    <string name="cancelled">キャンセルしました</string>
+    <string name="failed_acquire_details">詳細の取得に失敗しました</string>
+    <string name="did_not_match_regular_expression">正規表現にマッチしませんでした</string>
+    <string name="could_not_open">開けませんでした…</string>
+    <string name="tweet_success">ツイートしました</string>
+    <string name="tweet_failed">ツイートできませんでした…</string>
+    <string name="shorten">短縮</string>
+    <string name="undo">元に戻す</string>
+    <string name="acquisition_of_request_token_failed">RequestTokenの取得に失敗しました…</string>
+    <string name="acquisition_of_access_token_failed">アクセストークンの取得に失敗しました…</string>
+
+</resources>

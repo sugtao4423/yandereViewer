@@ -93,7 +93,7 @@ public class ShowImage extends Activity{
 			protected void onPostExecute(Bitmap bmp){
 				progDialog.dismiss();
 				if(bmp == null){
-					Toast.makeText(ShowImage.this, "開けませんでした...", Toast.LENGTH_LONG).show();
+					Toast.makeText(ShowImage.this, getString(R.string.could_not_open), Toast.LENGTH_LONG).show();
 					finish();
 					return;
 				}
@@ -102,7 +102,7 @@ public class ShowImage extends Activity{
 
 			@Override
 			protected void onCancelled(){
-				Toast.makeText(ShowImage.this, "キャンセルしました", Toast.LENGTH_SHORT).show();
+				Toast.makeText(ShowImage.this, getString(R.string.cancelled), Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
 	}

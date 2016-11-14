@@ -5,11 +5,11 @@
         android:entries="@array/how_view_entries"
         android:entryValues="@array/how_view_values"
         android:key="how_view"
-        android:title="画像の表示方法" />
+        android:title="@string/image_display_method" />
 
     <Preference android:key="twitter" />
     <Preference
         android:key="clearCache"
-        android:title="キャッシュクリア" />
+        android:title="@string/cache_clear" />
 
 </PreferenceScreen>
