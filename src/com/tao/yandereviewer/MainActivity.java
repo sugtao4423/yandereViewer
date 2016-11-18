@@ -1,11 +1,6 @@
 package com.tao.yandereviewer;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
@@ -22,14 +17,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
@@ -245,7 +238,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 							startActivity(i);
 						}else if(which == 2){
-							saveImage(post);
+							((App)getApplicationContext()).saveImage(MainActivity.this, post);
 						}else if(which == 3){
 							Intent i = new Intent();
 							i.setAction(Intent.ACTION_SEND);
@@ -313,85 +306,6 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		df.setMinimumFractionDigits(2);
 		df.setMaximumFractionDigits(2);
 		return df.format((double)filesize / 1024 / 1024) + "MB";
-	}
-
-	public void saveImage(final Post post){
-		new AsyncTask<Void, Integer, Boolean>(){
-			private ProgressDialog progDialog;
-
-			@Override
-			protected void onPreExecute(){
-				progDialog = new ProgressDialog(MainActivity.this);
-				progDialog.setMessage("Loading...");
-				progDialog.setIndeterminate(false);
-				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				progDialog.setMax(post.getFile().getSize());
-				progDialog.setProgress(0);
-				progDialog.setCancelable(true);
-				progDialog.setCanceledOnTouchOutside(false);
-				progDialog.setOnCancelListener(new OnCancelListener(){
-					@Override
-					public void onCancel(DialogInterface dialog){
-						cancel(true);
-					}
-				});
-				progDialog.show();
-			}
-
-			@Override
-			protected Boolean doInBackground(Void... params){
-				try{
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
-							Environment.DIRECTORY_DOWNLOADS + "/" + yandere.getFileName(post);
-
-					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
-					conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
-					conn.connect();
-					InputStream is = conn.getInputStream();
-					FileOutputStream fos = new FileOutputStream(path);
-					byte[] buffer = new byte[1024];
-					int len;
-					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
-						if(isCancelled()){
-							conn.disconnect();
-							is.close();
-							fos.close();
-							File file = new File(path);
-							if(file.exists())
-								file.delete();
-							break;
-						}
-						fos.write(buffer, 0, len);
-						publishProgress(i * 1024);
-					}
-					fos.close();
-					is.close();
-					conn.disconnect();
-					return true;
-				}catch(IOException e){
-					return false;
-				}
-			}
-
-			@Override
-			protected void onProgressUpdate(Integer... val){
-				progDialog.setProgress(val[0]);
-			}
-
-			@Override
-			protected void onPostExecute(Boolean result){
-				progDialog.dismiss();
-				if(!result)
-					Toast.makeText(MainActivity.this, getString(R.string.save_failed), Toast.LENGTH_LONG).show();
-				else
-					Toast.makeText(MainActivity.this, getString(R.string.save_success), Toast.LENGTH_LONG).show();
-			}
-
-			@Override
-			protected void onCancelled(){
-				Toast.makeText(MainActivity.this, getString(R.string.cancelled), Toast.LENGTH_SHORT).show();
-			}
-		}.execute();
 	}
 
 	@Override

@@ -130,6 +130,7 @@ public class PostDetail extends Activity{
 		if(onIntent){
 			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, getString(R.string.open_sample_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			menu.add(Menu.NONE, Menu.FIRST + 2, Menu.NONE, getString(R.string.open_full_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
+			menu.add(Menu.NONE, Menu.FIRST + 3, Menu.NONE, getString(R.string.save_full_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 		}
 		return true;
 	}
@@ -152,6 +153,8 @@ public class PostDetail extends Activity{
 			i.putExtra("url", post.getFile().getUrl());
 			i.putExtra("filesize", post.getFile().getSize());
 			startActivity(i);
+		}else if(item.getItemId() == Menu.FIRST + 3){
+			((App)getApplicationContext()).saveImage(PostDetail.this, post);
 		}
 		return super.onOptionsItemSelected(item);
 	}
