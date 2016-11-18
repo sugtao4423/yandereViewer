@@ -7,6 +7,7 @@
     <string name="cooperate_with_twitter">Twitterと連携</string>
     <string name="cooperated">連携しました</string>
     <string name="cancel_collaboration">連携を解除</string>
+    <string name="cancel_collaboration_really">本当によろしいですか？</string>
     <string name="cancelled_collaboration">連携を解除しました</string>
     <string name="cache">キャッシュ: %1$s</string>
     <string name="cache_clear">キャッシュクリア</string>

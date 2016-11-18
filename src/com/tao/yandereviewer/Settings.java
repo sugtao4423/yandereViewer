@@ -4,6 +4,9 @@ import java.text.DecimalFormat;
 
 import com.loopj.android.image.WebImageCache;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -59,15 +62,27 @@ public class Settings extends PreferenceActivity{
 				public boolean onPreferenceClick(Preference preference){
 					if(username.equals("")){
 						startActivity(new Intent(getActivity(), TwitterOAuth.class));
+						finish();
 					}else{
-						pref.edit()
-						.putString("twitter_username", "")
-						.putString("twitter_at", "")
-						.putString("twitter_ats", "")
-						.commit();
-						Toast.makeText(getActivity(), getString(R.string.cancelled_collaboration), Toast.LENGTH_SHORT).show();
+						new AlertDialog.Builder(getActivity())
+						.setTitle(getString(R.string.cancel_collaboration))
+						.setMessage(getString(R.string.cancel_collaboration_really))
+						.setPositiveButton("OK", new OnClickListener(){
+
+							@Override
+							public void onClick(DialogInterface dialog, int which){
+								pref.edit()
+								.putString("twitter_username", "")
+								.putString("twitter_at", "")
+								.putString("twitter_ats", "")
+								.commit();
+								Toast.makeText(getActivity(), getString(R.string.cancelled_collaboration), Toast.LENGTH_SHORT).show();
+								finish();
+							}
+						})
+						.setNegativeButton("Cancell", null)
+						.show();
 					}
-					finish();
 					return true;
 				}
 			});
