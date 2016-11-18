@@ -18,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
+import yandere4j.Yandere4j;
 
 public class ShowImage extends Activity{
 
@@ -57,7 +58,7 @@ public class ShowImage extends Activity{
 			protected Bitmap doInBackground(Void... params){
 				try{
 					HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
-					conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
+					conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
 					conn.connect();
 					InputStream is = conn.getInputStream();
 					ByteArrayOutputStream bout = new ByteArrayOutputStream();

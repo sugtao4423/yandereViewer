@@ -50,7 +50,7 @@ public class App extends Application{
 							Environment.DIRECTORY_DOWNLOADS + "/" + new Yandere4j().getFileName(post);
 
 					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
-					conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
+					conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
 					conn.connect();
 					InputStream is = conn.getInputStream();
 					FileOutputStream fos = new FileOutputStream(path);

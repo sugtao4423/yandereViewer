@@ -25,7 +25,9 @@ import yandere4j.data.Tag;
 
 public class Yandere4j{
 
-	private static String BASE_URL = "https://yande.re";
+	public static final String USER_AGENT = "yande.re viewer https://github.com/sugtao4423/yandereViewer";
+
+	private static final String BASE_URL = "https://yande.re";
 
 	public Post[] getPosts(int page) throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
 		return getPosts(getServer(BASE_URL + "/post.json?page=" + page));
@@ -158,7 +160,7 @@ public class Yandere4j{
 
 	public String getServer(String url) throws MalformedURLException, IOException{
 		HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
-		conn.setRequestProperty("User-Agent", "yande.re viewer https://github.com/sugtao4423/yandereViewer");
+		conn.setRequestProperty("User-Agent", USER_AGENT);
 		conn.connect();
 		StringBuffer sb = new StringBuffer();
 		InputStream is = conn.getInputStream();
