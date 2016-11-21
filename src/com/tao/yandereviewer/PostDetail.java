@@ -21,6 +21,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,9 +58,11 @@ public class PostDetail extends Activity{
 		String source = pixivMatcher.find() ?
 				"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(2) : post.getSource();
 
+		String date = DateFormat.getDateFormat(getApplicationContext()).format(post.getCreatedAt());
+
 		String str = "<p><strong>Statistics</strong><br />" +
 				"Id: " + post.getId() + "<br />" +
-				"Posted: " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.JAPANESE).format(post.getCreatedAt()) +
+				"Posted: " + date + " " + new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(post.getCreatedAt()) +
 							" by " + post.getAuthor() + "<br />" +
 				"Tags: " + tags + "<br />" +
 				"Size: " + post.getFile().getWidth() + "x" + post.getFile().getHeight() + "<br />" +
