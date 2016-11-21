@@ -45,6 +45,18 @@ public class DBUtils{
 		return result;
 	}
 
+	public ArrayList<String> loadTagNamesAsArrayList(){
+		ArrayList<String> result = new ArrayList<String>();
+		Cursor c = db.rawQuery("select name from tags", null);
+		boolean mov = c.moveToFirst();
+		while(mov){
+			result.add(c.getString(0));
+			mov = c.moveToNext();
+		}
+		c.close();
+		return result;
+	}
+
 	public void close(){
 		db.close();
 	}

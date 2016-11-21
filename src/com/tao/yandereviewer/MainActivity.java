@@ -48,7 +48,6 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
-import yandere4j.data.Tag;
 
 public class MainActivity extends Activity implements OnRefreshListener{
 
@@ -315,15 +314,15 @@ public class MainActivity extends Activity implements OnRefreshListener{
 			final ClearableMultiAutoCompleteTextView cmactv =
 					(ClearableMultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
 			cmactv.setEnabled(false);
-			new AsyncTask<Void, Void, Tag[]>(){
+			new AsyncTask<Void, Void, ArrayList<String>>(){
 
 				@Override
-				protected Tag[] doInBackground(Void... params){
-					return new DBUtils(db).loadTags();
+				protected ArrayList<String> doInBackground(Void... params){
+					return new DBUtils(db).loadTagNamesAsArrayList();
 				}
 
 				@Override
-				protected void onPostExecute(Tag[] result){
+				protected void onPostExecute(ArrayList<String> result){
 					prepareSuggest(result, cmactv);
 					cmactv.setEnabled(true);
 				}
@@ -334,11 +333,17 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	public void prepareSuggest(final Tag[] tags, final ClearableMultiAutoCompleteTextView cmactv){
-		ArrayList<String> tagNames = new ArrayList<String>();
-		for(int i = 0; i < tags.length; i++)
-			tagNames.add(tags[i].getName());
-		SearchableArrayAdapter<String> adapter = new SearchableArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, tagNames);
+	public void prepareSuggest(final ArrayList<String> tags, final ClearableMultiAutoCompleteTextView cmactv){
+		ArrayList<SearchItem> suggestItems = new ArrayList<SearchItem>();
+
+		String[] searchHistory = pref.getString("searchHistory", "").split(",");
+		for(String s : searchHistory)
+			suggestItems.add(new SearchItem(s, SearchItem.HISTORY));
+
+		for(int i = 0; i < tags.size(); i++)
+			suggestItems.add(new SearchItem(tags.get(i), SearchItem.TAG));
+
+		final SearchableArrayAdapter<SearchItem> adapter = new SearchableArrayAdapter<SearchItem>(getApplicationContext(), R.layout.item_dialog_icontext, R.id.dialog_text, suggestItems);
 		adapter.setHighLightColor("#2196F3");
 		cmactv.setAdapter(adapter);
 		cmactv.setHint("Search post from tag");
@@ -349,6 +354,22 @@ public class MainActivity extends Activity implements OnRefreshListener{
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
 				if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)){
 					String query = cmactv.getText().toString();
+					query = query.replaceAll("\\s+$", "");
+
+					ArrayList<String> history = new ArrayList<String>();
+					for(String s : pref.getString("searchHistory", "").split(",", 0)){
+						if(!s.isEmpty())
+							history.add(s);
+					}
+					if(history.indexOf(query) == -1 && tags.indexOf(query) == -1){
+						history.add(query);
+						String result = "";
+						for(String s : history)
+							result += s + ",";
+						pref.edit().putString("searchHistory", result).commit();
+						adapter.insert(new SearchItem(query, SearchItem.HISTORY), 0);
+					}
+
 					Intent i = new Intent(getApplicationContext(), MainActivity.class);
 					i.putExtra("searchQuery", query);
 					startActivity(i);

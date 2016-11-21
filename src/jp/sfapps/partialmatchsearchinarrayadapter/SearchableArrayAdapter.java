@@ -22,6 +22,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+
+import com.tao.yandereviewer.R;
+import com.tao.yandereviewer.SearchItem;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
@@ -42,6 +46,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 /**
@@ -382,7 +387,8 @@ public class SearchableArrayAdapter<T>extends BaseAdapter implements Filterable,
 	 * {@inheritDoc}
 	 */
 	public View getView(int position, View convertView, ViewGroup parent){
-		return createViewFromResource(mInflater, position, convertView, parent, mResource);
+		//return createViewFromResource(mInflater, position, convertView, parent, mResource);
+		return createHistoryView(position, convertView, parent, mResource);
 	}
 
 	private View createViewFromResource(LayoutInflater inflater, int position, View convertView, ViewGroup parent, int resource){
@@ -417,6 +423,34 @@ public class SearchableArrayAdapter<T>extends BaseAdapter implements Filterable,
 		// }
 		// Add SFApps
 		text.setText(highlight(item.toString()));
+
+		return view;
+	}
+
+	private View createHistoryView(int position, View convertView, ViewGroup parent, int resource){
+		View view;
+		TextView text;
+		ImageView icon;
+
+		if(convertView == null)
+			view = mInflater.inflate(resource, parent, false);
+		else
+			view = convertView;
+
+		if(mFieldId == 0){
+			throw new NullPointerException();
+		}else{
+			text = (TextView)view.findViewById(mFieldId);
+			icon = (ImageView)view.findViewById(R.id.dialog_image);
+		}
+
+		T item = getItem(position);
+
+		text.setText(highlight(item.toString()));
+		if(((SearchItem)item).getKind() == SearchItem.TAG)
+			icon.setImageResource(R.drawable.ic_menu_attachment);
+		else
+			icon.setImageResource(android.R.drawable.ic_menu_recent_history);
 
 		return view;
 	}
