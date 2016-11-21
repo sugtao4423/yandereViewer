@@ -20,6 +20,16 @@ import yandere4j.data.Post;
 
 public class App extends Application{
 
+	private boolean clearedHistory = false;
+
+	public void setClearedHistory(boolean clearedHistory){
+		this.clearedHistory = clearedHistory;
+	}
+
+	public boolean getClearedHistory(){
+		return clearedHistory;
+	}
+
 	public void saveImage(final Context context, final Post post){
 		new AsyncTask<Void, Integer, Boolean>(){
 			private ProgressDialog progDialog;

@@ -55,11 +55,14 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	private static final int FULL = 1;
 	private static final int ASK = 2;
 
+	private App app;
+
 	private CardGridView grid;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
 	private Yandere4j yandere;
 	private int yanderePage;
+	private SearchableArrayAdapter<SearchItem> searchableAdapter;
 	private String searchQuery;
 
 	private SharedPreferences pref;
@@ -83,6 +86,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
 		swipeRefresh.setOnRefreshListener(this);
 
+		app = (App)getApplicationContext();
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
 		loadSettings();
 
@@ -237,7 +241,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 							startActivity(i);
 						}else if(which == 2){
-							((App)getApplicationContext()).saveImage(MainActivity.this, post);
+							app.saveImage(MainActivity.this, post);
 						}else if(which == 3){
 							Intent i = new Intent();
 							i.setAction(Intent.ACTION_SEND);
@@ -270,6 +274,10 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	public void onResume(){
 		super.onResume();
 		loadSettings();
+		if(app.getClearedHistory() && searchQuery == null){
+			invalidateOptionsMenu();
+			app.setClearedHistory(false);
+		}
 	}
 
 	public void loadSettings(){
@@ -343,9 +351,9 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		for(int i = 0; i < tags.size(); i++)
 			suggestItems.add(new SearchItem(tags.get(i), SearchItem.TAG));
 
-		final SearchableArrayAdapter<SearchItem> adapter = new SearchableArrayAdapter<SearchItem>(getApplicationContext(), R.layout.item_dialog_icontext, R.id.dialog_text, suggestItems);
-		adapter.setHighLightColor("#2196F3");
-		cmactv.setAdapter(adapter);
+		searchableAdapter = new SearchableArrayAdapter<SearchItem>(getApplicationContext(), R.layout.item_dialog_icontext, R.id.dialog_text, suggestItems);
+		searchableAdapter.setHighLightColor("#2196F3");
+		cmactv.setAdapter(searchableAdapter);
 		cmactv.setHint("Search post from tag");
 		cmactv.setTokenizer(new SpaceTokenizer());
 		cmactv.setOnEditorActionListener(new OnEditorActionListener(){
@@ -367,7 +375,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 						for(String s : history)
 							result += s + ",";
 						pref.edit().putString("searchHistory", result).commit();
-						adapter.insert(new SearchItem(query, SearchItem.HISTORY), 0);
+						searchableAdapter.insert(new SearchItem(query, SearchItem.HISTORY), 0);
 					}
 
 					Intent i = new Intent(getApplicationContext(), MainActivity.class);

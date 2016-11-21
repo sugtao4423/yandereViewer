@@ -13,6 +13,8 @@
     <string name="cache">Cache: %1$s</string>
     <string name="cache_clear">Clear Cache</string>
     <string name="cache_cleared">Cache Cleared</string>
+    <string name="history_clear">Clear History</string>
+    <string name="history_cleared">History Cleared</string>
     <string name="sample_size">Sample Size</string>
     <string name="full_size">Full Size</string>
     <string name="ask">Ask</string>

@@ -12,6 +12,8 @@
     <string name="cache">キャッシュ: %1$s</string>
     <string name="cache_clear">キャッシュクリア</string>
     <string name="cache_cleared">キャッシュが削除されました</string>
+    <string name="history_clear">検索履歴を削除</string>
+    <string name="history_cleared">検索履歴を削除しました</string>
     <string name="sample_size">サンプルサイズ</string>
     <string name="full_size">フルサイズ</string>
     <string name="ask">その都度確認</string>

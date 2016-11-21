@@ -87,6 +87,28 @@ public class Settings extends PreferenceActivity{
 				}
 			});
 
+			Preference clearHistory = findPreference("clearHistory");
+			clearHistory.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+
+				@Override
+				public boolean onPreferenceClick(Preference preference){
+					new AlertDialog.Builder(getActivity())
+					.setTitle(getString(R.string.history_clear))
+					.setMessage(getString(R.string.cancel_collaboration_really))
+					.setNegativeButton("Cancel", null)
+					.setPositiveButton("OK", new OnClickListener(){
+
+						@Override
+						public void onClick(DialogInterface dialog, int which){
+							SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+							((App)getApplicationContext()).setClearedHistory(pref.edit().remove("searchHistory").commit());
+							Toast.makeText(getActivity(), getString(R.string.history_cleared), Toast.LENGTH_SHORT).show();
+						}
+					}).show();
+					return true;
+				}
+			});
+
 			Preference clearCache = findPreference("clearCache");
 			clearCache.setSummary(getString(R.string.cache, getCacheSize()));
 			clearCache.setOnPreferenceClickListener(new OnPreferenceClickListener(){

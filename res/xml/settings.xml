@@ -9,6 +9,9 @@
 
     <Preference android:key="twitter" />
     <Preference
+        android:key="clearHistory"
+        android:title="@string/history_clear" />
+    <Preference
         android:key="clearCache"
         android:title="@string/cache_clear" />
 
