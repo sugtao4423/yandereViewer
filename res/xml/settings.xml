@@ -9,6 +9,9 @@
 
     <Preference android:key="twitter" />
     <Preference
+        android:key="changeSaveDir"
+        android:title="@string/changeSaveDir" />
+    <Preference
         android:key="clearHistory"
         android:title="@string/history_clear" />
     <Preference

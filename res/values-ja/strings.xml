@@ -9,6 +9,7 @@
     <string name="cancel_collaboration">連携を解除</string>
     <string name="cancel_collaboration_really">本当によろしいですか？</string>
     <string name="cancelled_collaboration">連携を解除しました</string>
+    <string name="changeSaveDir">保存先の変更</string>
     <string name="cache">キャッシュ: %1$s</string>
     <string name="cache_clear">キャッシュクリア</string>
     <string name="cache_cleared">キャッシュが削除されました</string>

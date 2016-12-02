@@ -10,6 +10,7 @@
     <string name="cancel_collaboration">Cancel Collaboration</string>
     <string name="cancel_collaboration_really">Really?</string>
     <string name="cancelled_collaboration">Cancelled Collaboration</string>
+    <string name="changeSaveDir">Change Save Directory</string>
     <string name="cache">Cache: %1$s</string>
     <string name="cache_clear">Clear Cache</string>
     <string name="cache_cleared">Cache Cleared</string>

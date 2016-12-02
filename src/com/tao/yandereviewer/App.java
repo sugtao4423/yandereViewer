@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
@@ -56,8 +57,10 @@ public class App extends Application{
 			@Override
 			protected Boolean doInBackground(Void... params){
 				try{
-					String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
-							Environment.DIRECTORY_DOWNLOADS + "/" + new Yandere4j().getFileName(post);
+					String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+							Environment.DIRECTORY_DOWNLOADS + "/";
+					String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString("saveDir", defaultPath);
+					String path = saveDir + new Yandere4j().getFileName(post);
 
 					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
 					conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);

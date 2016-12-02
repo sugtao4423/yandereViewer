@@ -1,5 +1,6 @@
 package com.tao.yandereviewer;
 
+import java.io.File;
 import java.text.DecimalFormat;
 
 import com.loopj.android.image.WebImageCache;
@@ -10,6 +11,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -17,6 +19,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 public class Settings extends PreferenceActivity{
@@ -83,6 +86,48 @@ public class Settings extends PreferenceActivity{
 						.setNegativeButton("Cancell", null)
 						.show();
 					}
+					return true;
+				}
+			});
+
+			final Preference changeSaveDir = findPreference("changeSaveDir");
+			final String defaultDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+					Environment.DIRECTORY_DOWNLOADS + "/";
+			changeSaveDir.setSummary(pref.getString("saveDir", defaultDir));
+			changeSaveDir.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+
+				@Override
+				public boolean onPreferenceClick(Preference preference){
+					final EditText dirText = new EditText(getActivity());
+					String currentDir = pref.getString("saveDir", defaultDir);
+					dirText.setText(currentDir);
+
+					new AlertDialog.Builder(getActivity())
+					.setTitle(getString(R.string.changeSaveDir))
+					.setView(dirText)
+					.setNegativeButton("Cancel", null)
+					.setNeutralButton("Default", new OnClickListener(){
+
+						@Override
+						public void onClick(DialogInterface dialog, int which){
+							if(pref.edit().putString("saveDir", defaultDir).commit())
+								changeSaveDir.setSummary(defaultDir);
+						}
+					})
+					.setPositiveButton("OK", new OnClickListener(){
+
+						@Override
+						public void onClick(DialogInterface dialog, int which){
+							String current = dirText.getText().toString();
+							if(!current.endsWith("/"))
+								current += "/";
+							File fDir = new File(current);
+							if(!fDir.exists())
+								fDir.mkdirs();
+							if(pref.edit().putString("saveDir", current).commit())
+								changeSaveDir.setSummary(current);
+						}
+					}).show();
 					return true;
 				}
 			});
