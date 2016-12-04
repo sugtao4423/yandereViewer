@@ -19,14 +19,14 @@ public class PostAdapter extends CardGridArrayAdapter{
 		this.listener = listener;
 	}
 
-	public void add(Post post){
-		PostCard card = new PostCard(context, post);
+	public void add(Post post, long readedId){
+		PostCard card = new PostCard(context, post, readedId);
 		card.setOnClickListener(listener);
 		add(card);
 	}
 
-	public void addAll(Post[] post){
+	public void addAll(Post[] post, long readedId){
 		for(Post p : post)
-			add(p);
+			add(p, readedId);
 	}
 }

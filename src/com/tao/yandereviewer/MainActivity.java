@@ -153,11 +153,13 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
 					return;
 				}
-				yanderePage++;
-				adapter.addAll(result);
+				adapter.addAll(result, pref.getLong("readedId", -1));
 				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
-				adapter.add(load);
+				adapter.add(load, -1);
+				if(yanderePage == 1 && searchQuery == null)
+					pref.edit().putLong("readedId", result[0].getId()).commit();
+				yanderePage++;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}

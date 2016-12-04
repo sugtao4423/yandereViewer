@@ -15,10 +15,11 @@
 
     <TextView
         android:id="@+id/imageSize"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/postImage"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp" />
+        android:layout_marginTop="5dp"
+        android:gravity="center" />
 
 </RelativeLayout>
