@@ -65,7 +65,8 @@ public class PostAdapter extends CardGridArrayMultiChoiceAdapter{
 			ArrayList<Post> posts = new ArrayList<Post>();
 			for(Card c : getSelectedCards())
 				posts.add(((PostCard)c).getPost());
-			((App)activity.getApplicationContext()).saveImage(activity, posts);
+			((App)activity.getApplicationContext()).saveImages(activity, posts);
+			mode.finish();
 			return true;
 		}
 		return false;

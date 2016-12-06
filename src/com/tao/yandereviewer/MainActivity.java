@@ -245,9 +245,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 							startActivity(i);
 						}else if(which == 2){
-							ArrayList<Post> arr = new ArrayList<Post>();
-							arr.add(post);
-							app.saveImage(MainActivity.this, arr);
+							app.saveImage(MainActivity.this, post);
 						}else if(which == 3){
 							Intent i = new Intent();
 							i.setAction(Intent.ACTION_SEND);

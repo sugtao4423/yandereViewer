@@ -9,10 +9,15 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -32,7 +37,7 @@ public class App extends Application{
 		return clearedHistory;
 	}
 
-	public void saveImage(final Context context, final ArrayList<Post> posts){
+	public void saveImage(final Context context, final Post post){
 		new AsyncTask<Void, Integer, Boolean>(){
 			private ProgressDialog progDialog;
 
@@ -42,10 +47,7 @@ public class App extends Application{
 				progDialog.setMessage("Saving...");
 				progDialog.setIndeterminate(false);
 				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				int max = 0;
-				for(Post p : posts)
-					max += p.getFile().getSize();
-				progDialog.setMax(max);
+				progDialog.setMax(post.getFile().getSize());
 				progDialog.setProgress(0);
 				progDialog.setCancelable(true);
 				progDialog.setCanceledOnTouchOutside(false);
@@ -64,36 +66,31 @@ public class App extends Application{
 					String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 							Environment.DIRECTORY_DOWNLOADS + "/";
 					String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString("saveDir", defaultPath);
-					int savedSize = 0;
-					for(int count = 0; count < posts.size(); count++){
-						Post post = posts.get(count);
-						String path = saveDir + new Yandere4j().getFileName(post);
-	
-						HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
-						conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
-						conn.connect();
-						InputStream is = conn.getInputStream();
-						FileOutputStream fos = new FileOutputStream(path);
-						byte[] buffer = new byte[1024];
-						int len;
-						while((len = is.read(buffer)) > 0){
-							if(isCancelled()){
-								conn.disconnect();
-								is.close();
-								fos.close();
-								File file = new File(path);
-								if(file.exists())
-									file.delete();
-								break;
-							}
-							fos.write(buffer, 0, len);
-							savedSize += 1024;
-							publishProgress(savedSize);
+					String path = saveDir + new Yandere4j().getFileName(post);
+
+					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
+					conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
+					conn.connect();
+					InputStream is = conn.getInputStream();
+					FileOutputStream fos = new FileOutputStream(path);
+					byte[] buffer = new byte[1024];
+					int len;
+					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
+						if(isCancelled()){
+							conn.disconnect();
+							is.close();
+							fos.close();
+							File file = new File(path);
+							if(file.exists())
+								file.delete();
+							break;
 						}
-						fos.close();
-						is.close();
-						conn.disconnect();
+						fos.write(buffer, 0, len);
+						publishProgress(i * 1024);
 					}
+					fos.close();
+					is.close();
+					conn.disconnect();
 					return true;
 				}catch(IOException e){
 					return false;
@@ -119,5 +116,74 @@ public class App extends Application{
 				Toast.makeText(context, getString(R.string.cancelled), Toast.LENGTH_SHORT).show();
 			}
 		}.execute();
+	}
+
+	public void saveImages(final Context context, final ArrayList<Post> saveList){
+		final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+		String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
+				Environment.DIRECTORY_DOWNLOADS + "/";
+		final String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString("saveDir", defaultPath);
+
+		new AsyncTask<Void, Void, Void>(){
+
+			@Override
+			protected Void doInBackground(Void... params){
+				for(int i = 0; i < saveList.size(); i++){
+					Post current = saveList.get(i);
+					Notification.Builder builder = new Notification.Builder(context);
+					builder.setContentTitle("Saving... " + (i + 1) + "/" + saveList.size())
+					.setContentText(new Yandere4j().getFileName(current))
+					.setSmallIcon(android.R.drawable.stat_sys_download)
+					.setProgress(current.getFile().getSize(), 0, false)
+					.setOngoing(true);
+					nm.notify(i, builder.build());
+
+					String path = saveDir + new Yandere4j().getFileName(current);
+
+					try{
+						HttpURLConnection conn = (HttpURLConnection)new URL(current.getFile().getUrl()).openConnection();
+						conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
+						conn.connect();
+						InputStream is = conn.getInputStream();
+						FileOutputStream fos = new FileOutputStream(path);
+						byte[] buffer = new byte[1024];
+						int len;
+						for(int j = 0; (len = is.read(buffer)) > 0; ++j){
+							fos.write(buffer, 0, len);
+							builder.setProgress(current.getFile().getSize(), j * 1024, false);
+							nm.notify(i, builder.build());
+						}
+						fos.close();
+						is.close();
+						conn.disconnect();
+					}catch(IOException e){
+						File f = new File(path);
+						if(f.exists())
+							f.delete();
+						String url = "https://yande.re/post/show/" + current.getId();
+						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+						PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, 0);
+						builder.setProgress(0, 0, false)
+						.setContentTitle(getString(R.string.save_failed) + " " + (i + 1) + "/" + saveList.size())
+						.setSmallIcon(android.R.drawable.stat_sys_download_done)
+						.setOngoing(false)
+						.setContentIntent(pendingIntent);
+						nm.notify(i, builder.build());
+						continue;
+					}
+					Intent picIntent = new Intent(Intent.ACTION_VIEW);
+					picIntent.setDataAndType(Uri.fromFile(new File(path)), "image/*");
+					PendingIntent contentIntent = PendingIntent.getActivity(context, 1, picIntent, 0);
+					builder.setProgress(0, 0, false)
+					.setContentTitle(getString(R.string.save_success) + " " + (i + 1) + "/" + saveList.size())
+					.setSmallIcon(android.R.drawable.stat_sys_download_done)
+					.setOngoing(false)
+					.setContentIntent(contentIntent)
+					.setAutoCancel(true);
+					nm.notify(i, builder.build());
+				}
+				return null;
+			}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 }
