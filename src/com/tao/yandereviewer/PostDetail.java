@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -157,7 +158,9 @@ public class PostDetail extends Activity{
 			i.putExtra("filesize", post.getFile().getSize());
 			startActivity(i);
 		}else if(item.getItemId() == Menu.FIRST + 3){
-			((App)getApplicationContext()).saveImage(PostDetail.this, post);
+			ArrayList<Post> arr = new ArrayList<Post>();
+			arr.add(post);
+			((App)getApplicationContext()).saveImage(PostDetail.this, arr);
 		}
 		return super.onOptionsItemSelected(item);
 	}

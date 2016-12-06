@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import android.app.Application;
 import android.app.ProgressDialog;
@@ -31,7 +32,7 @@ public class App extends Application{
 		return clearedHistory;
 	}
 
-	public void saveImage(final Context context, final Post post){
+	public void saveImage(final Context context, final ArrayList<Post> posts){
 		new AsyncTask<Void, Integer, Boolean>(){
 			private ProgressDialog progDialog;
 
@@ -41,7 +42,10 @@ public class App extends Application{
 				progDialog.setMessage("Saving...");
 				progDialog.setIndeterminate(false);
 				progDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-				progDialog.setMax(post.getFile().getSize());
+				int max = 0;
+				for(Post p : posts)
+					max += p.getFile().getSize();
+				progDialog.setMax(max);
 				progDialog.setProgress(0);
 				progDialog.setCancelable(true);
 				progDialog.setCanceledOnTouchOutside(false);
@@ -60,31 +64,36 @@ public class App extends Application{
 					String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 							Environment.DIRECTORY_DOWNLOADS + "/";
 					String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString("saveDir", defaultPath);
-					String path = saveDir + new Yandere4j().getFileName(post);
-
-					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
-					conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
-					conn.connect();
-					InputStream is = conn.getInputStream();
-					FileOutputStream fos = new FileOutputStream(path);
-					byte[] buffer = new byte[1024];
-					int len;
-					for(int i = 0; (len = is.read(buffer)) > 0; ++i){
-						if(isCancelled()){
-							conn.disconnect();
-							is.close();
-							fos.close();
-							File file = new File(path);
-							if(file.exists())
-								file.delete();
-							break;
+					int savedSize = 0;
+					for(int count = 0; count < posts.size(); count++){
+						Post post = posts.get(count);
+						String path = saveDir + new Yandere4j().getFileName(post);
+	
+						HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
+						conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT);
+						conn.connect();
+						InputStream is = conn.getInputStream();
+						FileOutputStream fos = new FileOutputStream(path);
+						byte[] buffer = new byte[1024];
+						int len;
+						while((len = is.read(buffer)) > 0){
+							if(isCancelled()){
+								conn.disconnect();
+								is.close();
+								fos.close();
+								File file = new File(path);
+								if(file.exists())
+									file.delete();
+								break;
+							}
+							fos.write(buffer, 0, len);
+							savedSize += 1024;
+							publishProgress(savedSize);
 						}
-						fos.write(buffer, 0, len);
-						publishProgress(i * 1024);
+						fos.close();
+						is.close();
+						conn.disconnect();
 					}
-					fos.close();
-					is.close();
-					conn.disconnect();
 					return true;
 				}catch(IOException e){
 					return false;

@@ -34,6 +34,7 @@ import android.view.View.OnAttachStateChangeListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
@@ -81,6 +82,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		grid.setVerticalSpacing(15);
 		adapter = new PostAdapter(this, getCardClickListener());
 		grid.setAdapter(adapter);
+		grid.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
 		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
@@ -243,7 +245,9 @@ public class MainActivity extends Activity implements OnRefreshListener{
 							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 							startActivity(i);
 						}else if(which == 2){
-							app.saveImage(MainActivity.this, post);
+							ArrayList<Post> arr = new ArrayList<Post>();
+							arr.add(post);
+							app.saveImage(MainActivity.this, arr);
 						}else if(which == 3){
 							Intent i = new Intent();
 							i.setAction(Intent.ACTION_SEND);
