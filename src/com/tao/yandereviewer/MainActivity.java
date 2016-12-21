@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	private PostAdapter adapter;
 	private Yandere4j yandere;
 	private int yanderePage;
+	private long readedId;
 	private SearchableArrayAdapter<SearchItem> searchableAdapter;
 	private String searchQuery;
 
@@ -94,6 +95,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 		yandere = new Yandere4j();
 		yanderePage = 1;
+		readedId = pref.getLong("readedId", -1);
 		searchQuery = getIntent().getStringExtra("searchQuery");
 		if(searchQuery != null){
 			getActionBar().setTitle(searchQuery);
@@ -155,7 +157,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
 					return;
 				}
-				adapter.addAll(result, pref.getLong("readedId", -1));
+				adapter.addAll(result, readedId);
 				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
 				adapter.add(load, -1);
