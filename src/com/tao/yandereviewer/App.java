@@ -134,7 +134,7 @@ public class App extends Application{
 					builder.setContentTitle("Saving... " + (i + 1) + "/" + saveList.size())
 					.setContentText(new Yandere4j().getFileName(current))
 					.setSmallIcon(android.R.drawable.stat_sys_download)
-					.setProgress(current.getFile().getSize(), 0, false)
+					.setProgress(100, 0, false)
 					.setOngoing(true);
 					nm.notify(i, builder.build());
 
@@ -148,10 +148,15 @@ public class App extends Application{
 						FileOutputStream fos = new FileOutputStream(path);
 						byte[] buffer = new byte[1024];
 						int len;
+						int percentage = 0;
 						for(int j = 0; (len = is.read(buffer)) > 0; ++j){
 							fos.write(buffer, 0, len);
-							builder.setProgress(current.getFile().getSize(), j * 1024, false);
-							nm.notify(i, builder.build());
+							int currentPer = Math.round((float)j * 1024 / current.getFile().getSize() * 100);
+							if(percentage != currentPer){
+								builder.setProgress(100, currentPer, false);
+								nm.notify(i, builder.build());
+								percentage = currentPer;
+							}
 						}
 						fos.close();
 						is.close();
