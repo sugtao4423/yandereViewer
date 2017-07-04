@@ -59,13 +59,13 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		 * 'whitespace' will be ignored.
 		 * 
 		 * @param view
-		 * - View the user tapped.
+		 *            - View the user tapped.
 		 * @param x
-		 * - where the user tapped from the of the Drawable, as
-		 * percentage of the Drawable width.
+		 *            - where the user tapped from the of the Drawable, as
+		 *            percentage of the Drawable width.
 		 * @param y
-		 * - where the user tapped from the top of the Drawable, as
-		 * percentage of the Drawable height.
+		 *            - where the user tapped from the top of the Drawable, as
+		 *            percentage of the Drawable height.
 		 */
 		public void onPhotoTap(View view, float x, float y);
 	}
@@ -83,11 +83,11 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		 * 'whitespace' will not be ignored.
 		 * 
 		 * @param view
-		 * - View the user tapped.
+		 *            - View the user tapped.
 		 * @param x
-		 * - where the user tapped from the left of the View.
+		 *            - where the user tapped from the left of the View.
 		 * @param y
-		 * - where the user tapped from the top of the View.
+		 *            - where the user tapped from the top of the View.
 		 */
 		public void onViewTap(View view, float x, float y);
 	}
@@ -128,7 +128,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		}
 
 		public boolean onTouchEvent(MotionEvent event){
-			if(gestureDetector.onTouchEvent(event)) {
+			if(gestureDetector.onTouchEvent(event)){
 				return true;
 			}
 
@@ -149,9 +149,9 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			/*
 			 * If the pointer count has changed cancel the drag
 			 */
-			if(pointerCount != lastPointerCount) {
+			if(pointerCount != lastPointerCount){
 				isDragging = false;
-				if(velocityTracker != null) {
+				if(velocityTracker != null){
 					velocityTracker.clear();
 				}
 				lastTouchX = x;
@@ -161,7 +161,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 			switch(event.getAction()){
 			case MotionEvent.ACTION_DOWN:
-				if(velocityTracker == null) {
+				if(velocityTracker == null){
 					velocityTracker = VelocityTracker.obtain();
 				}else{
 					velocityTracker.clear();
@@ -176,14 +176,14 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			case MotionEvent.ACTION_MOVE:{
 				final float dx = x - lastTouchX, dy = y - lastTouchY;
 
-				if(isDragging == false) {
+				if(isDragging == false){
 					// Use Pythagoras to see if drag length is larger than
 					// touch slop
 					isDragging = Math.sqrt((dx * dx) + (dy * dy)) >= scaledTouchSlop;
 				}
 
-				if(isDragging) {
-					if(getDrawable() != null) {
+				if(isDragging){
+					if(getDrawable() != null){
 						suppMatrix.postTranslate(dx, dy);
 						checkAndDisplayMatrix();
 
@@ -198,11 +198,11 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 						 * against the edge, aka 'overscrolling', let the
 						 * parent take over).
 						 */
-						if(allowParentInterceptOnEdge && !multiGestureDetector.isScaling()) {
+						if(allowParentInterceptOnEdge && !multiGestureDetector.isScaling()){
 							if((scrollEdge == EDGE_BOTH) || ((scrollEdge == EDGE_LEFT) && (dx >= 1f))
-									|| ((scrollEdge == EDGE_RIGHT) && (dx <= -1f))) {
+									|| ((scrollEdge == EDGE_RIGHT) && (dx <= -1f))){
 
-								if(getParent() != null) {
+								if(getParent() != null){
 									getParent().requestDisallowInterceptTouchEvent(false);
 								}
 							}
@@ -212,35 +212,38 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 					lastTouchX = x;
 					lastTouchY = y;
 
-					if(velocityTracker != null) {
+					if(velocityTracker != null){
 						velocityTracker.addMovement(event);
 					}
 				}
 				break;
 			}
 			case MotionEvent.ACTION_UP:{
-				if(isDragging) {
+				if(isDragging){
 					lastTouchX = x;
 					lastTouchY = y;
 
 					// Compute velocity within the last 1000ms
-					velocityTracker.addMovement(event);
-					velocityTracker.computeCurrentVelocity(1000);
+					if(velocityTracker != null){
+						velocityTracker.addMovement(event);
+						velocityTracker.computeCurrentVelocity(1000);
 
-					final float vX = velocityTracker.getXVelocity(), vY = velocityTracker.getYVelocity();
+						final float vX = velocityTracker.getXVelocity(), vY = velocityTracker.getYVelocity();
 
-					// If the velocity is greater than minVelocity perform
-					// a fling
-					if((Math.max(Math.abs(vX), Math.abs(vY)) >= scaledMinimumFlingVelocity) && (getDrawable() != null)) {
-						currentFlingRunnable = new FlingRunnable(getContext());
-						currentFlingRunnable.fling(getWidth(), getHeight(), (int)-vX, (int)-vY);
-						post(currentFlingRunnable);
+						// If the velocity is greater than minVelocity perform
+						// a fling
+						if((Math.max(Math.abs(vX), Math.abs(vY)) >= scaledMinimumFlingVelocity) && (getDrawable() != null)){
+							currentFlingRunnable = new FlingRunnable(getContext());
+							currentFlingRunnable.fling(getWidth(), getHeight(), (int)-vX, (int)-vY);
+							post(currentFlingRunnable);
+						}
 					}
 				}
+				break;
 			}
 			case MotionEvent.ACTION_CANCEL:
 				lastPointerCount = 0;
-				if(velocityTracker != null) {
+				if(velocityTracker != null){
 					velocityTracker.recycle();
 					velocityTracker = null;
 				}
@@ -256,7 +259,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			float scaleFactor = detector.getScaleFactor();
 
 			if((getDrawable() != null)
-					&& (!(((scale >= maxScale) && (scaleFactor > 1f)) || ((scale <= 0.75) && (scaleFactor < 1f))))) {
+					&& (!(((scale >= maxScale) && (scaleFactor > 1f)) || ((scale <= 0.75) && (scaleFactor < 1f))))){
 				suppMatrix.postScale(scaleFactor, scaleFactor, detector.getFocusX(), detector.getFocusY());
 				checkAndDisplayMatrix();
 			}
@@ -280,9 +283,9 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 				float x = event.getX();
 				float y = event.getY();
 
-				if(scale < midScale) {
+				if(scale < midScale){
 					post(new AnimatedZoomRunnable(scale, midScale, x, y));
-				}else if((scale >= midScale) && (scale < maxScale)) {
+				}else if((scale >= midScale) && (scale < maxScale)){
 					post(new AnimatedZoomRunnable(scale, maxScale, x, y));
 				}else{
 					post(new AnimatedZoomRunnable(scale, minScale, x, y));
@@ -302,14 +305,14 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 		@Override
 		public boolean onSingleTapConfirmed(MotionEvent event){
-			if(photoTapListener != null) {
+			if(photoTapListener != null){
 				final RectF displayRect = getDisplayRect();
 
-				if(null != displayRect) {
+				if(null != displayRect){
 					final float x = event.getX(), y = event.getY();
 
 					// Check to see if the user tapped on the photo
-					if(displayRect.contains(x, y)) {
+					if(displayRect.contains(x, y)){
 
 						float xResult = (x - displayRect.left) / displayRect.width();
 						float yResult = (y - displayRect.top) / displayRect.height();
@@ -319,7 +322,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 					}
 				}
 			}
-			if(viewTapListener != null) {
+			if(viewTapListener != null){
 				viewTapListener.onViewTap(ZoomImageView.this, event.getX(), event.getY());
 			}
 
@@ -328,7 +331,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 		@Override
 		public void onLongPress(MotionEvent e){
-			if(longClickListener != null) {
+			if(longClickListener != null){
 				longClickListener.onLongClick(ZoomImageView.this);
 			}
 		}
@@ -349,7 +352,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		private Object scroller;
 
 		public ScrollerProxy(Context context){
-			if(VERSION.SDK_INT < VERSION_CODES.GINGERBREAD) {
+			if(VERSION.SDK_INT < VERSION_CODES.GINGERBREAD){
 				isOld = true;
 				scroller = new Scroller(context);
 			}else{
@@ -364,7 +367,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 		public void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY, int overX, int overY){
 
-			if(isOld) {
+			if(isOld){
 				((Scroller)scroller).fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
 			}else{
 				((OverScroller)scroller).fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, overX, overY);
@@ -372,7 +375,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		}
 
 		public void forceFinished(boolean finished){
-			if(isOld) {
+			if(isOld){
 				((Scroller)scroller).forceFinished(finished);
 			}else{
 				((OverScroller)scroller).forceFinished(finished);
@@ -458,7 +461,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 	/**
 	 * @return The current minimum scale level. What this value represents
-	 * depends on the current {@link android.widget.ImageView.ScaleType}
+	 *         depends on the current {@link android.widget.ImageView.ScaleType}
 	 */
 	public float getMinScale(){
 		return minScale;
@@ -475,7 +478,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 	/**
 	 * @return The current middle scale level. What this value represents
-	 * depends on the current {@link android.widget.ImageView.ScaleType}
+	 *         depends on the current {@link android.widget.ImageView.ScaleType}
 	 */
 	public float getMidScale(){
 		return midScale;
@@ -492,7 +495,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 	/**
 	 * @return The current maximum scale level. What this value represents
-	 * depends on the current {@link android.widget.ImageView.ScaleType}
+	 *         depends on the current {@link android.widget.ImageView.ScaleType}
 	 */
 	public float getMaxScale(){
 		return maxScale;
@@ -531,15 +534,15 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * this {@link android.widget.ImageView.ScaleType}.
 	 * 
 	 * @param scaleType
-	 * - The desired scaling mode.
+	 *            - The desired scaling mode.
 	 */
 	@Override
 	public final void setScaleType(ScaleType scaleType){
-		if(scaleType == ScaleType.MATRIX) {
+		if(scaleType == ScaleType.MATRIX){
 			throw new IllegalArgumentException(scaleType.name() + " is not supported in ZoomImageView");
 		}
 
-		if(scaleType != this.scaleType) {
+		if(scaleType != this.scaleType){
 			this.scaleType = scaleType;
 			update();
 		}
@@ -559,7 +562,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * When disable the ImageView reverts to using the FIT_CENTER matrix.
 	 * 
 	 * @param isZoomEnabled
-	 * - Whether the zoom functionality is enabled.
+	 *            - Whether the zoom functionality is enabled.
 	 */
 	public final void setIsZoomEnabled(boolean isZoomEnabled){
 		this.isZoomEnabled = isZoomEnabled;
@@ -603,7 +606,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * is long-pressed.
 	 * 
 	 * @param listener
-	 * - Listener to be registered.
+	 *            - Listener to be registered.
 	 */
 	@Override
 	public final void setOnLongClickListener(OnLongClickListener listener){
@@ -615,7 +618,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * is tapped with a single tap.
 	 * 
 	 * @param listener
-	 * - Listener to be registered.
+	 *            - Listener to be registered.
 	 */
 	public final void setOnPhotoTapListener(OnPhotoTapListener listener){
 		photoTapListener = listener;
@@ -626,7 +629,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * tap.
 	 * 
 	 * @param listener
-	 * - Listener to be registered.
+	 *            - Listener to be registered.
 	 */
 	public final void setOnViewTapListener(OnViewTapListener listener){
 		viewTapListener = listener;
@@ -634,7 +637,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 	@Override
 	public final void onGlobalLayout(){
-		if(isZoomEnabled) {
+		if(isZoomEnabled){
 			final int top = getTop();
 			final int right = getRight();
 			final int bottom = getBottom();
@@ -647,7 +650,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			 * work, keeping track of the ImageView's bounds and then checking
 			 * if the values change.
 			 */
-			if((top != this.top) || (bottom != this.bottom) || (left != this.left) || (right != this.right)) {
+			if((top != this.top) || (bottom != this.bottom) || (left != this.left) || (right != this.right)){
 				// Update our base matrix, as the bounds have changed
 				updateBaseMatrix(getDrawable());
 
@@ -664,18 +667,18 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	public final boolean onTouch(View v, MotionEvent ev){
 		boolean handled = false;
 
-		if(isZoomEnabled) {
+		if(isZoomEnabled){
 			switch(ev.getAction()){
 			case MotionEvent.ACTION_DOWN:
 				// First, disable the Parent from intercepting the touch
 				// event
-				if(v.getParent() != null) {
+				if(v.getParent() != null){
 					v.getParent().requestDisallowInterceptTouchEvent(true);
 				}
 
 				// If we're flinging, and the user presses down, cancel
 				// fling
-				if(currentFlingRunnable != null) {
+				if(currentFlingRunnable != null){
 					currentFlingRunnable.cancelFling();
 					currentFlingRunnable = null;
 				}
@@ -685,9 +688,9 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			case MotionEvent.ACTION_UP:
 				// If the user has zoomed less than min scale, zoom back
 				// to min scale
-				if(getScale() < minScale) {
+				if(getScale() < minScale){
 					RectF rect = getDisplayRect();
-					if(null != rect) {
+					if(null != rect){
 						v.post(new AnimatedZoomRunnable(getScale(), minScale, rect.centerX(), rect.centerY()));
 						handled = true;
 					}
@@ -696,7 +699,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			}
 
 			// Finally, try the scale/drag/tap detector
-			if((multiGestureDetector != null) && multiGestureDetector.onTouchEvent(ev)) {
+			if((multiGestureDetector != null) && multiGestureDetector.onTouchEvent(ev)){
 				handled = true;
 			}
 		}
@@ -726,7 +729,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	}
 
 	private final void update(){
-		if(isZoomEnabled) {
+		if(isZoomEnabled){
 			super.setScaleType(ScaleType.MATRIX);
 			updateBaseMatrix(getDrawable());
 		}else{
@@ -744,7 +747,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 	private void checkMatrixBounds(){
 		final RectF rect = getDisplayRect(getDisplayMatrix());
-		if(null == rect) {
+		if(null == rect){
 			return;
 		}
 
@@ -752,7 +755,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		float deltaX = 0, deltaY = 0;
 
 		final int viewHeight = getHeight();
-		if(height <= viewHeight) {
+		if(height <= viewHeight){
 			switch(scaleType){
 			case FIT_START:
 				deltaY = -rect.top;
@@ -764,14 +767,14 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 				deltaY = ((viewHeight - height) / 2) - rect.top;
 				break;
 			}
-		}else if(rect.top > 0) {
+		}else if(rect.top > 0){
 			deltaY = -rect.top;
-		}else if(rect.bottom < viewHeight) {
+		}else if(rect.bottom < viewHeight){
 			deltaY = viewHeight - rect.bottom;
 		}
 
 		final int viewWidth = getWidth();
-		if(width <= viewWidth) {
+		if(width <= viewWidth){
 			switch(scaleType){
 			case FIT_START:
 				deltaX = -rect.left;
@@ -784,10 +787,10 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 				break;
 			}
 			scrollEdge = EDGE_BOTH;
-		}else if(rect.left > 0) {
+		}else if(rect.left > 0){
 			scrollEdge = EDGE_LEFT;
 			deltaX = -rect.left;
-		}else if(rect.right < viewWidth) {
+		}else if(rect.right < viewWidth){
 			deltaX = viewWidth - rect.right;
 			scrollEdge = EDGE_RIGHT;
 		}else{
@@ -802,12 +805,12 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * Helper method that maps the supplied Matrix to the current Drawable
 	 * 
 	 * @param matrix
-	 * - Matrix to map Drawable against
+	 *            - Matrix to map Drawable against
 	 * @return RectF - Displayed Rectangle
 	 */
 	private RectF getDisplayRect(Matrix matrix){
 		Drawable d = getDrawable();
-		if(null != d) {
+		if(null != d){
 			displayRect.set(0, 0, d.getIntrinsicWidth(), d.getIntrinsicHeight());
 			matrix.mapRect(displayRect);
 			return displayRect;
@@ -829,10 +832,10 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	 * Calculate Matrix for FIT_CENTER
 	 * 
 	 * @param d
-	 * - Drawable being displayed
+	 *            - Drawable being displayed
 	 */
 	private void updateBaseMatrix(Drawable d){
-		if(null == d) {
+		if(null == d){
 			return;
 		}
 
@@ -846,15 +849,15 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 		final float widthScale = viewWidth / drawableWidth;
 		final float heightScale = viewHeight / drawableHeight;
 
-		if(scaleType == ScaleType.CENTER) {
+		if(scaleType == ScaleType.CENTER){
 			baseMatrix.postTranslate((viewWidth - drawableWidth) / 2F, (viewHeight - drawableHeight) / 2F);
 
-		}else if(scaleType == ScaleType.CENTER_CROP) {
+		}else if(scaleType == ScaleType.CENTER_CROP){
 			float scale = Math.max(widthScale, heightScale);
 			baseMatrix.postScale(scale, scale);
 			baseMatrix.postTranslate((viewWidth - (drawableWidth * scale)) / 2F, (viewHeight - (drawableHeight * scale)) / 2F);
 
-		}else if(scaleType == ScaleType.CENTER_INSIDE) {
+		}else if(scaleType == ScaleType.CENTER_INSIDE){
 			float scale = Math.min(1.0f, Math.min(widthScale, heightScale));
 			baseMatrix.postScale(scale, scale);
 			baseMatrix.postTranslate((viewWidth - (drawableWidth * scale)) / 2F, (viewHeight - (drawableHeight * scale)) / 2F);
@@ -890,7 +893,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	private void postOnAnimation(View view, Runnable runnable){
-		if(VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN) {
+		if(VERSION.SDK_INT >= VERSION_CODES.JELLY_BEAN){
 			view.postOnAnimation(runnable);
 		}else{
 			view.postDelayed(runnable, 16);
@@ -898,9 +901,9 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 	}
 
 	private void checkZoomLevels(float minZoom, float midZoom, float maxZoom){
-		if(minZoom >= midZoom) {
+		if(minZoom >= midZoom){
 			throw new IllegalArgumentException("MinZoom should be less than MidZoom");
-		}else if(midZoom >= maxZoom) {
+		}else if(midZoom >= maxZoom){
 			throw new IllegalArgumentException("MidZoom should be less than MaxZoom");
 		}
 	}
@@ -919,7 +922,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			this.focalX = focalX;
 			this.focalY = focalY;
 
-			if(currentZoom < targetZoom) {
+			if(currentZoom < targetZoom){
 				deltaScale = ANIMATION_SCALE_PER_ITERATION_IN;
 			}else{
 				deltaScale = ANIMATION_SCALE_PER_ITERATION_OUT;
@@ -932,7 +935,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 			final float currentScale = getScale();
 
-			if(((deltaScale > 1f) && (currentScale < targetZoom)) || ((deltaScale < 1f) && (targetZoom < currentScale))) {
+			if(((deltaScale > 1f) && (currentScale < targetZoom)) || ((deltaScale < 1f) && (targetZoom < currentScale))){
 				// We haven't hit our target scale yet, so post ourselves
 				// again
 				postOnAnimation(ZoomImageView.this, this);
@@ -961,14 +964,14 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 
 		public void fling(int viewWidth, int viewHeight, int velocityX, int velocityY){
 			final RectF rect = getDisplayRect();
-			if(null == rect) {
+			if(null == rect){
 				return;
 			}
 
 			final int startX = Math.round(-rect.left);
 			final int minX, maxX, minY, maxY;
 
-			if(viewWidth < rect.width()) {
+			if(viewWidth < rect.width()){
 				minX = 0;
 				maxX = Math.round(rect.width() - viewWidth);
 			}else{
@@ -976,7 +979,7 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			}
 
 			final int startY = Math.round(-rect.top);
-			if(viewHeight < rect.height()) {
+			if(viewHeight < rect.height()){
 				minY = 0;
 				maxY = Math.round(rect.height() - viewHeight);
 			}else{
@@ -987,14 +990,14 @@ public class ZoomImageView extends ImageView implements View.OnTouchListener, Vi
 			currentY = startY;
 
 			// If we actually can move, fling the scroller
-			if((startX != maxX) || (startY != maxY)) {
+			if((startX != maxX) || (startY != maxY)){
 				scroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY, 0, 0);
 			}
 		}
 
 		@Override
 		public void run(){
-			if(scroller.computeScrollOffset()) {
+			if(scroller.computeScrollOffset()){
 				final int newX = scroller.getCurrX();
 				final int newY = scroller.getCurrY();
 

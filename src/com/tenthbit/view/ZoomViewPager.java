@@ -18,7 +18,6 @@
  *******************************************************************************/
 package com.tenthbit.view;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -54,7 +53,6 @@ public class ZoomViewPager extends ViewPager{
 		}
 	}
 
-	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(MotionEvent event){
 		try{
