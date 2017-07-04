@@ -200,11 +200,11 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				items[1] = new IconItem(getString(R.string.open_full_size_on_browser), android.R.drawable.ic_menu_set_as);
 				items[2] = new IconItem(getString(R.string.save_full_size), android.R.drawable.ic_menu_save);
 				items[3] = new IconItem(getString(R.string.share), android.R.drawable.ic_menu_share);
-				if(twitter != null){
+				if(twitter == null){
+					items[4] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
+				}else{
 					items[4] = new IconItem(getString(R.string.share_on_twitter), R.drawable.twitter_social_icon_blue);
 					items[5] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
-				}else{
-					items[4] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
 				}
 
 				IconDialog dialog = new IconDialog(MainActivity.this);
@@ -212,8 +212,10 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 					@Override
 					public void onClick(DialogInterface dialog, int which){
-						if(which == 0){
-							final Intent i = new Intent(MainActivity.this, ShowImage.class);
+						final Intent i;
+						switch(which){
+						case 0:
+							i = new Intent(MainActivity.this, ShowImage.class);
 							if(howViewStr == null){
 								String sampleSize = " (" + getFileMB(post.getSample().getSize()) + ")";
 								String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
@@ -243,27 +245,33 @@ public class MainActivity extends Activity implements OnRefreshListener{
 								}
 								startActivity(i);
 							}
-						}else if(which == 1){
-							Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
+							break;
+						case 1:
+							i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
 							startActivity(i);
-						}else if(which == 2){
+							break;
+						case 2:
 							app.saveImage(MainActivity.this, post);
-						}else if(which == 3){
-							Intent i = new Intent();
+							break;
+						case 3:
+							i = new Intent();
 							i.setAction(Intent.ACTION_SEND);
 							i.setType("text/plain");
 							i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post));
 							startActivity(i);
-						}else if(which == 4){
+							break;
+						case 4:
 							if(twitter == null){
 								detail(post);
 								return;
 							}
-							Intent i = new Intent(MainActivity.this, TweetActivity.class);
+							i = new Intent(MainActivity.this, TweetActivity.class);
 							i.putExtra("post", post);
 							startActivity(i);
-						}else if(which == 5){
+							break;
+						case 5:
 							detail(post);
+							break;
 						}
 					}
 				}).show();
