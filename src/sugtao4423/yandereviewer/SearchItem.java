@@ -1,4 +1,4 @@
-package com.tao.yandereviewer;
+package sugtao4423.yandereviewer;
 
 public class SearchItem{
 

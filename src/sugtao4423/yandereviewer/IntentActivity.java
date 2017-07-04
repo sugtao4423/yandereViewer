@@ -1,4 +1,4 @@
-package com.tao.yandereviewer;
+package sugtao4423.yandereviewer;
 
 import java.io.IOException;
 import java.util.regex.Matcher;

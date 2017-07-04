@@ -1,4 +1,4 @@
-package com.tao.yandereviewer;
+package sugtao4423.yandereviewer;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -6,9 +6,6 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import org.json.JSONException;
-
-import com.tao.icondialog.IconDialog;
-import com.tao.icondialog.IconItem;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -42,6 +39,8 @@ import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
 import it.gmariotti.cardslib.library.view.CardGridView;
 import jp.sfapps.partialmatchsearchinarrayadapter.SearchableArrayAdapter;
+import sugtao4423.icondialog.IconDialog;
+import sugtao4423.icondialog.IconItem;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;

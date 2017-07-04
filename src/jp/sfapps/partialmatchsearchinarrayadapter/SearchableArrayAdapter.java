@@ -23,9 +23,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import com.tao.yandereviewer.R;
-import com.tao.yandereviewer.SearchItem;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
@@ -48,6 +45,8 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+import sugtao4423.yandereviewer.R;
+import sugtao4423.yandereviewer.SearchItem;
 
 /**
  * A concrete BaseAdapter that is backed by an array of arbitrary

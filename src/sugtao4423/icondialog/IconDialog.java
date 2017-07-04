@@ -1,6 +1,4 @@
-package com.tao.icondialog;
-
-import com.tao.yandereviewer.R;
+package sugtao4423.icondialog;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -14,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import sugtao4423.yandereviewer.R;
 
 public class IconDialog{
 

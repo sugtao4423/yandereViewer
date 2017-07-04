@@ -1,4 +1,4 @@
-package com.tao.yandereviewer;
+package sugtao4423.yandereviewer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

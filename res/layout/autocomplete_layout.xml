@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <com.tao.yandereviewer.ClearableMultiAutoCompleteTextView
+    <sugtao4423.yandereviewer.ClearableMultiAutoCompleteTextView
         android:id="@+id/cactv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,6 +13,6 @@
         android:inputType="textAutoComplete|textAutoCorrect" >
 
         <requestFocus />
-    </com.tao.yandereviewer.ClearableMultiAutoCompleteTextView>
+    </sugtao4423.yandereviewer.ClearableMultiAutoCompleteTextView>
 
 </LinearLayout>

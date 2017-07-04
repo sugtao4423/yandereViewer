@@ -1,4 +1,4 @@
-package com.tao.yandereviewer;
+package sugtao4423.yandereviewer;
 
 import android.text.SpannableString;
 import android.text.Spanned;

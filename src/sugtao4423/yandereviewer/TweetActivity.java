@@ -1,4 +1,4 @@
-package com.tao.yandereviewer;
+package sugtao4423.yandereviewer;
 
 import android.app.Activity;
 import android.content.SharedPreferences;

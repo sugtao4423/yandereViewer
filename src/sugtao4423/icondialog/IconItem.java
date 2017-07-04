@@ -1,4 +1,4 @@
-package com.tao.icondialog;
+package sugtao4423.icondialog;
 
 public class IconItem{
 
