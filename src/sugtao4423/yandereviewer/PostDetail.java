@@ -52,12 +52,17 @@ public class PostDetail extends Activity{
 		getActionBar().setTitle(tags);
 		setActionbarIcon();
 
-		Matcher pixivMatcher = Pattern.compile(
-				"http(s)?://(i[0-9].pixiv|i.pximg).net/img-original/img/[0-9]{4}/([0-9]{2}/){5}([0-9]+)_p[0-9]+\\..+"
-				).matcher(post.getSource());
-		String source = pixivMatcher.find() ?
-				"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(4) : post.getSource();
-
+		String source;
+		Matcher urlMatcher = Pattern.compile("http(s)?://([\\w-]+\\.)+[\\w-]+(/[\\w- ./?%&=]*)?").matcher(post.getSource());
+		if(urlMatcher.find()){
+			Matcher pixivMatcher = Pattern.compile(
+					"http(s)?://(i[0-9].pixiv|i.pximg).net/img-original/img/[0-9]{4}/([0-9]{2}/){5}([0-9]+)_p[0-9]+\\..+")
+					.matcher(post.getSource());
+			source = pixivMatcher.find() ?
+					"http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(4) : post.getSource();
+		}else{
+			source = "http://google.com/search?q=" + post.getSource();
+		}
 		String date = DateFormat.getDateFormat(getApplicationContext()).format(post.getCreatedAt());
 
 		String str = "<p><strong>Statistics</strong><br />" +
