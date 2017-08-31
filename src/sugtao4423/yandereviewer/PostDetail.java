@@ -98,6 +98,8 @@ public class PostDetail extends Activity{
 
 	public void setActionbarIcon(){
 		final ActionBar actionBar = getActionBar();
+		actionBar.setDisplayUseLogoEnabled(true);
+		actionBar.setDisplayShowHomeEnabled(true);
 		actionBar.setIcon(R.drawable.ic_action_refresh);
 		String path = getApplicationContext().getCacheDir().getAbsolutePath() + "/web_image_cache/" +
 				post.getPreview().getUrl().replaceAll("[.:/,%?&=]", "+").replaceAll("[+]+", "+");
