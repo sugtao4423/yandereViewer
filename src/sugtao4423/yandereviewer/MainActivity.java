@@ -32,13 +32,13 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import it.gmariotti.cardslib.library.internal.Card;
 import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
 import it.gmariotti.cardslib.library.view.CardGridView;
-import jp.sfapps.partialmatchsearchinarrayadapter.SearchableArrayAdapter;
 import sugtao4423.icondialog.IconDialog;
 import sugtao4423.icondialog.IconItem;
 import twitter4j.Twitter;
@@ -63,7 +63,6 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	private Yandere4j yandere;
 	private int yanderePage;
 	private long readedId;
-	private SearchableArrayAdapter<SearchItem> searchableAdapter;
 	private String searchQuery;
 
 	private SharedPreferences pref;
@@ -332,9 +331,9 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	public boolean onCreateOptionsMenu(Menu menu){
 		if(searchQuery == null){
 			getMenuInflater().inflate(R.menu.menu_both, menu);
-			final ClearableMultiAutoCompleteTextView cmactv =
-					(ClearableMultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
-			cmactv.setEnabled(false);
+			final MultiAutoCompleteTextView mactv =
+					(MultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
+			mactv.setEnabled(false);
 			new AsyncTask<Void, Void, ArrayList<String>>(){
 
 				@Override
@@ -344,8 +343,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 				@Override
 				protected void onPostExecute(ArrayList<String> result){
-					prepareSuggest(result, cmactv);
-					cmactv.setEnabled(true);
+					prepareSuggest(result, mactv);
+					mactv.setEnabled(true);
 				}
 			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}else{
@@ -354,27 +353,25 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	public void prepareSuggest(final ArrayList<String> tags, final ClearableMultiAutoCompleteTextView cmactv){
-		ArrayList<SearchItem> suggestItems = new ArrayList<SearchItem>();
+	public void prepareSuggest(final ArrayList<String> tags, final MultiAutoCompleteTextView mactv){
+		final SuggestAdapter suggestAdapter = new SuggestAdapter(this);
 
 		String[] searchHistory = pref.getString("searchHistory", "").split(",");
 		for(String s : searchHistory)
-			suggestItems.add(new SearchItem(s, SearchItem.HISTORY));
+			suggestAdapter.add(new SearchItem(s, SearchItem.HISTORY));
 
 		for(int i = 0; i < tags.size(); i++)
-			suggestItems.add(new SearchItem(tags.get(i), SearchItem.TAG));
+			suggestAdapter.add(new SearchItem(tags.get(i), SearchItem.TAG));
 
-		searchableAdapter = new SearchableArrayAdapter<SearchItem>(getApplicationContext(), R.layout.item_dialog_icontext, R.id.dialog_text, suggestItems);
-		searchableAdapter.setHighLightColor("#2196F3");
-		cmactv.setAdapter(searchableAdapter);
-		cmactv.setHint("Search post from tag");
-		cmactv.setTokenizer(new SpaceTokenizer());
-		cmactv.setOnEditorActionListener(new OnEditorActionListener(){
+		mactv.setAdapter(suggestAdapter);
+		mactv.setHint("Search post from tag");
+		mactv.setTokenizer(new SpaceTokenizer());
+		mactv.setOnEditorActionListener(new OnEditorActionListener(){
 
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
 				if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)){
-					String query = cmactv.getText().toString();
+					String query = mactv.getText().toString();
 					query = query.replaceAll("\\s+$", "");
 
 					ArrayList<String> history = new ArrayList<String>();
@@ -388,7 +385,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 						for(String s : history)
 							result += s + ",";
 						pref.edit().putString("searchHistory", result).commit();
-						searchableAdapter.insert(new SearchItem(query, SearchItem.HISTORY), 0);
+						suggestAdapter.add(new SearchItem(query, SearchItem.HISTORY));
 					}
 
 					Intent i = new Intent(getApplicationContext(), MainActivity.class);
@@ -398,7 +395,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				return false;
 			}
 		});
-		cmactv.addOnAttachStateChangeListener(new OnAttachStateChangeListener(){
+		mactv.addOnAttachStateChangeListener(new OnAttachStateChangeListener(){
 			@Override
 			public void onViewDetachedFromWindow(View v){
 			}
