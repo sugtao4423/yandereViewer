@@ -19,6 +19,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -86,6 +87,29 @@ public class Settings extends PreferenceActivity{
 						.setNegativeButton("Cancell", null)
 						.show();
 					}
+					return true;
+				}
+			});
+
+			final Preference requestLimit = findPreference("reqPostCount");
+			requestLimit.setSummary(String.valueOf(pref.getInt("reqPostCount", 50)));
+			requestLimit.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+
+				@Override
+				public boolean onPreferenceClick(Preference preference){
+					final EditText eLimit = new EditText(getActivity());
+					eLimit.setInputType(InputType.TYPE_CLASS_NUMBER);
+					new AlertDialog.Builder(getActivity())
+					.setView(eLimit)
+					.setNegativeButton("Cancel", null)
+					.setPositiveButton("OK", new OnClickListener(){
+
+						@Override
+						public void onClick(DialogInterface dialog, int which){
+							pref.edit().putInt("reqPostCount", Integer.parseInt(eLimit.getText().toString())).commit();
+							requestLimit.setSummary(eLimit.getText().toString());
+						}
+					}).show();
 					return true;
 				}
 			});

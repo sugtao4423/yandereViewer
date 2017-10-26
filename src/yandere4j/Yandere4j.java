@@ -29,8 +29,10 @@ public class Yandere4j{
 
 	private static final String BASE_URL = "https://yande.re";
 
+	private int reqPostCount = 50;
+
 	public Post[] getPosts(int page) throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
-		return getPosts(getServer(BASE_URL + "/post.json?page=" + page));
+		return getPosts(getServer(BASE_URL + "/post.json?page=" + page + "&limit=" + reqPostCount));
 	}
 
 	public Post getPost(long id) throws MalformedURLException, IOException, JSONException{
@@ -46,7 +48,11 @@ public class Yandere4j{
 
 	public Post[] searchPosts(String query, int page) throws MalformedURLException, JSONException, IOException{
 		query = URLEncoder.encode(query, "UTF-8");
-		return getPosts(getServer(BASE_URL + "/post.json?tags=" + query + "&page=" + page));
+		return getPosts(getServer(BASE_URL + "/post.json?tags=" + query + "&page=" + page + "&limit=" + reqPostCount));
+	}
+
+	public void setRequestPostCount(int reqPostCount){
+		this.reqPostCount = reqPostCount;
 	}
 
 	public String getFileName(Post post){

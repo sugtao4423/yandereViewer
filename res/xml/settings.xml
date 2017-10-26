@@ -9,6 +9,9 @@
 
     <Preference android:key="twitter" />
     <Preference
+        android:key="reqPostCount"
+        android:title="@string/reqPostCount" />
+    <Preference
         android:key="changeSaveDir"
         android:title="@string/changeSaveDir" />
     <Preference

@@ -89,9 +89,9 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 		app = (App)getApplicationContext();
 		pref = PreferenceManager.getDefaultSharedPreferences(this);
-		loadSettings();
-
 		yandere = new Yandere4j();
+
+		loadSettings();
 		yanderePage = 1;
 		readedId = pref.getLong("readedId", -1);
 		searchQuery = getIntent().getStringExtra("searchQuery");
@@ -318,6 +318,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		}else{
 			twitter = null;
 		}
+		yandere.setRequestPostCount(pref.getInt("reqPostCount", 50));
 	}
 
 	public String getFileMB(int filesize){
