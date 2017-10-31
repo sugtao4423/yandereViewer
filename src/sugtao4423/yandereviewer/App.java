@@ -65,7 +65,7 @@ public class App extends Application{
 				try{
 					String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 							Environment.DIRECTORY_DOWNLOADS + "/";
-					String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString("saveDir", defaultPath);
+					String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.SAVEDIR, defaultPath);
 					String path = saveDir + new Yandere4j().getFileName(post);
 
 					HttpURLConnection conn = (HttpURLConnection)new URL(post.getFile().getUrl()).openConnection();
@@ -122,7 +122,7 @@ public class App extends Application{
 		final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 				Environment.DIRECTORY_DOWNLOADS + "/";
-		final String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString("saveDir", defaultPath);
+		final String saveDir = PreferenceManager.getDefaultSharedPreferences(context).getString(Keys.SAVEDIR, defaultPath);
 
 		new AsyncTask<Void, Void, Void>(){
 

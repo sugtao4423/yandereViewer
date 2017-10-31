@@ -61,8 +61,8 @@ public class IntentActivity extends Activity{
 						return;
 					}
 					Intent i = new Intent(IntentActivity.this, PostDetail.class);
-					i.putExtra("postdata", post);
-					i.putExtra("onIntent", true);
+					i.putExtra(PostDetail.INTENT_EXTRA_POSTDATA, post);
+					i.putExtra(PostDetail.INTENT_EXTRA_ONINTENT, true);
 					startActivity(i);
 					finish();
 				}

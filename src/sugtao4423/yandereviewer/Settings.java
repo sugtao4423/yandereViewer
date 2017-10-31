@@ -42,7 +42,7 @@ public class Settings extends PreferenceActivity{
 			final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 			final ListPreference how_view = (ListPreference)findPreference("how_view");
-			how_view.setSummary(getHowViewSummary(pref.getString("how_view", "full")));
+			how_view.setSummary(getHowViewSummary(pref.getString(Keys.HOWVIEW, Keys.VAL_FULL)));
 			how_view.setOnPreferenceChangeListener(new OnPreferenceChangeListener(){
 
 				@Override
@@ -53,7 +53,7 @@ public class Settings extends PreferenceActivity{
 			});
 
 			Preference twitter = findPreference("twitter");
-			final String username = pref.getString("twitter_username", "");
+			final String username = pref.getString(Keys.TWITTER_USERNAME, "");
 			if(username.equals("")){
 				twitter.setTitle(getString(R.string.cooperate_with_twitter));
 			}else{
@@ -76,9 +76,9 @@ public class Settings extends PreferenceActivity{
 							@Override
 							public void onClick(DialogInterface dialog, int which){
 								pref.edit()
-								.putString("twitter_username", "")
-								.putString("twitter_at", "")
-								.putString("twitter_ats", "")
+								.putString(Keys.TWITTER_USERNAME, "")
+								.putString(Keys.TWITTER_AT, "")
+								.putString(Keys.TWITTER_ATS, "")
 								.commit();
 								Toast.makeText(getActivity(), getString(R.string.cancelled_collaboration), Toast.LENGTH_SHORT).show();
 								finish();
@@ -92,7 +92,7 @@ public class Settings extends PreferenceActivity{
 			});
 
 			final Preference requestLimit = findPreference("reqPostCount");
-			requestLimit.setSummary(String.valueOf(pref.getInt("reqPostCount", 50)));
+			requestLimit.setSummary(String.valueOf(pref.getInt(Keys.REQUEST_POSTCOUNT, 50)));
 			requestLimit.setOnPreferenceClickListener(new OnPreferenceClickListener(){
 
 				@Override
@@ -107,7 +107,7 @@ public class Settings extends PreferenceActivity{
 
 						@Override
 						public void onClick(DialogInterface dialog, int which){
-							pref.edit().putInt("reqPostCount", Integer.parseInt(eLimit.getText().toString())).commit();
+							pref.edit().putInt(Keys.REQUEST_POSTCOUNT, Integer.parseInt(eLimit.getText().toString())).commit();
 							requestLimit.setSummary(eLimit.getText().toString());
 						}
 					}).show();
@@ -118,13 +118,13 @@ public class Settings extends PreferenceActivity{
 			final Preference changeSaveDir = findPreference("changeSaveDir");
 			final String defaultDir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 					Environment.DIRECTORY_DOWNLOADS + "/";
-			changeSaveDir.setSummary(pref.getString("saveDir", defaultDir));
+			changeSaveDir.setSummary(pref.getString(Keys.SAVEDIR, defaultDir));
 			changeSaveDir.setOnPreferenceClickListener(new OnPreferenceClickListener(){
 
 				@Override
 				public boolean onPreferenceClick(Preference preference){
 					final EditText dirText = new EditText(getActivity());
-					String currentDir = pref.getString("saveDir", defaultDir);
+					String currentDir = pref.getString(Keys.SAVEDIR, defaultDir);
 					dirText.setText(currentDir);
 
 					new AlertDialog.Builder(getActivity())
@@ -135,7 +135,7 @@ public class Settings extends PreferenceActivity{
 
 						@Override
 						public void onClick(DialogInterface dialog, int which){
-							if(pref.edit().putString("saveDir", defaultDir).commit())
+							if(pref.edit().putString(Keys.SAVEDIR, defaultDir).commit())
 								changeSaveDir.setSummary(defaultDir);
 						}
 					})
@@ -149,7 +149,7 @@ public class Settings extends PreferenceActivity{
 							File fDir = new File(current);
 							if(!fDir.exists())
 								fDir.mkdirs();
-							if(pref.edit().putString("saveDir", current).commit())
+							if(pref.edit().putString(Keys.SAVEDIR, current).commit())
 								changeSaveDir.setSummary(current);
 						}
 					}).show();
@@ -171,7 +171,7 @@ public class Settings extends PreferenceActivity{
 						@Override
 						public void onClick(DialogInterface dialog, int which){
 							SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-							((App)getApplicationContext()).setClearedHistory(pref.edit().remove("searchHistory").commit());
+							((App)getApplicationContext()).setClearedHistory(pref.edit().remove(Keys.SEARCH_HISTORY).commit());
 							Toast.makeText(getActivity(), getString(R.string.history_cleared), Toast.LENGTH_SHORT).show();
 						}
 					}).show();
@@ -202,11 +202,11 @@ public class Settings extends PreferenceActivity{
 
 		public String getHowViewSummary(String str){
 			switch(str){
-			case "sample":
+			case Keys.VAL_SAMPLE:
 				return getString(R.string.sample_size);
-			case "full":
+			case Keys.VAL_FULL:
 				return getString(R.string.full_size);
-			case "ask":
+			case Keys.VAL_ASK:
 				return getString(R.string.ask);
 			}
 			return null;

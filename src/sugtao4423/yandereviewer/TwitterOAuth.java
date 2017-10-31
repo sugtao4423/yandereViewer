@@ -99,9 +99,9 @@ public class TwitterOAuth extends Activity{
 				progDialog.dismiss();
 				if(accessToken != null){
 					PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
-						.putString("twitter_at", accessToken.getToken())
-						.putString("twitter_ats", accessToken.getTokenSecret())
-						.putString("twitter_username", "@" + accessToken.getScreenName())
+						.putString(Keys.TWITTER_AT, accessToken.getToken())
+						.putString(Keys.TWITTER_ATS, accessToken.getTokenSecret())
+						.putString(Keys.TWITTER_USERNAME, "@" + accessToken.getScreenName())
 					.commit();
 					Toast.makeText(TwitterOAuth.this, getString(R.string.cooperated), Toast.LENGTH_LONG).show();
 				}else{

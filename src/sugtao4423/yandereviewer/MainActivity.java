@@ -51,6 +51,8 @@ import yandere4j.data.Post;
 
 public class MainActivity extends Activity implements OnRefreshListener{
 
+	public static final String INTENT_EXTRA_SEARCHQUERY = "searchQuery";
+
 	private static final int SAMPLE = 0;
 	private static final int FULL = 1;
 	private static final int ASK = 2;
@@ -93,8 +95,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 		loadSettings();
 		yanderePage = 1;
-		readedId = pref.getLong("readedId", -1);
-		searchQuery = getIntent().getStringExtra("searchQuery");
+		readedId = pref.getLong(Keys.READEDID, -1);
+		searchQuery = getIntent().getStringExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY);
 		if(searchQuery != null){
 			getActionBar().setTitle(searchQuery);
 			getActionBar().setIcon(android.R.drawable.ic_menu_search);
@@ -102,9 +104,9 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 		db = new TagSQLiteHelper(this).getWritableDatabase();
 
-		if(!pref.getBoolean("tagSaved", false)){
+		if(!pref.getBoolean(Keys.TAGSAVED, false)){
 			Intent i = new Intent(MainActivity.this, SaveTagActivity.class);
-			i.putExtra("startMain", true);
+			i.putExtra(SaveTagActivity.INTENT_EXTRA_STARTMAIN, true);
 			startActivity(i);
 			finish();
 			return;
@@ -160,7 +162,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
 				adapter.add(load, -1);
 				if(yanderePage == 1 && searchQuery == null)
-					pref.edit().putLong("readedId", result[0].getId()).commit();
+					pref.edit().putLong(Keys.READEDID, result[0].getId()).commit();
 				yanderePage++;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -224,22 +226,22 @@ public class MainActivity extends Activity implements OnRefreshListener{
 									@Override
 									public void onClick(DialogInterface dialog, int which){
 										if(which == 0){
-											i.putExtra("url", post.getSample().getUrl());
-											i.putExtra("filesize", post.getSample().getSize());
+											i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
+											i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
 										}else if(which == 1){
-											i.putExtra("url", post.getFile().getUrl());
-											i.putExtra("filesize", post.getFile().getSize());
+											i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
+											i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
 										}
 										startActivity(i);
 									}
 								}).show();
 							}else{
 								if(howView == SAMPLE){
-									i.putExtra("url", post.getSample().getUrl());
-									i.putExtra("filesize", post.getSample().getSize());
+									i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
+									i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
 								}else if(howView == FULL){
-									i.putExtra("url", post.getFile().getUrl());
-									i.putExtra("filesize", post.getFile().getSize());
+									i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
+									i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
 								}
 								startActivity(i);
 							}
@@ -264,7 +266,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 								return;
 							}
 							i = new Intent(MainActivity.this, TweetActivity.class);
-							i.putExtra("post", post);
+							i.putExtra(TweetActivity.INTENT_EXTRA_POST, post);
 							startActivity(i);
 							break;
 						case 5:
@@ -276,7 +278,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 			}
 			private void detail(Post post){
 				Intent i = new Intent(MainActivity.this, PostDetail.class);
-				i.putExtra("postdata", post);
+				i.putExtra(PostDetail.INTENT_EXTRA_POSTDATA, post);
 				startActivity(i);
 			}
 		};
@@ -293,32 +295,32 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	}
 
 	public void loadSettings(){
-		switch(pref.getString("how_view", "full")){
-		case "sample":
+		switch(pref.getString(Keys.HOWVIEW, Keys.VAL_FULL)){
+		case Keys.VAL_SAMPLE:
 			howView = SAMPLE;
 			howViewStr = getString(R.string.view_sample_size);
 			break;
-		case "full":
+		case Keys.VAL_FULL:
 			howView = FULL;
 			howViewStr = getString(R.string.view_full_size);
 			break;
-		case "ask":
+		case Keys.VAL_ASK:
 			howView = ASK;
 			howViewStr = null;
 			break;
 		}
 
-		if(!pref.getString("twitter_username", "").equals("")){
+		if(!pref.getString(Keys.TWITTER_USERNAME, "").equals("")){
 			Configuration conf = new ConfigurationBuilder()
 					.setOAuthConsumerKey(getString(R.string.twitter_ck))
 					.setOAuthConsumerSecret(getString(R.string.twitter_cs))
 			.build();
-			AccessToken at = new AccessToken(pref.getString("twitter_at", null), pref.getString("twitter_ats", null));
+			AccessToken at = new AccessToken(pref.getString(Keys.TWITTER_AT, null), pref.getString(Keys.TWITTER_ATS, null));
 			twitter = new TwitterFactory(conf).getInstance(at);
 		}else{
 			twitter = null;
 		}
-		yandere.setRequestPostCount(pref.getInt("reqPostCount", 50));
+		yandere.setRequestPostCount(pref.getInt(Keys.REQUEST_POSTCOUNT, 50));
 	}
 
 	public String getFileMB(int filesize){
@@ -357,7 +359,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	public void prepareSuggest(final ArrayList<String> tags, final MultiAutoCompleteTextView mactv){
 		final SuggestAdapter suggestAdapter = new SuggestAdapter(this);
 
-		String[] searchHistory = pref.getString("searchHistory", "").split(",");
+		String[] searchHistory = pref.getString(Keys.SEARCH_HISTORY, "").split(",");
 		for(String s : searchHistory)
 			suggestAdapter.add(new SearchItem(s, SearchItem.HISTORY));
 
@@ -376,7 +378,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					query = query.replaceAll("\\s+$", "");
 
 					ArrayList<String> history = new ArrayList<String>();
-					for(String s : pref.getString("searchHistory", "").split(",", 0)){
+					for(String s : pref.getString(Keys.SEARCH_HISTORY, "").split(",", 0)){
 						if(!s.isEmpty())
 							history.add(s);
 					}
@@ -385,12 +387,12 @@ public class MainActivity extends Activity implements OnRefreshListener{
 						String result = "";
 						for(String s : history)
 							result += s + ",";
-						pref.edit().putString("searchHistory", result).commit();
+						pref.edit().putString(Keys.SEARCH_HISTORY, result).commit();
 						suggestAdapter.add(new SearchItem(query, SearchItem.HISTORY));
 					}
 
 					Intent i = new Intent(getApplicationContext(), MainActivity.class);
-					i.putExtra("searchQuery", query);
+					i.putExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY, query);
 					startActivity(i);
 				}
 				return false;

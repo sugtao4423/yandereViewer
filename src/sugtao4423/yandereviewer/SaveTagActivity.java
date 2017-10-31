@@ -17,11 +17,13 @@ import yandere4j.data.Tag;
 
 public class SaveTagActivity extends Activity{
 
+	public static final String INTENT_EXTRA_STARTMAIN = "startMain";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 
-		final boolean start_main = getIntent().getBooleanExtra("startMain", false);
+		final boolean start_main = getIntent().getBooleanExtra(INTENT_EXTRA_STARTMAIN, false);
 
 		final Yandere4j yandere = new Yandere4j();
 		final SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
@@ -54,7 +56,7 @@ public class SaveTagActivity extends Activity{
 				new DBUtils(db).writeTags(tags);
 				db.close();
 				progDialog.dismiss();
-				pref.edit().putBoolean("tagSaved", true).commit();
+				pref.edit().putBoolean(Keys.TAGSAVED, true).commit();
 				if(start_main)
 					startActivity(new Intent(SaveTagActivity.this, MainActivity.class));
 				finish();

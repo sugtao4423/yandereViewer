@@ -31,6 +31,9 @@ import yandere4j.data.Post;
 
 public class PostDetail extends Activity{
 
+	public static final String INTENT_EXTRA_POSTDATA = "postdata";
+	public static final String INTENT_EXTRA_ONINTENT = "onIntent";
+
 	private Post post;
 	private boolean onIntent;
 
@@ -41,8 +44,8 @@ public class PostDetail extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.post_detail);
 		text = (TextView)findViewById(R.id.postDetail_text);
-		post = (Post)getIntent().getSerializableExtra("postdata");
-		onIntent = getIntent().getBooleanExtra("onIntent", false);
+		post = (Post)getIntent().getSerializableExtra(INTENT_EXTRA_POSTDATA);
+		onIntent = getIntent().getBooleanExtra(INTENT_EXTRA_ONINTENT, false);
 
 		String tags = "";
 		for(String s : post.getTags())
@@ -155,13 +158,13 @@ public class PostDetail extends Activity{
 			startActivity(i);
 		}else if(item.getItemId() == Menu.FIRST + 1){
 			Intent i = new Intent(PostDetail.this, ShowImage.class);
-			i.putExtra("url", post.getSample().getUrl());
-			i.putExtra("filesize", post.getSample().getSize());
+			i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
+			i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
 			startActivity(i);
 		}else if(item.getItemId() == Menu.FIRST + 2){
 			Intent i = new Intent(PostDetail.this, ShowImage.class);
-			i.putExtra("url", post.getFile().getUrl());
-			i.putExtra("filesize", post.getFile().getSize());
+			i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
+			i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
 			startActivity(i);
 		}else if(item.getItemId() == Menu.FIRST + 3){
 			((App)getApplicationContext()).saveImage(PostDetail.this, post);

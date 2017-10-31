@@ -22,14 +22,17 @@ import yandere4j.Yandere4j;
 
 public class ShowImage extends Activity{
 
+	public static final String INTENT_EXTRA_URL = "url";
+	public static final String INTENT_EXTRA_FILESIZE = "filesize";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		final ZoomImageView image = new ZoomImageView(this);
 		setContentView(image);
 		Intent i = getIntent();
-		final String url = i.getStringExtra("url");
-		final int size = i.getIntExtra("filesize", -1);
+		final String url = i.getStringExtra(INTENT_EXTRA_URL);
+		final int size = i.getIntExtra(INTENT_EXTRA_FILESIZE, -1);
 
 		new AsyncTask<Void, Integer, Bitmap>(){
 			private ProgressDialog progDialog;

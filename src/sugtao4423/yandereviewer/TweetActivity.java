@@ -25,6 +25,8 @@ import yandere4j.data.Post;
 
 public class TweetActivity extends Activity{
 
+	public static final String INTENT_EXTRA_POST = "post";
+
 	private Post post;
 	private Twitter twitter;
 
@@ -37,21 +39,21 @@ public class TweetActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.tweet_activity);
-		post = (Post)getIntent().getSerializableExtra("post");
+		post = (Post)getIntent().getSerializableExtra(INTENT_EXTRA_POST);
 
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		Configuration conf = new ConfigurationBuilder()
 				.setOAuthConsumerKey(getString(R.string.twitter_ck))
 				.setOAuthConsumerSecret(getString(R.string.twitter_cs))
 		.build();
-		AccessToken at = new AccessToken(pref.getString("twitter_at", null), pref.getString("twitter_ats", null));
+		AccessToken at = new AccessToken(pref.getString(Keys.TWITTER_AT, null), pref.getString(Keys.TWITTER_ATS, null));
 		twitter = new TwitterFactory(conf).getInstance(at);
 		yandere = new Yandere4j();
 
 		tweetBtn = (ImageButton)findViewById(R.id.tweetButton);
 		editText = (EditText)findViewById(R.id.tweetText);
 		addTextWatcher((TextView)findViewById(R.id.moji140));
-		((TextView)findViewById(R.id.tweetAccount)).setText(pref.getString("twitter_username", null));
+		((TextView)findViewById(R.id.tweetAccount)).setText(pref.getString(Keys.TWITTER_USERNAME, null));
 
 		editText.setText(yandere.getShareText(post));
 	}
