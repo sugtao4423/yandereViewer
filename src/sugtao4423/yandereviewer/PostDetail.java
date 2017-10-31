@@ -139,7 +139,7 @@ public class PostDetail extends Activity{
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
-		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "共有").setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, getString(R.string.share)).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		if(onIntent){
 			menu.add(Menu.NONE, Menu.FIRST + 1, Menu.NONE, getString(R.string.open_sample_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
 			menu.add(Menu.NONE, Menu.FIRST + 2, Menu.NONE, getString(R.string.open_full_size)).setShowAsAction(MenuItem.SHOW_AS_ACTION_NEVER);
