@@ -5,6 +5,8 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 import org.json.JSONException;
 
 import android.app.Activity;
@@ -14,7 +16,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.DialogInterface.OnClickListener;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
@@ -23,22 +24,21 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.support.v7.widget.CardView;
+import android.view.ActionMode;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
-import it.gmariotti.cardslib.library.internal.Card;
-import it.gmariotti.cardslib.library.internal.Card.OnCardClickListener;
-import it.gmariotti.cardslib.library.view.CardGridView;
 import sugtao4423.icondialog.IconDialog;
 import sugtao4423.icondialog.IconItem;
 import twitter4j.Twitter;
@@ -59,12 +59,13 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 	private App app;
 
-	private CardGridView grid;
+	private PostGridView grid;
+	private ActionMode multiSelectMode;
+	private HashMap<Post, View> multiSelectItems;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
 	private Yandere4j yandere;
 	private int yanderePage;
-	private long readedId;
 	private String searchQuery;
 
 	private SharedPreferences pref;
@@ -78,12 +79,11 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		grid = (CardGridView)findViewById(R.id.grid);
-		grid.setNumColumns(GridView.AUTO_FIT);
-		grid.setVerticalSpacing(15);
-		adapter = new PostAdapter(this, getCardClickListener());
+		grid = (PostGridView)findViewById(R.id.grid);
+		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
-		grid.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+		
+		multiSelectItems = new HashMap<Post, View>();
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
 		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
@@ -95,7 +95,6 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 		loadSettings();
 		yanderePage = 1;
-		readedId = pref.getLong(Keys.READEDID, -1);
 		searchQuery = getIntent().getStringExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY);
 		if(searchQuery != null){
 			getActionBar().setTitle(searchQuery);
@@ -157,10 +156,10 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
 					return;
 				}
-				adapter.addAll(result, readedId);
+				adapter.addAll(result);
 				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
 						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
-				adapter.add(load, -1);
+				adapter.add(load);
 				if(yanderePage == 1 && searchQuery == null)
 					pref.edit().putLong(Keys.READEDID, result[0].getId()).commit();
 				yanderePage++;
@@ -173,15 +172,30 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		loadPosts(true);
 	}
 
-	public OnCardClickListener getCardClickListener(){
-		return new OnCardClickListener(){
+	public OnClickListener getOnCardClickListener(final Post post){
+		return new OnClickListener(){
 
 			@Override
-			public void onClick(Card c, View view){
-				final Post post = ((PostCard)c).getPost();
+			public void onClick(View view){
 				if(post.getMD5().equals("LOADMORE")){
-					adapter.remove(c);
+					adapter.remove(post);
 					loadPosts(false);
+					return;
+				}
+				if(multiSelectMode != null){
+					if(!view.isSelected()){
+						multiSelectItems.put(post, view);
+						view.setSelected(true);
+						view.setBackgroundColor(Color.parseColor("#B3E5FC"));
+					}else{
+						multiSelectItems.remove(post);
+						view.setSelected(false);
+						view.setBackgroundColor(((CardView)view).getCardBackgroundColor().getDefaultColor());
+					}
+					int selectedCount = multiSelectItems.size();
+					multiSelectMode.setTitle(selectedCount + " selected");
+					if(selectedCount == 0)
+						multiSelectMode.finish();
 					return;
 				}
 
@@ -208,7 +222,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				}
 
 				IconDialog dialog = new IconDialog(MainActivity.this);
-				dialog.setItems(items, new OnClickListener(){
+				dialog.setItems(items, new android.content.DialogInterface.OnClickListener(){
 
 					@Override
 					public void onClick(DialogInterface dialog, int which){
@@ -221,7 +235,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 								String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
 								new AlertDialog.Builder(MainActivity.this)
 								.setItems(new String[]{getString(R.string.open_sample_size) + sampleSize,
-										getString(R.string.open_full_size) + fullSize}, new OnClickListener(){
+										getString(R.string.open_full_size) + fullSize}, new android.content.DialogInterface.OnClickListener(){
 
 									@Override
 									public void onClick(DialogInterface dialog, int which){
@@ -280,6 +294,51 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				Intent i = new Intent(MainActivity.this, PostDetail.class);
 				i.putExtra(PostDetail.INTENT_EXTRA_POSTDATA, post);
 				startActivity(i);
+			}
+		};
+	}
+
+	public OnLongClickListener getOnCardLongClickListener(){
+		return new OnLongClickListener(){
+
+			@Override
+			public boolean onLongClick(final View v){
+				startActionMode(new ActionMode.Callback(){
+
+					@Override
+					public boolean onCreateActionMode(ActionMode mode, Menu menu){
+						multiSelectMode = mode;
+						menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "Save All").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+						v.callOnClick();
+						return true;
+					}
+
+					@Override
+					public boolean onPrepareActionMode(ActionMode mode, Menu menu){
+						return false;
+					}
+
+					@Override
+					public boolean onActionItemClicked(ActionMode mode, MenuItem item){
+						if(item.getItemId() == Menu.FIRST){
+							((App)getApplicationContext()).saveImages(MainActivity.this,
+									(Post[])multiSelectItems.keySet().toArray(new Post[multiSelectItems.size()]));
+							mode.finish();
+						}
+						return true;
+					}
+
+					@Override
+					public void onDestroyActionMode(ActionMode mode){
+						multiSelectMode = null;
+						for(View v : multiSelectItems.values()){
+							v.setSelected(false);
+							v.setBackgroundColor(((CardView)v).getCardBackgroundColor().getDefaultColor());
+						}
+						multiSelectItems.clear();
+					}
+				});
+				return true;
 			}
 		};
 	}

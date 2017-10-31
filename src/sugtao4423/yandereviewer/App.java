@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 
 import android.app.Application;
 import android.app.Notification;
@@ -118,7 +117,7 @@ public class App extends Application{
 		}.execute();
 	}
 
-	public void saveImages(final Context context, final ArrayList<Post> saveList){
+	public void saveImages(final Context context, final Post[] saveList){
 		final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 		String defaultPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" +
 				Environment.DIRECTORY_DOWNLOADS + "/";
@@ -128,10 +127,10 @@ public class App extends Application{
 
 			@Override
 			protected Void doInBackground(Void... params){
-				for(int i = 0; i < saveList.size(); i++){
-					Post current = saveList.get(i);
+				for(int i = 0; i < saveList.length; i++){
+					Post current = saveList[i];
 					Notification.Builder builder = new Notification.Builder(context);
-					builder.setContentTitle("Saving... " + (i + 1) + "/" + saveList.size())
+					builder.setContentTitle("Saving... " + (i + 1) + "/" + saveList.length)
 					.setContentText(new Yandere4j().getFileName(current))
 					.setSmallIcon(android.R.drawable.stat_sys_download)
 					.setProgress(100, 0, false)
@@ -169,7 +168,7 @@ public class App extends Application{
 						Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 						PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, 0);
 						builder.setProgress(0, 0, false)
-						.setContentTitle(getString(R.string.save_failed) + " " + (i + 1) + "/" + saveList.size())
+						.setContentTitle(getString(R.string.save_failed) + " " + (i + 1) + "/" + saveList.length)
 						.setSmallIcon(android.R.drawable.stat_sys_download_done)
 						.setOngoing(false)
 						.setContentIntent(pendingIntent);
@@ -180,7 +179,7 @@ public class App extends Application{
 					picIntent.setDataAndType(Uri.fromFile(new File(path)), "image/*");
 					PendingIntent contentIntent = PendingIntent.getActivity(context, 1, picIntent, 0);
 					builder.setProgress(0, 0, false)
-					.setContentTitle(getString(R.string.save_success) + " " + (i + 1) + "/" + saveList.size())
+					.setContentTitle(getString(R.string.save_success) + " " + (i + 1) + "/" + saveList.length)
 					.setSmallIcon(android.R.drawable.stat_sys_download_done)
 					.setOngoing(false)
 					.setContentIntent(contentIntent)

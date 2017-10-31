@@ -8,14 +8,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" >
 
-        <it.gmariotti.cardslib.library.view.CardGridView
+        <sugtao4423.yandereviewer.PostGridView
             android:id="@+id/grid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/swipe_refresh" >
-        </it.gmariotti.cardslib.library.view.CardGridView>
+        </sugtao4423.yandereviewer.PostGridView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
 </RelativeLayout>
