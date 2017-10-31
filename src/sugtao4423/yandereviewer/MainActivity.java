@@ -70,7 +70,6 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 	private SharedPreferences pref;
 	private int howView;
-	private String howViewStr;
 	private SQLiteDatabase db;
 
 	private Twitter twitter;
@@ -82,7 +81,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		grid = (PostGridView)findViewById(R.id.grid);
 		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
-		
+
 		multiSelectItems = new HashMap<Post, View>();
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
@@ -199,18 +198,21 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					return;
 				}
 
-				String fileSize = " (";
-				if(howView == SAMPLE)
-					fileSize += getFileMB(post.getSample().getSize()) + ")";
-				else if(howView == FULL)
-					fileSize += getFileMB(post.getFile().getSize()) + ")";
+				String openText = null;
+				switch(howView){
+				case ASK:
+					openText = getString(R.string.open);
+					break;
+				case SAMPLE:
+					openText = getString(R.string.view_sample_size) + " (" + getFileMB(post.getSample().getSize()) + ")";
+					break;
+				case FULL:
+					openText = getString(R.string.view_full_size) + " (" + getFileMB(post.getFile().getSize()) + ")";
+					break;
+				}
 
-				IconItem[] items;
-				if(twitter == null)
-					items = new IconItem[5];
-				else
-					items = new IconItem[6];
-				items[0] = new IconItem(howViewStr == null ? getString(R.string.open) : howViewStr + fileSize, android.R.drawable.ic_menu_gallery);
+				IconItem[] items = new IconItem[(twitter == null) ? 5 : 6];
+				items[0] = new IconItem(openText, android.R.drawable.ic_menu_gallery);
 				items[1] = new IconItem(getString(R.string.open_full_size_on_browser), android.R.drawable.ic_menu_set_as);
 				items[2] = new IconItem(getString(R.string.save_full_size), android.R.drawable.ic_menu_save);
 				items[3] = new IconItem(getString(R.string.share), android.R.drawable.ic_menu_share);
@@ -230,7 +232,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 						switch(which){
 						case 0:
 							i = new Intent(MainActivity.this, ShowImage.class);
-							if(howViewStr == null){
+							if(howView == ASK){
 								String sampleSize = " (" + getFileMB(post.getSample().getSize()) + ")";
 								String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
 								new AlertDialog.Builder(MainActivity.this)
@@ -321,8 +323,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item){
 						if(item.getItemId() == Menu.FIRST){
-							((App)getApplicationContext()).saveImages(MainActivity.this,
-									(Post[])multiSelectItems.keySet().toArray(new Post[multiSelectItems.size()]));
+							app.saveImages(MainActivity.this, multiSelectItems.keySet().toArray(new Post[multiSelectItems.size()]));
 							mode.finish();
 						}
 						return true;
@@ -357,15 +358,12 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		switch(pref.getString(Keys.HOWVIEW, Keys.VAL_FULL)){
 		case Keys.VAL_SAMPLE:
 			howView = SAMPLE;
-			howViewStr = getString(R.string.view_sample_size);
 			break;
 		case Keys.VAL_FULL:
 			howView = FULL;
-			howViewStr = getString(R.string.view_full_size);
 			break;
 		case Keys.VAL_ASK:
 			howView = ASK;
-			howViewStr = null;
 			break;
 		}
 
