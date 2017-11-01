@@ -9,7 +9,6 @@ import java.net.URL;
 import com.tenthbit.view.ZoomImageView;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
@@ -18,6 +17,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import sugtao4423.progressdialog.ProgressDialog;
 import yandere4j.Yandere4j;
 
 public class ShowImage extends Activity{

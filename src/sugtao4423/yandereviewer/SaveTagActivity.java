@@ -5,13 +5,14 @@ import java.io.IOException;
 import org.json.JSONException;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
+import sugtao4423.progressdialog.ProgressDialog;
 import yandere4j.Yandere4j;
 import yandere4j.data.Tag;
 

@@ -11,7 +11,6 @@ import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -21,6 +20,8 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+
+import sugtao4423.progressdialog.ProgressDialog;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import org.json.JSONException;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,13 +40,17 @@ import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+
 import sugtao4423.icondialog.IconDialog;
 import sugtao4423.icondialog.IconItem;
+import sugtao4423.progressdialog.ProgressDialog;
+
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 

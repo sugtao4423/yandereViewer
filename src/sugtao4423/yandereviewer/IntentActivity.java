@@ -7,11 +7,12 @@ import java.util.regex.Pattern;
 import org.json.JSONException;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import sugtao4423.progressdialog.ProgressDialog;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 

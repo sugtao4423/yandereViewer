@@ -22,6 +22,7 @@ A simple yande.re viewer for Android
 * android-support-core-ui-v26.0.2
 * android-support-compat-v26.0.2
 * android-support-design-v26.0.2
+* [android-ProgressDialog](https://github.com/sugtao4423/android-ProgressDialog)
 * [android smart image view](https://github.com/sugtao4423/android-smart-image-view) (forked me) (stored libs/)
 * twitter4j core (stored libs/)
 
