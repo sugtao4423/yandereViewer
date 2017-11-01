@@ -19,8 +19,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.view.Menu;
@@ -88,8 +90,16 @@ public class PostDetail extends Activity{
 				"URL: <a href=\"" + post.getFile().getUrl() + "\">" + post.getFile().getUrl() + "</a><br />" +
 				"Size: " + post.getFile().getWidth() + "x" + post.getFile().getHeight() + "<br />" +
 				"File Size: " + getMB(post.getFile().getSize()) + "</p>";
-		text.setText(Html.fromHtml(str));
+		text.setText(fromHtml(str));
 		text.setMovementMethod(LinkMovementMethod.getInstance());
+	}
+
+	@SuppressWarnings("deprecation")
+	public Spanned fromHtml(String source){
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+			return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+		else
+			return Html.fromHtml(source);
 	}
 
 	public String getMB(int bytesize){
