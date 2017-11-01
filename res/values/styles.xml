@@ -17,6 +17,13 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="Theme.Toolbar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="android:textColorTertiary">@color/textDarkPrimary</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
     <drawable name="transparameter">#bb000000</drawable>
 
     <style name="Theme.TranslucentBackground" parent="android:Theme.Light.NoTitleBar">

@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 import org.json.JSONException;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -24,10 +23,13 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.CardView;
-import android.view.ActionMode;
+import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnAttachStateChangeListener;
@@ -49,7 +51,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 
-public class MainActivity extends Activity implements OnRefreshListener{
+public class MainActivity extends AppCompatActivity implements OnRefreshListener{
 
 	public static final String INTENT_EXTRA_SEARCHQUERY = "searchQuery";
 
@@ -78,6 +80,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
 		grid = (PostGridView)findViewById(R.id.grid);
 		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
@@ -96,8 +99,8 @@ public class MainActivity extends Activity implements OnRefreshListener{
 		yanderePage = 1;
 		searchQuery = getIntent().getStringExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY);
 		if(searchQuery != null){
-			getActionBar().setTitle(searchQuery);
-			getActionBar().setIcon(android.R.drawable.ic_menu_search);
+			getSupportActionBar().setTitle(searchQuery);
+			getSupportActionBar().setIcon(android.R.drawable.ic_menu_search);
 		}
 
 		db = new TagSQLiteHelper(this).getWritableDatabase();
@@ -305,7 +308,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 
 			@Override
 			public boolean onLongClick(final View v){
-				startActionMode(new ActionMode.Callback(){
+				startSupportActionMode(new ActionMode.Callback(){
 
 					@Override
 					public boolean onCreateActionMode(ActionMode mode, Menu menu){
@@ -390,7 +393,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu){
 		if(searchQuery == null){
-			getMenuInflater().inflate(R.menu.menu_both, menu);
+			new MenuInflater(this).inflate(R.menu.menu_both, menu);
 			final MultiAutoCompleteTextView mactv =
 					(MultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
 			mactv.setEnabled(false);
@@ -408,7 +411,7 @@ public class MainActivity extends Activity implements OnRefreshListener{
 				}
 			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		}else{
-			getMenuInflater().inflate(R.menu.menu_settings, menu);
+			new MenuInflater(this).inflate(R.menu.menu_settings, menu);
 		}
 		return super.onCreateOptionsMenu(menu);
 	}
