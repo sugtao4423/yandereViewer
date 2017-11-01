@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@+id/swipe_refresh" >
+            android:layout_below="@+id/swipe_refresh"
+            android:scrollbars="vertical" >
         </sugtao4423.yandereviewer.PostGridView>
     </android.support.v4.widget.SwipeRefreshLayout>
 
