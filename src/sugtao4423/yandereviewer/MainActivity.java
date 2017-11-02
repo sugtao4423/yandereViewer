@@ -43,7 +43,6 @@ import android.widget.Toast;
 
 import sugtao4423.icondialog.IconDialog;
 import sugtao4423.icondialog.IconItem;
-import sugtao4423.progressdialog.ProgressDialog;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
@@ -125,18 +124,10 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 			yanderePage = 1;
 		}
 		new AsyncTask<Void, Void, Post[]>(){
-			private ProgressDialog progDialog;
 
 			@Override
 			protected void onPreExecute(){
-				if(!isRefresh){
-					progDialog = new ProgressDialog(MainActivity.this);
-					progDialog.setMessage("Loading...");
-					progDialog.setIndeterminate(false);
-					progDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					progDialog.setCancelable(true);
-					progDialog.show();
-				}
+				swipeRefresh.setRefreshing(true);
 			}
 
 			@Override
@@ -153,10 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
 			@Override
 			protected void onPostExecute(Post[] result){
-				if(!isRefresh)
-					progDialog.dismiss();
-				else
-					swipeRefresh.setRefreshing(false);
+				swipeRefresh.setRefreshing(false);
 				if(result == null){
 					Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
 					return;
