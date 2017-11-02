@@ -17,6 +17,7 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
@@ -126,11 +127,16 @@ public class App extends Application{
 
 		new AsyncTask<Void, Void, Void>(){
 
+			@SuppressWarnings("deprecation")
 			@Override
 			protected Void doInBackground(Void... params){
 				for(int i = 0; i < saveList.length; i++){
 					Post current = saveList[i];
-					Notification.Builder builder = new Notification.Builder(context);
+					Notification.Builder builder;
+					if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+						builder = new Notification.Builder(context, "");
+					else
+						builder = new Notification.Builder(context);
 					builder.setContentTitle("Saving... " + (i + 1) + "/" + saveList.length)
 					.setContentText(new Yandere4j().getFileName(current))
 					.setSmallIcon(android.R.drawable.stat_sys_download)
