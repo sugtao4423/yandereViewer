@@ -2,7 +2,6 @@ package sugtao4423.yandereviewer;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -58,7 +57,7 @@ public class TwitterOAuth extends Activity{
 			protected void onPostExecute(Boolean result){
 				progDialog.dismiss();
 				if(result)
-					startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(rt.getAuthenticationURL())));
+					new ChromeIntent(TwitterOAuth.this, rt.getAuthenticationURL());
 				else
 					Toast.makeText(TwitterOAuth.this, getString(R.string.acquisition_of_request_token_failed), Toast.LENGTH_SHORT).show();
 			}

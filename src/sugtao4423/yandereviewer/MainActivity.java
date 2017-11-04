@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -257,8 +256,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 							}
 							break;
 						case 1:
-							i = new Intent(Intent.ACTION_VIEW, Uri.parse(post.getFile().getUrl()));
-							startActivity(i);
+							new ChromeIntent(MainActivity.this, post.getFile().getUrl());
 							break;
 						case 2:
 							app.saveImage(MainActivity.this, post);
