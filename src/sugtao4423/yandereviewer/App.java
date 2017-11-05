@@ -29,6 +29,7 @@ import yandere4j.data.Post;
 public class App extends Application{
 
 	private boolean clearedHistory = false;
+	private boolean isRefreshTags = false;
 
 	public void setClearedHistory(boolean clearedHistory){
 		this.clearedHistory = clearedHistory;
@@ -36,6 +37,14 @@ public class App extends Application{
 
 	public boolean getClearedHistory(){
 		return clearedHistory;
+	}
+
+	public void setIsRefreshTags(boolean isRefreshTags){
+		this.isRefreshTags = isRefreshTags;
+	}
+
+	public boolean getIsRefreshTags(){
+		return isRefreshTags;
 	}
 
 	public void saveImage(final Context context, final Post post){

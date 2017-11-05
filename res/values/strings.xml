@@ -8,10 +8,10 @@
     <string name="cooperate_with_twitter">Cooperate with Twitter</string>
     <string name="cooperated">Cooperated</string>
     <string name="cancel_collaboration">Cancel Collaboration</string>
-    <string name="cancel_collaboration_really">Really?</string>
     <string name="cancelled_collaboration">Cancelled Collaboration</string>
     <string name="reqPostCount">Number of acquisitions</string>
     <string name="changeSaveDir">Change Save Directory</string>
+    <string name="refreshAllTags">Refresh all tags</string>
     <string name="cache">Cache: %1$s</string>
     <string name="cache_clear">Clear Cache</string>
     <string name="cache_cleared">Cache Cleared</string>
@@ -55,5 +55,6 @@
     <string name="undo">Undo</string>
     <string name="acquisition_of_request_token_failed">Acquisition of RequestToken Failed…</string>
     <string name="acquisition_of_access_token_failed">Acquisition of AccessToken Failed…</string>
+    <string name="is_this_okay">Is this okay?</string>
 
 </resources>

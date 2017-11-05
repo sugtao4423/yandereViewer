@@ -15,6 +15,9 @@
         android:key="changeSaveDir"
         android:title="@string/changeSaveDir" />
     <Preference
+        android:key="refreshAllTags"
+        android:title="@string/refreshAllTags"/>
+    <Preference
         android:key="clearHistory"
         android:title="@string/history_clear" />
     <Preference

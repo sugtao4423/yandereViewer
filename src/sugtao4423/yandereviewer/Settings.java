@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.ListPreference;
@@ -70,7 +71,7 @@ public class Settings extends PreferenceActivity{
 					}else{
 						new AlertDialog.Builder(getActivity())
 						.setTitle(getString(R.string.cancel_collaboration))
-						.setMessage(getString(R.string.cancel_collaboration_really))
+						.setMessage(getString(R.string.is_this_okay))
 						.setPositiveButton("OK", new OnClickListener(){
 
 							@Override
@@ -157,6 +158,29 @@ public class Settings extends PreferenceActivity{
 				}
 			});
 
+			Preference refreshAllTags = findPreference("refreshAllTags");
+			refreshAllTags.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+
+				@Override
+				public boolean onPreferenceClick(Preference preference){
+					new AlertDialog.Builder(getActivity())
+					.setTitle(getString(R.string.refreshAllTags))
+					.setMessage(getString(R.string.is_this_okay))
+					.setNegativeButton("Cancell", null)
+					.setPositiveButton("OK", new OnClickListener(){
+
+						@Override
+						public void onClick(DialogInterface dialog, int which){
+							SQLiteDatabase db = new TagSQLiteHelper(getActivity()).getWritableDatabase();
+							new DBUtils(db).deleteAllTags();
+							((App)getApplicationContext()).setIsRefreshTags(true);
+							startActivity(new Intent(getActivity(), SaveTagActivity.class));
+						}
+					}).show();
+					return true;
+				}
+			});
+
 			Preference clearHistory = findPreference("clearHistory");
 			clearHistory.setOnPreferenceClickListener(new OnPreferenceClickListener(){
 
@@ -164,7 +188,7 @@ public class Settings extends PreferenceActivity{
 				public boolean onPreferenceClick(Preference preference){
 					new AlertDialog.Builder(getActivity())
 					.setTitle(getString(R.string.history_clear))
-					.setMessage(getString(R.string.cancel_collaboration_really))
+					.setMessage(getString(R.string.is_this_okay))
 					.setNegativeButton("Cancel", null)
 					.setPositiveButton("OK", new OnClickListener(){
 

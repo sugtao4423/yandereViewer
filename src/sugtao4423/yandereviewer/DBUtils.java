@@ -57,6 +57,11 @@ public class DBUtils{
 		return result;
 	}
 
+	public void deleteAllTags(){
+		db.execSQL(TagSQLiteHelper.DROP_DB_TABLE);
+		db.execSQL(TagSQLiteHelper.CREATE_DB_TABLE);
+	}
+
 	public void close(){
 		db.close();
 	}

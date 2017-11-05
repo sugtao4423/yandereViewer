@@ -340,9 +340,10 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 	public void onResume(){
 		super.onResume();
 		loadSettings();
-		if(app.getClearedHistory() && searchQuery == null){
+		if(searchQuery == null && (app.getClearedHistory() || app.getIsRefreshTags())){
 			invalidateOptionsMenu();
 			app.setClearedHistory(false);
+			app.setIsRefreshTags(false);
 		}
 	}
 
