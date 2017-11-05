@@ -18,16 +18,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.text.format.DateFormat;
-import android.text.method.LinkMovementMethod;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import sugtao4423.yandereviewer.MutableLinkMovementMethod.OnUrlClickListener;
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;
 
@@ -90,8 +91,15 @@ public class PostDetail extends Activity{
 				"URL: <a href=\"" + post.getFile().getUrl() + "\">" + post.getFile().getUrl() + "</a><br />" +
 				"Size: " + post.getFile().getWidth() + "x" + post.getFile().getHeight() + "<br />" +
 				"File Size: " + getMB(post.getFile().getSize()) + "</p>";
+		MutableLinkMovementMethod mlmm = new MutableLinkMovementMethod();
+		mlmm.setOnUrlClickListener(new OnUrlClickListener(){
+			@Override
+			public void onUrlClick(TextView widget, Uri uri){
+				new ChromeIntent(PostDetail.this, uri);
+			}
+		});
 		text.setText(fromHtml(str));
-		text.setMovementMethod(LinkMovementMethod.getInstance());
+		text.setMovementMethod(mlmm);
 	}
 
 	@SuppressWarnings("deprecation")
