@@ -89,7 +89,8 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 		multiSelectItems = new HashMap<Post, View>();
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
-		swipeRefresh.setColorSchemeColors(Color.parseColor("#2196F3"));
+		swipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+				android.R.color.holo_orange_light, android.R.color.holo_red_light);
 		swipeRefresh.setOnRefreshListener(this);
 
 		app = (App)getApplicationContext();
