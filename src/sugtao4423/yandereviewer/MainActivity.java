@@ -150,9 +150,11 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 					return;
 				}
 				adapter.addAll(result);
-				Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
-						"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
-				adapter.add(load);
+				if(result.length >= yandere.getRequestPostCount()){
+					Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
+							"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
+					adapter.add(load);
+				}
 				if(yanderePage == 1 && searchQuery == null)
 					pref.edit().putLong(Keys.READEDID, result[0].getId()).commit();
 				yanderePage++;

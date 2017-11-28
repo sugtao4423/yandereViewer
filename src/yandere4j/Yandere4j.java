@@ -55,6 +55,10 @@ public class Yandere4j{
 		this.reqPostCount = reqPostCount;
 	}
 
+	public int getRequestPostCount(){
+		return reqPostCount;
+	}
+
 	public String getFileName(Post post){
 		String name = "yande.re " + post.getId() + " ";
 		for(String s : post.getTags())
