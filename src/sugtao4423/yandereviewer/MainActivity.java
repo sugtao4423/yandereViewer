@@ -62,7 +62,6 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
 	private App app;
 
-	private PostGridView grid;
 	private ActionMode multiSelectMode;
 	private HashMap<Post, View> multiSelectItems;
 	private SwipeRefreshLayout swipeRefresh;
@@ -82,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
-		grid = (PostGridView)findViewById(R.id.grid);
+		PostGridView grid = (PostGridView)findViewById(R.id.grid);
 		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
 
