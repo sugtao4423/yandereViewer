@@ -24,6 +24,7 @@ import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
 	private ActionMode multiSelectMode;
 	private HashMap<Post, View> multiSelectItems;
+	private EndlessScrollListener scrollListener;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
 	private Yandere4j yandere;
@@ -86,6 +88,9 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 		grid.setAdapter(adapter);
 
 		multiSelectItems = new HashMap<Post, View>();
+
+		scrollListener = getScrollListener(grid.getGridLayoutManager());
+		grid.addOnScrollListener(scrollListener);
 
 		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
 		swipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
@@ -149,11 +154,8 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 					return;
 				}
 				adapter.addAll(result);
-				if(result.length >= yandere.getRequestPostCount()){
-					Post load = new Post(null, null, null, -1, -1, -1, null, null, null, null, null,
-							"LOADMORE", null, null, null, null, false, false, false, false, false, false, -1, -1, -1);
-					adapter.add(load);
-				}
+				if(result.length < yandere.getRequestPostCount())
+					scrollListener.setStopOnLoadMore(true);
 				if(yanderePage == 1 && searchQuery == null)
 					pref.edit().putLong(Keys.READEDID, result[0].getId()).commit();
 				yanderePage++;
@@ -163,7 +165,18 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
 	@Override
 	public void onRefresh(){
+		scrollListener.resetState();
 		loadPosts(true);
+	}
+
+	public EndlessScrollListener getScrollListener(GridLayoutManager glm){
+		return new EndlessScrollListener(glm){
+
+			@Override
+			public void onLoadMore(int current_page){
+				loadPosts(false);
+			}
+		};
 	}
 
 	public OnClickListener getOnCardClickListener(final Post post){
@@ -171,11 +184,6 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 
 			@Override
 			public void onClick(View view){
-				if(post.getMD5().equals("LOADMORE")){
-					adapter.remove(post);
-					loadPosts(false);
-					return;
-				}
 				if(multiSelectMode != null){
 					if(!view.isSelected()){
 						multiSelectItems.put(post, view);

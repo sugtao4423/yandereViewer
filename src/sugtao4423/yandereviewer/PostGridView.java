@@ -9,6 +9,8 @@ import android.view.View;
 
 public class PostGridView extends RecyclerView{
 
+	private GridLayoutManager gridLayoutManager;
+
 	public PostGridView(Context context){
 		super(context);
 		init(context);
@@ -21,8 +23,13 @@ public class PostGridView extends RecyclerView{
 
 	public void init(Context context){
 		setHasFixedSize(true);
-		setLayoutManager(new GridLayoutManager(context, 2));
+		gridLayoutManager = new GridLayoutManager(context, 2);
+		setLayoutManager(gridLayoutManager);
 		addItemDecoration(new GridSpacingItemDecoration(2, 30, true));
+	}
+
+	public GridLayoutManager getGridLayoutManager(){
+		return gridLayoutManager;
 	}
 
 }
