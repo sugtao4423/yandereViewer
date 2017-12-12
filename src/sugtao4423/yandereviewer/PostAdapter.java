@@ -1,6 +1,7 @@
 package sugtao4423.yandereviewer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.loopj.android.image.SmartImageView;
 
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 	private ArrayList<Post> data;
 	private LayoutInflater inflater;
 	private Handler handler;
+	private HashMap<Post, Integer> multiSelectedItems;
+	private int cardViewBGColor;
 
 	public PostAdapter(MainActivity mainActivity){
 		this.mainActivity = mainActivity;
@@ -29,6 +33,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 		inflater = (LayoutInflater)mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		readedId = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext()).getLong(Keys.READEDID, -1L);
 		handler = new Handler();
+		multiSelectedItems = new HashMap<Post, Integer>();
+		cardViewBGColor = new CardView(mainActivity).getCardBackgroundColor().getDefaultColor();
 	}
 
 	@Override
@@ -57,6 +63,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 			holder.imageSize.setBackgroundColor(Color.parseColor("#e1bee7"));
 		else
 			holder.imageSize.setBackgroundColor(Color.parseColor("#ffffff"));
+		if(multiSelectedItems.keySet().contains(item))
+			holder.itemView.setBackgroundColor(Color.parseColor("#B3E5FC"));
+		else
+			holder.itemView.setBackgroundColor(cardViewBGColor);
 	}
 
 	@Override
@@ -113,6 +123,30 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
 				notifyItemRemoved(pos);
 			}
 		});
+	}
+
+	public boolean isPostSelected(Post post){
+		return multiSelectedItems.keySet().contains(post);
+	}
+
+	public void setPostSelected(Post post, boolean isSelect){
+		int pos = data.indexOf(post);
+		if(isSelect)
+			multiSelectedItems.put(post, pos);
+		else
+			multiSelectedItems.remove(post);
+		notifyItemChanged(pos);
+	}
+
+	public Post[] getSelectedPosts(){
+		return multiSelectedItems.keySet().toArray(new Post[multiSelectedItems.size()]);
+	}
+
+	public void clearSelectedPosts(){
+		Integer[] destroySelectedPostPos = multiSelectedItems.values().toArray(new Integer[multiSelectedItems.size()]);
+		multiSelectedItems.clear();
+		for(int i : destroySelectedPostPos)
+			notifyItemChanged(i);
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder{

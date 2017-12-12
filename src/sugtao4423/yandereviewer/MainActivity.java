@@ -5,8 +5,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.json.JSONException;
 
 import android.app.AlertDialog;
@@ -15,7 +13,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -23,7 +20,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
@@ -64,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 	private App app;
 
 	private ActionMode multiSelectMode;
-	private HashMap<Post, View> multiSelectItems;
 	private EndlessScrollListener scrollListener;
 	private SwipeRefreshLayout swipeRefresh;
 	private PostAdapter adapter;
@@ -86,8 +81,6 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 		PostGridView grid = (PostGridView)findViewById(R.id.grid);
 		adapter = new PostAdapter(this);
 		grid.setAdapter(adapter);
-
-		multiSelectItems = new HashMap<Post, View>();
 
 		scrollListener = getScrollListener(grid.getGridLayoutManager());
 		grid.addOnScrollListener(scrollListener);
@@ -185,16 +178,11 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 			@Override
 			public void onClick(View view){
 				if(multiSelectMode != null){
-					if(!view.isSelected()){
-						multiSelectItems.put(post, view);
-						view.setSelected(true);
-						view.setBackgroundColor(Color.parseColor("#B3E5FC"));
-					}else{
-						multiSelectItems.remove(post);
-						view.setSelected(false);
-						view.setBackgroundColor(((CardView)view).getCardBackgroundColor().getDefaultColor());
-					}
-					int selectedCount = multiSelectItems.size();
+					if(!adapter.isPostSelected(post))
+						adapter.setPostSelected(post, true);
+					else
+						adapter.setPostSelected(post, false);
+					int selectedCount = adapter.getSelectedPosts().length;
 					multiSelectMode.setTitle(selectedCount + " selected");
 					if(selectedCount == 0)
 						multiSelectMode.finish();
@@ -325,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item){
 						if(item.getItemId() == Menu.FIRST){
-							app.saveImages(MainActivity.this, multiSelectItems.keySet().toArray(new Post[multiSelectItems.size()]));
+							app.saveImages(MainActivity.this, adapter.getSelectedPosts());
 							mode.finish();
 						}
 						return true;
@@ -334,11 +322,7 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 					@Override
 					public void onDestroyActionMode(ActionMode mode){
 						multiSelectMode = null;
-						for(View v : multiSelectItems.values()){
-							v.setSelected(false);
-							v.setBackgroundColor(((CardView)v).getCardBackgroundColor().getDefaultColor());
-						}
-						multiSelectItems.clear();
+						adapter.clearSelectedPosts();
 					}
 				});
 				return true;
