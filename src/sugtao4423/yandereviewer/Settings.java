@@ -99,6 +99,7 @@ public class Settings extends PreferenceActivity{
 				@Override
 				public boolean onPreferenceClick(Preference preference){
 					final EditText eLimit = new EditText(getActivity());
+					eLimit.setText(String.valueOf(pref.getInt(Keys.REQUEST_POSTCOUNT, 50)));
 					eLimit.setHint("1 to 100");
 					eLimit.setInputType(InputType.TYPE_CLASS_NUMBER);
 					new AlertDialog.Builder(getActivity())
