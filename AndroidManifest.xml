@@ -56,8 +56,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="twitter"
-                    android:scheme="yande.re-viewer" >
+                    android:host="localhost"
+                    android:pathPattern="/sugtao4423.yandereviewer/oauth.*"
+                    android:scheme="https" >
                 </data>
             </intent-filter>
         </activity>

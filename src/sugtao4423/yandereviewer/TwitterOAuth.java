@@ -2,6 +2,7 @@ package sugtao4423.yandereviewer;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -18,6 +19,8 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterOAuth extends Activity{
+
+	public static final String CALLBACK_URL = "https://localhost/sugtao4423.yandereviewer/oauth";
 
 	private Twitter twitter;
 	private RequestToken rt;
@@ -46,7 +49,7 @@ public class TwitterOAuth extends Activity{
 				Configuration conf = new ConfigurationBuilder().setOAuthConsumerKey(ck).setOAuthConsumerSecret(cs).build();
 				twitter = new TwitterFactory(conf).getInstance();
 				try{
-					rt = twitter.getOAuthRequestToken("yande.re-viewer://twitter");
+					rt = twitter.getOAuthRequestToken(CALLBACK_URL);
 					return true;
 				}catch(TwitterException e){
 					return false;
@@ -56,10 +59,12 @@ public class TwitterOAuth extends Activity{
 			@Override
 			protected void onPostExecute(Boolean result){
 				progDialog.dismiss();
-				if(result)
-					new ChromeIntent(TwitterOAuth.this, rt.getAuthenticationURL());
-				else
+				if(result){
+					Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(rt.getAuthenticationURL()));
+					startActivity(intent);
+				}else{
 					Toast.makeText(TwitterOAuth.this, getString(R.string.acquisition_of_request_token_failed), Toast.LENGTH_SHORT).show();
+				}
 			}
 		}.execute();
 	}
@@ -67,7 +72,7 @@ public class TwitterOAuth extends Activity{
 	@Override
 	protected void onNewIntent(Intent intent){
 		super.onNewIntent(intent);
-		if(intent == null || intent.getData() == null || !intent.getData().toString().startsWith("yande.re-viewer://twitter"))
+		if(intent == null || intent.getData() == null || !intent.getData().toString().startsWith(CALLBACK_URL))
 			return;
 
 		final String verifier = intent.getData().getQueryParameter("oauth_verifier");
