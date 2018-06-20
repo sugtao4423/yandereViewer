@@ -21,7 +21,9 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.text.InputType;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 public class Settings extends PreferenceActivity{
@@ -98,12 +100,13 @@ public class Settings extends PreferenceActivity{
 
 				@Override
 				public boolean onPreferenceClick(Preference preference){
-					final EditText eLimit = new EditText(getActivity());
+					FrameLayout dialogLayout = getEditTextDialogLayout(true);
+					final EditText eLimit = (EditText)dialogLayout.getChildAt(0);
 					eLimit.setText(String.valueOf(pref.getInt(Keys.REQUEST_POSTCOUNT, 50)));
 					eLimit.setHint("1 to 100");
 					eLimit.setInputType(InputType.TYPE_CLASS_NUMBER);
 					new AlertDialog.Builder(getActivity())
-					.setView(eLimit)
+					.setView(dialogLayout)
 					.setNegativeButton("Cancel", null)
 					.setPositiveButton("OK", new OnClickListener(){
 
@@ -125,13 +128,14 @@ public class Settings extends PreferenceActivity{
 
 				@Override
 				public boolean onPreferenceClick(Preference preference){
-					final EditText dirText = new EditText(getActivity());
+					FrameLayout dialogLayout = getEditTextDialogLayout(false);
+					final EditText dirText = (EditText)dialogLayout.getChildAt(0);
 					String currentDir = pref.getString(Keys.SAVEDIR, defaultDir);
 					dirText.setText(currentDir);
 
 					new AlertDialog.Builder(getActivity())
 					.setTitle(getString(R.string.changeSaveDir))
-					.setView(dirText)
+					.setView(dialogLayout)
 					.setNegativeButton("Cancel", null)
 					.setNeutralButton("Default", new OnClickListener(){
 
@@ -235,6 +239,20 @@ public class Settings extends PreferenceActivity{
 				return getString(R.string.ask);
 			}
 			return null;
+		}
+
+		public FrameLayout getEditTextDialogLayout(boolean isTopMargin){
+			final EditText userEdit = new EditText(getActivity());
+			FrameLayout editContainer = new FrameLayout(getActivity());
+			FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+			int margin = (int)((24 * getResources().getDisplayMetrics().density) + 0.5);
+			if(isTopMargin)
+				params.topMargin = margin;
+			params.leftMargin = margin;
+			params.rightMargin = margin;
+			userEdit.setLayoutParams(params);
+			editContainer.addView(userEdit);
+			return editContainer;
 		}
 	}
 }
