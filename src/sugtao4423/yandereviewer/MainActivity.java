@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -313,7 +314,13 @@ public class MainActivity extends AppCompatActivity implements OnRefreshListener
 					@Override
 					public boolean onActionItemClicked(ActionMode mode, MenuItem item){
 						if(item.getItemId() == Menu.FIRST){
-							app.saveImages(MainActivity.this, adapter.getSelectedPosts());
+							Intent intent = new Intent(MainActivity.this, DownloadService.class);
+							intent.putExtra(DownloadService.INTENT_KEY_POSTS, adapter.getSelectedPosts());
+							if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+								startForegroundService(intent);
+							}else{
+								startService(intent);
+							}
 							mode.finish();
 						}
 						return true;

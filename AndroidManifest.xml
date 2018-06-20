@@ -87,6 +87,11 @@
                 </data>
             </intent-filter>
         </activity>
+
+        <service
+            android:name="DownloadService"
+            android:process=":downloadService" >
+        </service>
     </application>
 
 </manifest>
