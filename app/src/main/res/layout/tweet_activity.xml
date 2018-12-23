@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#e9e9e9"
-    tools:context=".TweetActivity" >
+    tools:context=".TweetActivity">
 
     <EditText
         android:id="@+id/tweetText"
@@ -12,11 +12,11 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/tweetButton"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
         android:ems="10"
         android:gravity="top|left"
-        android:inputType="textMultiLine" >
+        android:inputType="textMultiLine">
 
         <requestFocus />
     </EditText>
@@ -36,16 +36,16 @@
         android:id="@+id/tweetAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_below="@+id/tweetText"
+        android:layout_alignParentLeft="true"
         android:text="tweetAccount" />
 
     <TextView
         android:id="@+id/moji140"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignTop="@+id/tweetButton"
+        android:layout_alignParentRight="true"
         android:layout_marginRight="10dp"
         android:text="140"
         android:textAppearance="?android:attr/textAppearanceMedium" />

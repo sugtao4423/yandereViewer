@@ -5,6 +5,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
 import org.json.JSONException;
 
 import android.app.AlertDialog;
@@ -52,426 +53,427 @@ import yandere4j.data.Post;
 
 public class MainActivity extends AppCompatActivity implements OnRefreshListener{
 
-	public static final String INTENT_EXTRA_SEARCHQUERY = "searchQuery";
+    public static final String INTENT_EXTRA_SEARCHQUERY = "searchQuery";
 
-	private static final int SAMPLE = 0;
-	private static final int FULL = 1;
-	private static final int ASK = 2;
+    private static final int SAMPLE = 0;
+    private static final int FULL = 1;
+    private static final int ASK = 2;
 
-	private App app;
+    private App app;
 
-	private ActionMode multiSelectMode;
-	private EndlessScrollListener scrollListener;
-	private SwipeRefreshLayout swipeRefresh;
-	private PostAdapter adapter;
-	private Yandere4j yandere;
-	private int yanderePage;
-	private String searchQuery;
+    private ActionMode multiSelectMode;
+    private EndlessScrollListener scrollListener;
+    private SwipeRefreshLayout swipeRefresh;
+    private PostAdapter adapter;
+    private Yandere4j yandere;
+    private int yanderePage;
+    private String searchQuery;
 
-	private SharedPreferences pref;
-	private int howView;
-	private SQLiteDatabase db;
+    private SharedPreferences pref;
+    private int howView;
+    private SQLiteDatabase db;
 
-	private Twitter twitter;
+    private Twitter twitter;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState){
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
-		PostGridView grid = (PostGridView)findViewById(R.id.grid);
-		adapter = new PostAdapter(this);
-		grid.setAdapter(adapter);
+    @Override
+    protected void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
+        PostGridView grid = (PostGridView)findViewById(R.id.grid);
+        adapter = new PostAdapter(this);
+        grid.setAdapter(adapter);
 
-		scrollListener = getScrollListener(grid.getGridLayoutManager());
-		grid.addOnScrollListener(scrollListener);
+        scrollListener = getScrollListener(grid.getGridLayoutManager());
+        grid.addOnScrollListener(scrollListener);
 
-		swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
-		swipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
-				android.R.color.holo_orange_light, android.R.color.holo_red_light);
-		swipeRefresh.setOnRefreshListener(this);
+        swipeRefresh = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
+        swipeRefresh.setOnRefreshListener(this);
 
-		app = (App)getApplicationContext();
-		pref = PreferenceManager.getDefaultSharedPreferences(this);
-		yandere = new Yandere4j();
+        app = (App)getApplicationContext();
+        pref = PreferenceManager.getDefaultSharedPreferences(this);
+        yandere = new Yandere4j();
 
-		loadSettings();
-		yanderePage = 1;
-		searchQuery = getIntent().getStringExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY);
-		if(searchQuery != null){
-			getSupportActionBar().setTitle(searchQuery);
-			getSupportActionBar().setIcon(android.R.drawable.ic_menu_search);
-		}
+        loadSettings();
+        yanderePage = 1;
+        searchQuery = getIntent().getStringExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY);
+        if(searchQuery != null){
+            getSupportActionBar().setTitle(searchQuery);
+            getSupportActionBar().setIcon(android.R.drawable.ic_menu_search);
+        }
 
-		db = new TagSQLiteHelper(this).getWritableDatabase();
+        db = new TagSQLiteHelper(this).getWritableDatabase();
 
-		if(!pref.getBoolean(Keys.TAGSAVED, false)){
-			Intent i = new Intent(MainActivity.this, SaveTagActivity.class);
-			i.putExtra(SaveTagActivity.INTENT_EXTRA_STARTMAIN, true);
-			startActivity(i);
-			finish();
-			return;
-		}else{
-			loadPosts(false);
-		}
-	}
+        if(!pref.getBoolean(Keys.TAGSAVED, false)){
+            Intent i = new Intent(MainActivity.this, SaveTagActivity.class);
+            i.putExtra(SaveTagActivity.INTENT_EXTRA_STARTMAIN, true);
+            startActivity(i);
+            finish();
+            return;
+        }else{
+            loadPosts(false);
+        }
+    }
 
-	public void loadPosts(final boolean isRefresh){
-		if(isRefresh){
-			adapter.clear();
-			yanderePage = 1;
-		}
-		new AsyncTask<Void, Void, Post[]>(){
+    public void loadPosts(final boolean isRefresh){
+        if(isRefresh){
+            adapter.clear();
+            yanderePage = 1;
+        }
+        new AsyncTask<Void, Void, Post[]>(){
 
-			@Override
-			protected void onPreExecute(){
-				swipeRefresh.setRefreshing(true);
-			}
+            @Override
+            protected void onPreExecute(){
+                swipeRefresh.setRefreshing(true);
+            }
 
-			@Override
-			protected Post[] doInBackground(Void... params){
-				try{
-					if(searchQuery == null)
-						return yandere.getPosts(yanderePage);
-					else
-						return yandere.searchPosts(searchQuery, yanderePage);
-				}catch(KeyManagementException | NoSuchAlgorithmException | JSONException | IOException e){
-					return null;
-				}
-			}
+            @Override
+            protected Post[] doInBackground(Void... params){
+                try{
+                    if(searchQuery == null)
+                        return yandere.getPosts(yanderePage);
+                    else
+                        return yandere.searchPosts(searchQuery, yanderePage);
+                }catch(KeyManagementException | NoSuchAlgorithmException | JSONException | IOException e){
+                    return null;
+                }
+            }
 
-			@Override
-			protected void onPostExecute(Post[] result){
-				swipeRefresh.setRefreshing(false);
-				if(result == null){
-					Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
-					return;
-				}
-				adapter.addAll(result);
-				if(result.length < yandere.getRequestPostCount())
-					scrollListener.setStopOnLoadMore(true);
-				if(yanderePage == 1 && searchQuery == null)
-					pref.edit().putLong(Keys.READEDID, result[0].getId()).commit();
-				yanderePage++;
-			}
-		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-	}
+            @Override
+            protected void onPostExecute(Post[] result){
+                swipeRefresh.setRefreshing(false);
+                if(result == null){
+                    Toast.makeText(MainActivity.this, getString(R.string.get_error), Toast.LENGTH_LONG).show();
+                    return;
+                }
+                adapter.addAll(result);
+                if(result.length < yandere.getRequestPostCount())
+                    scrollListener.setStopOnLoadMore(true);
+                if(yanderePage == 1 && searchQuery == null)
+                    pref.edit().putLong(Keys.READEDID, result[0].getId()).commit();
+                yanderePage++;
+            }
+        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
 
-	@Override
-	public void onRefresh(){
-		scrollListener.resetState();
-		loadPosts(true);
-	}
+    @Override
+    public void onRefresh(){
+        scrollListener.resetState();
+        loadPosts(true);
+    }
 
-	public EndlessScrollListener getScrollListener(GridLayoutManager glm){
-		return new EndlessScrollListener(glm){
+    public EndlessScrollListener getScrollListener(GridLayoutManager glm){
+        return new EndlessScrollListener(glm){
 
-			@Override
-			public void onLoadMore(int current_page){
-				loadPosts(false);
-			}
-		};
-	}
+            @Override
+            public void onLoadMore(int current_page){
+                loadPosts(false);
+            }
+        };
+    }
 
-	public OnClickListener getOnCardClickListener(final Post post){
-		return new OnClickListener(){
+    public OnClickListener getOnCardClickListener(final Post post){
+        return new OnClickListener(){
 
-			@Override
-			public void onClick(View view){
-				if(multiSelectMode != null){
-					if(!adapter.isPostSelected(post))
-						adapter.setPostSelected(post, true);
-					else
-						adapter.setPostSelected(post, false);
-					int selectedCount = adapter.getSelectedPosts().length;
-					multiSelectMode.setTitle(selectedCount + " selected");
-					if(selectedCount == 0)
-						multiSelectMode.finish();
-					return;
-				}
+            @Override
+            public void onClick(View view){
+                if(multiSelectMode != null){
+                    if(!adapter.isPostSelected(post))
+                        adapter.setPostSelected(post, true);
+                    else
+                        adapter.setPostSelected(post, false);
+                    int selectedCount = adapter.getSelectedPosts().length;
+                    multiSelectMode.setTitle(selectedCount + " selected");
+                    if(selectedCount == 0)
+                        multiSelectMode.finish();
+                    return;
+                }
 
-				String openText = null;
-				switch(howView){
-				case ASK:
-					openText = getString(R.string.open);
-					break;
-				case SAMPLE:
-					openText = getString(R.string.view_sample_size) + " (" + getFileMB(post.getSample().getSize()) + ")";
-					break;
-				case FULL:
-					openText = getString(R.string.view_full_size) + " (" + getFileMB(post.getFile().getSize()) + ")";
-					break;
-				}
+                String openText = null;
+                switch(howView){
+                    case ASK:
+                        openText = getString(R.string.open);
+                        break;
+                    case SAMPLE:
+                        openText = getString(R.string.view_sample_size) + " (" + getFileMB(post.getSample().getSize()) + ")";
+                        break;
+                    case FULL:
+                        openText = getString(R.string.view_full_size) + " (" + getFileMB(post.getFile().getSize()) + ")";
+                        break;
+                }
 
-				IconItem[] items = new IconItem[(twitter == null) ? 5 : 6];
-				items[0] = new IconItem(openText, android.R.drawable.ic_menu_gallery);
-				items[1] = new IconItem(getString(R.string.open_full_size_on_browser), android.R.drawable.ic_menu_set_as);
-				items[2] = new IconItem(getString(R.string.save_full_size), android.R.drawable.ic_menu_save);
-				items[3] = new IconItem(getString(R.string.share), android.R.drawable.ic_menu_share);
-				if(twitter == null){
-					items[4] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
-				}else{
-					items[4] = new IconItem(getString(R.string.share_on_twitter), R.drawable.twitter_social_icon_blue);
-					items[5] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
-				}
+                IconItem[] items = new IconItem[(twitter == null) ? 5 : 6];
+                items[0] = new IconItem(openText, android.R.drawable.ic_menu_gallery);
+                items[1] = new IconItem(getString(R.string.open_full_size_on_browser), android.R.drawable.ic_menu_set_as);
+                items[2] = new IconItem(getString(R.string.save_full_size), android.R.drawable.ic_menu_save);
+                items[3] = new IconItem(getString(R.string.share), android.R.drawable.ic_menu_share);
+                if(twitter == null){
+                    items[4] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
+                }else{
+                    items[4] = new IconItem(getString(R.string.share_on_twitter), R.drawable.twitter_social_icon_blue);
+                    items[5] = new IconItem(getString(R.string.detail), android.R.drawable.ic_menu_info_details);
+                }
 
-				IconDialog dialog = new IconDialog(MainActivity.this);
-				dialog.setItems(items, new android.content.DialogInterface.OnClickListener(){
+                IconDialog dialog = new IconDialog(MainActivity.this);
+                dialog.setItems(items, new android.content.DialogInterface.OnClickListener(){
 
-					@Override
-					public void onClick(DialogInterface dialog, int which){
-						final Intent i;
-						switch(which){
-						case 0:
-							i = new Intent(MainActivity.this, ShowImage.class);
-							if(howView == ASK){
-								String sampleSize = " (" + getFileMB(post.getSample().getSize()) + ")";
-								String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
-								new AlertDialog.Builder(MainActivity.this)
-								.setItems(new String[]{getString(R.string.open_sample_size) + sampleSize,
-										getString(R.string.open_full_size) + fullSize}, new android.content.DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which){
+                        final Intent i;
+                        switch(which){
+                            case 0:
+                                i = new Intent(MainActivity.this, ShowImage.class);
+                                if(howView == ASK){
+                                    String sampleSize = " (" + getFileMB(post.getSample().getSize()) + ")";
+                                    String fullSize = " (" + getFileMB(post.getFile().getSize()) + ")";
+                                    new AlertDialog.Builder(MainActivity.this)
+                                            .setItems(new String[]{getString(R.string.open_sample_size) + sampleSize,
+                                                    getString(R.string.open_full_size) + fullSize}, new android.content.DialogInterface.OnClickListener(){
 
-									@Override
-									public void onClick(DialogInterface dialog, int which){
-										if(which == 0){
-											i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
-											i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
-										}else if(which == 1){
-											i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
-											i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
-										}
-										startActivity(i);
-									}
-								}).show();
-							}else{
-								if(howView == SAMPLE){
-									i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
-									i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
-								}else if(howView == FULL){
-									i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
-									i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
-								}
-								startActivity(i);
-							}
-							break;
-						case 1:
-							new ChromeIntent(MainActivity.this, post.getFile().getUrl());
-							break;
-						case 2:
-							app.saveImage(MainActivity.this, post);
-							break;
-						case 3:
-							i = new Intent();
-							i.setAction(Intent.ACTION_SEND);
-							i.setType("text/plain");
-							i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post));
-							startActivity(i);
-							break;
-						case 4:
-							if(twitter == null){
-								detail(post);
-								return;
-							}
-							i = new Intent(MainActivity.this, TweetActivity.class);
-							i.putExtra(TweetActivity.INTENT_EXTRA_POST, post);
-							startActivity(i);
-							break;
-						case 5:
-							detail(post);
-							break;
-						}
-					}
-				}).show();
-			}
-			private void detail(Post post){
-				Intent i = new Intent(MainActivity.this, PostDetail.class);
-				i.putExtra(PostDetail.INTENT_EXTRA_POSTDATA, post);
-				startActivity(i);
-			}
-		};
-	}
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which){
+                                                    if(which == 0){
+                                                        i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
+                                                        i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
+                                                    }else if(which == 1){
+                                                        i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
+                                                        i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
+                                                    }
+                                                    startActivity(i);
+                                                }
+                                            }).show();
+                                }else{
+                                    if(howView == SAMPLE){
+                                        i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getSample().getUrl());
+                                        i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getSample().getSize());
+                                    }else if(howView == FULL){
+                                        i.putExtra(ShowImage.INTENT_EXTRA_URL, post.getFile().getUrl());
+                                        i.putExtra(ShowImage.INTENT_EXTRA_FILESIZE, post.getFile().getSize());
+                                    }
+                                    startActivity(i);
+                                }
+                                break;
+                            case 1:
+                                new ChromeIntent(MainActivity.this, post.getFile().getUrl());
+                                break;
+                            case 2:
+                                app.saveImage(MainActivity.this, post);
+                                break;
+                            case 3:
+                                i = new Intent();
+                                i.setAction(Intent.ACTION_SEND);
+                                i.setType("text/plain");
+                                i.putExtra(Intent.EXTRA_TEXT, yandere.getShareText(post));
+                                startActivity(i);
+                                break;
+                            case 4:
+                                if(twitter == null){
+                                    detail(post);
+                                    return;
+                                }
+                                i = new Intent(MainActivity.this, TweetActivity.class);
+                                i.putExtra(TweetActivity.INTENT_EXTRA_POST, post);
+                                startActivity(i);
+                                break;
+                            case 5:
+                                detail(post);
+                                break;
+                        }
+                    }
+                }).show();
+            }
 
-	public OnLongClickListener getOnCardLongClickListener(){
-		return new OnLongClickListener(){
+            private void detail(Post post){
+                Intent i = new Intent(MainActivity.this, PostDetail.class);
+                i.putExtra(PostDetail.INTENT_EXTRA_POSTDATA, post);
+                startActivity(i);
+            }
+        };
+    }
 
-			@Override
-			public boolean onLongClick(final View v){
-				startSupportActionMode(new ActionMode.Callback(){
+    public OnLongClickListener getOnCardLongClickListener(){
+        return new OnLongClickListener(){
 
-					@Override
-					public boolean onCreateActionMode(ActionMode mode, Menu menu){
-						multiSelectMode = mode;
-						menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "Save All").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-						v.callOnClick();
-						return true;
-					}
+            @Override
+            public boolean onLongClick(final View v){
+                startSupportActionMode(new ActionMode.Callback(){
 
-					@Override
-					public boolean onPrepareActionMode(ActionMode mode, Menu menu){
-						return false;
-					}
+                    @Override
+                    public boolean onCreateActionMode(ActionMode mode, Menu menu){
+                        multiSelectMode = mode;
+                        menu.add(Menu.NONE, Menu.FIRST, Menu.NONE, "Save All").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+                        v.callOnClick();
+                        return true;
+                    }
 
-					@Override
-					public boolean onActionItemClicked(ActionMode mode, MenuItem item){
-						if(item.getItemId() == Menu.FIRST){
-							Intent intent = new Intent(MainActivity.this, DownloadService.class);
-							intent.putExtra(DownloadService.INTENT_KEY_POSTS, adapter.getSelectedPosts());
-							if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-								startForegroundService(intent);
-							}else{
-								startService(intent);
-							}
-							mode.finish();
-						}
-						return true;
-					}
+                    @Override
+                    public boolean onPrepareActionMode(ActionMode mode, Menu menu){
+                        return false;
+                    }
 
-					@Override
-					public void onDestroyActionMode(ActionMode mode){
-						multiSelectMode = null;
-						adapter.clearSelectedPosts();
-					}
-				});
-				return true;
-			}
-		};
-	}
+                    @Override
+                    public boolean onActionItemClicked(ActionMode mode, MenuItem item){
+                        if(item.getItemId() == Menu.FIRST){
+                            Intent intent = new Intent(MainActivity.this, DownloadService.class);
+                            intent.putExtra(DownloadService.INTENT_KEY_POSTS, adapter.getSelectedPosts());
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                                startForegroundService(intent);
+                            }else{
+                                startService(intent);
+                            }
+                            mode.finish();
+                        }
+                        return true;
+                    }
 
-	@Override
-	public void onResume(){
-		super.onResume();
-		loadSettings();
-		if(searchQuery == null && (app.getClearedHistory() || app.getIsRefreshTags())){
-			invalidateOptionsMenu();
-			app.setClearedHistory(false);
-			app.setIsRefreshTags(false);
-		}
-	}
+                    @Override
+                    public void onDestroyActionMode(ActionMode mode){
+                        multiSelectMode = null;
+                        adapter.clearSelectedPosts();
+                    }
+                });
+                return true;
+            }
+        };
+    }
 
-	public void loadSettings(){
-		switch(pref.getString(Keys.HOWVIEW, Keys.VAL_FULL)){
-		case Keys.VAL_SAMPLE:
-			howView = SAMPLE;
-			break;
-		case Keys.VAL_FULL:
-			howView = FULL;
-			break;
-		case Keys.VAL_ASK:
-			howView = ASK;
-			break;
-		}
+    @Override
+    public void onResume(){
+        super.onResume();
+        loadSettings();
+        if(searchQuery == null && (app.getClearedHistory() || app.getIsRefreshTags())){
+            invalidateOptionsMenu();
+            app.setClearedHistory(false);
+            app.setIsRefreshTags(false);
+        }
+    }
 
-		if(!pref.getString(Keys.TWITTER_USERNAME, "").equals("")){
-			Configuration conf = new ConfigurationBuilder()
-					.setOAuthConsumerKey(getString(R.string.twitter_ck))
-					.setOAuthConsumerSecret(getString(R.string.twitter_cs))
-			.build();
-			AccessToken at = new AccessToken(pref.getString(Keys.TWITTER_AT, null), pref.getString(Keys.TWITTER_ATS, null));
-			twitter = new TwitterFactory(conf).getInstance(at);
-		}else{
-			twitter = null;
-		}
-		yandere.setRequestPostCount(pref.getInt(Keys.REQUEST_POSTCOUNT, 50));
-	}
+    public void loadSettings(){
+        switch(pref.getString(Keys.HOWVIEW, Keys.VAL_FULL)){
+            case Keys.VAL_SAMPLE:
+                howView = SAMPLE;
+                break;
+            case Keys.VAL_FULL:
+                howView = FULL;
+                break;
+            case Keys.VAL_ASK:
+                howView = ASK;
+                break;
+        }
 
-	public String getFileMB(int filesize){
-		DecimalFormat df = new DecimalFormat("#.#");
-		df.setMinimumFractionDigits(2);
-		df.setMaximumFractionDigits(2);
-		return df.format((double)filesize / 1024 / 1024) + "MB";
-	}
+        if(!pref.getString(Keys.TWITTER_USERNAME, "").equals("")){
+            Configuration conf = new ConfigurationBuilder()
+                    .setOAuthConsumerKey(getString(R.string.twitter_ck))
+                    .setOAuthConsumerSecret(getString(R.string.twitter_cs))
+                    .build();
+            AccessToken at = new AccessToken(pref.getString(Keys.TWITTER_AT, null), pref.getString(Keys.TWITTER_ATS, null));
+            twitter = new TwitterFactory(conf).getInstance(at);
+        }else{
+            twitter = null;
+        }
+        yandere.setRequestPostCount(pref.getInt(Keys.REQUEST_POSTCOUNT, 50));
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu){
-		if(searchQuery == null){
-			new MenuInflater(this).inflate(R.menu.menu_both, menu);
-			final MultiAutoCompleteTextView mactv =
-					(MultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
-			mactv.setEnabled(false);
-			new AsyncTask<Void, Void, ArrayList<String>>(){
+    public String getFileMB(int filesize){
+        DecimalFormat df = new DecimalFormat("#.#");
+        df.setMinimumFractionDigits(2);
+        df.setMaximumFractionDigits(2);
+        return df.format((double)filesize / 1024 / 1024) + "MB";
+    }
 
-				@Override
-				protected ArrayList<String> doInBackground(Void... params){
-					return new DBUtils(db).loadTagNamesAsArrayList();
-				}
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        if(searchQuery == null){
+            new MenuInflater(this).inflate(R.menu.menu_both, menu);
+            final MultiAutoCompleteTextView mactv =
+                    (MultiAutoCompleteTextView)((View)menu.findItem(R.id.search_view).getActionView()).findViewById(R.id.cactv);
+            mactv.setEnabled(false);
+            new AsyncTask<Void, Void, ArrayList<String>>(){
 
-				@Override
-				protected void onPostExecute(ArrayList<String> result){
-					prepareSuggest(result, mactv);
-					mactv.setEnabled(true);
-				}
-			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		}else{
-			new MenuInflater(this).inflate(R.menu.menu_settings, menu);
-		}
-		return super.onCreateOptionsMenu(menu);
-	}
+                @Override
+                protected ArrayList<String> doInBackground(Void... params){
+                    return new DBUtils(db).loadTagNamesAsArrayList();
+                }
 
-	public void prepareSuggest(final ArrayList<String> tags, final MultiAutoCompleteTextView mactv){
-		final SuggestAdapter suggestAdapter = new SuggestAdapter(this);
+                @Override
+                protected void onPostExecute(ArrayList<String> result){
+                    prepareSuggest(result, mactv);
+                    mactv.setEnabled(true);
+                }
+            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }else{
+            new MenuInflater(this).inflate(R.menu.menu_settings, menu);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
 
-		String[] searchHistory = pref.getString(Keys.SEARCH_HISTORY, "").split(",");
-		for(String s : searchHistory)
-			suggestAdapter.add(new SearchItem(s, SearchItem.HISTORY));
+    public void prepareSuggest(final ArrayList<String> tags, final MultiAutoCompleteTextView mactv){
+        final SuggestAdapter suggestAdapter = new SuggestAdapter(this);
 
-		for(int i = 0; i < tags.size(); i++)
-			suggestAdapter.add(new SearchItem(tags.get(i), SearchItem.TAG));
+        String[] searchHistory = pref.getString(Keys.SEARCH_HISTORY, "").split(",");
+        for(String s : searchHistory)
+            suggestAdapter.add(new SearchItem(s, SearchItem.HISTORY));
 
-		mactv.setAdapter(suggestAdapter);
-		mactv.setHint("Search post from tag");
-		mactv.setTokenizer(new SpaceTokenizer());
-		mactv.setOnEditorActionListener(new OnEditorActionListener(){
+        for(int i = 0; i < tags.size(); i++)
+            suggestAdapter.add(new SearchItem(tags.get(i), SearchItem.TAG));
 
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
-				if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)){
-					String query = mactv.getText().toString();
-					query = query.replaceAll("\\s+$", "");
+        mactv.setAdapter(suggestAdapter);
+        mactv.setHint("Search post from tag");
+        mactv.setTokenizer(new SpaceTokenizer());
+        mactv.setOnEditorActionListener(new OnEditorActionListener(){
 
-					ArrayList<String> history = new ArrayList<String>();
-					for(String s : pref.getString(Keys.SEARCH_HISTORY, "").split(",", 0)){
-						if(!s.isEmpty())
-							history.add(s);
-					}
-					if(history.indexOf(query) == -1 && tags.indexOf(query) == -1){
-						history.add(query);
-						String result = "";
-						for(String s : history)
-							result += s + ",";
-						pref.edit().putString(Keys.SEARCH_HISTORY, result).commit();
-						suggestAdapter.add(new SearchItem(query, SearchItem.HISTORY));
-					}
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event){
+                if((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)){
+                    String query = mactv.getText().toString();
+                    query = query.replaceAll("\\s+$", "");
 
-					Intent i = new Intent(getApplicationContext(), MainActivity.class);
-					i.putExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY, query);
-					startActivity(i);
-				}
-				return false;
-			}
-		});
-		mactv.addOnAttachStateChangeListener(new OnAttachStateChangeListener(){
-			@Override
-			public void onViewDetachedFromWindow(View v){
-			}
+                    ArrayList<String> history = new ArrayList<String>();
+                    for(String s : pref.getString(Keys.SEARCH_HISTORY, "").split(",", 0)){
+                        if(!s.isEmpty())
+                            history.add(s);
+                    }
+                    if(history.indexOf(query) == -1 && tags.indexOf(query) == -1){
+                        history.add(query);
+                        String result = "";
+                        for(String s : history)
+                            result += s + ",";
+                        pref.edit().putString(Keys.SEARCH_HISTORY, result).commit();
+                        suggestAdapter.add(new SearchItem(query, SearchItem.HISTORY));
+                    }
 
-			@Override
-			public void onViewAttachedToWindow(View v){
-				InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-				inputMethodManager.showSoftInput(v, 0);
-			}
-		});
-	}
+                    Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                    i.putExtra(MainActivity.INTENT_EXTRA_SEARCHQUERY, query);
+                    startActivity(i);
+                }
+                return false;
+            }
+        });
+        mactv.addOnAttachStateChangeListener(new OnAttachStateChangeListener(){
+            @Override
+            public void onViewDetachedFromWindow(View v){
+            }
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item){
-		if(item.getOrder() == Menu.FIRST + 1)
-			startActivity(new Intent(this, Settings.class));
-		return super.onOptionsItemSelected(item);
-	}
+            @Override
+            public void onViewAttachedToWindow(View v){
+                InputMethodManager inputMethodManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.showSoftInput(v, 0);
+            }
+        });
+    }
 
-	@Override
-	public void onDestroy(){
-		super.onDestroy();
-		db.close();
-	}
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        if(item.getOrder() == Menu.FIRST + 1)
+            startActivity(new Intent(this, Settings.class));
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        db.close();
+    }
 }

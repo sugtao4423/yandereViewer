@@ -11,12 +11,12 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name="sugtao4423.yandereviewer.MainActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:theme="@style/Theme.Toolbar" >
+            android:theme="@style/Theme.Toolbar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,26 +25,22 @@
         </activity>
         <activity
             android:name="PostDetail"
-            android:configChanges="orientation|screenSize" >
-        </activity>
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name="ShowImage"
             android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.TranslucentBackground" >
-        </activity>
+            android:theme="@style/Theme.TranslucentBackground" />
         <activity
             android:name="Settings"
-            android:label="@string/settings"
-            android:configChanges="orientation|screenSize" >
-        </activity>
+            android:configChanges="orientation|screenSize"
+            android:label="@string/settings" />
         <activity
             android:name="SaveTagActivity"
-            android:configChanges="orientation|screenSize" >
-        </activity>
+            android:configChanges="orientation|screenSize" />
         <activity
             android:name="TwitterOAuth"
             android:configChanges="orientation|screenSize"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -54,18 +50,16 @@
                 <data
                     android:host="localhost"
                     android:pathPattern="/sugtao4423.yandereviewer/oauth.*"
-                    android:scheme="https" >
-                </data>
+                    android:scheme="https" />
             </intent-filter>
         </activity>
         <activity
             android:name="TweetActivity"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="adjustResize" >
-        </activity>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="IntentActivity"
-            android:configChanges="orientation|screenSize" >
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -75,20 +69,17 @@
                 <data
                     android:host="yande.re"
                     android:pathPattern="/post/show/..*"
-                    android:scheme="http" >
-                </data>
+                    android:scheme="http" />
                 <data
                     android:host="yande.re"
                     android:pathPattern="/post/show/..*"
-                    android:scheme="https" >
-                </data>
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
         <service
             android:name="DownloadService"
-            android:process=":downloadService" >
-        </service>
+            android:process=":downloadService" />
     </application>
 
 </manifest>

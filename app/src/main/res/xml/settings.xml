@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
         android:entries="@array/how_view_entries"
@@ -16,7 +16,7 @@
         android:title="@string/changeSaveDir" />
     <Preference
         android:key="refreshAllTags"
-        android:title="@string/refreshAllTags"/>
+        android:title="@string/refreshAllTags" />
     <Preference
         android:key="clearHistory"
         android:title="@string/history_clear" />
