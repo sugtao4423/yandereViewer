@@ -1,0 +1,29 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="android:textColorTertiary">@color/textDarkPrimary</item>
+    </style>
+
+    <style name="Theme.Toolbar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
+        <item name="android:textColorTertiary">@color/textDarkPrimary</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+
+    <drawable name="transparameter">#bb000000</drawable>
+
+    <style name="Theme.TranslucentBackground" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowBackground">@drawable/transparameter</item>
+    </style>
+
+    <style name="tweet_btn">
+        <item name="android:src">@xml/tweetbtn</item>
+    </style>
+
+</resources>
