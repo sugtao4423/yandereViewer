@@ -25,162 +25,163 @@ import yandere4j.data.Tag;
 
 public class Yandere4j{
 
-	public static final String USER_AGENT = "yande.re viewer https://github.com/sugtao4423/yandereViewer";
+    public static final String USER_AGENT = "yande.re viewer https://github.com/sugtao4423/yandereViewer";
 
-	private static final String BASE_URL = "https://yande.re";
+    private static final String BASE_URL = "https://yande.re";
 
-	private int reqPostCount = 50;
+    private int reqPostCount = 50;
 
-	public Post[] getPosts(int page) throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
-		return getPosts(getServer(BASE_URL + "/post.json?page=" + page + "&limit=" + reqPostCount));
-	}
+    public Post[] getPosts(int page) throws KeyManagementException, NoSuchAlgorithmException, JSONException, IOException{
+        return getPosts(getServer(BASE_URL + "/post.json?page=" + page + "&limit=" + reqPostCount));
+    }
 
-	public Post getPost(long id) throws MalformedURLException, IOException, JSONException{
-		return getPost(new JSONArray(getServer(BASE_URL + "/post.json?tags=id:" + id)).getJSONObject(0));
-	}
+    public Post getPost(long id) throws MalformedURLException, IOException, JSONException{
+        return getPost(new JSONArray(getServer(BASE_URL + "/post.json?tags=id:" + id)).getJSONObject(0));
+    }
 
-	public Tag[] getTags(boolean sortWithId) throws MalformedURLException, JSONException, IOException{
-		Tag[] tags = getTags(getServer(BASE_URL + "/tag.json?limit=0"));
-		if(sortWithId)
-			Arrays.sort(tags);
-		return tags;
-	}
+    public Tag[] getTags(boolean sortWithId) throws MalformedURLException, JSONException, IOException{
+        Tag[] tags = getTags(getServer(BASE_URL + "/tag.json?limit=0"));
+        if(sortWithId)
+            Arrays.sort(tags);
+        return tags;
+    }
 
-	public Post[] searchPosts(String query, int page) throws MalformedURLException, JSONException, IOException{
-		query = URLEncoder.encode(query, "UTF-8");
-		return getPosts(getServer(BASE_URL + "/post.json?tags=" + query + "&page=" + page + "&limit=" + reqPostCount));
-	}
+    public Post[] searchPosts(String query, int page) throws MalformedURLException, JSONException, IOException{
+        query = URLEncoder.encode(query, "UTF-8");
+        return getPosts(getServer(BASE_URL + "/post.json?tags=" + query + "&page=" + page + "&limit=" + reqPostCount));
+    }
 
-	public void setRequestPostCount(int reqPostCount){
-		this.reqPostCount = reqPostCount;
-	}
+    public void setRequestPostCount(int reqPostCount){
+        this.reqPostCount = reqPostCount;
+    }
 
-	public int getRequestPostCount(){
-		return reqPostCount;
-	}
+    public int getRequestPostCount(){
+        return reqPostCount;
+    }
 
-	public String getFileName(Post post){
-		String name = "yande.re " + post.getId() + " ";
-		for(String s : post.getTags())
-			name += s + " ";
-		name = name.substring(0, name.length() - 1);
-		return name + "." + post.getFile().getExt();
-	}
+    public String getFileName(Post post){
+        String name = "yande.re " + post.getId() + " ";
+        for(String s : post.getTags())
+            name += s + " ";
+        name = name.substring(0, name.length() - 1);
+        return name + "." + post.getFile().getExt();
+    }
 
-	public String getShareText(Post post){
-		return getShareTitle(post) + " " + getShareURL(post);
-	}
+    public String getShareText(Post post){
+        return getShareTitle(post) + " " + getShareURL(post);
+    }
 
-	public String getShareTitle(Post post){
-		String tags = "";
-		for(String s : post.getTags())
-			tags += s + " ";
-		return tags.substring(0, tags.length() - 1);
-	}
+    public String getShareTitle(Post post){
+        String tags = "";
+        for(String s : post.getTags())
+            tags += s + " ";
+        return tags.substring(0, tags.length() - 1);
+    }
 
-	public String getShareURL(Post post){
-		return BASE_URL + "/post/show/" + post.getId();
-	}
+    public String getShareURL(Post post){
+        return BASE_URL + "/post/show/" + post.getId();
+    }
 
-	private Post[] getPosts(String json) throws JSONException{
-		JSONArray arr = new JSONArray(json);
-		Post[] result = new Post[arr.length()];
-		for(int i = 0; i < arr.length(); i++)
-			result[i] = getPost(arr.getJSONObject(i));
-		return result;
-	}
+    private Post[] getPosts(String json) throws JSONException{
+        JSONArray arr = new JSONArray(json);
+        Post[] result = new Post[arr.length()];
+        for(int i = 0; i < arr.length(); i++)
+            result[i] = getPost(arr.getJSONObject(i));
+        return result;
+    }
 
-	private Post getPost(JSONObject obj) throws JSONException{
-		// File
-		String url = obj.getString("file_url");
-		String ext = obj.getString("file_ext");
-		int size = obj.getInt("file_size");
-		int width = obj.getInt("width");
-		int height = obj.getInt("height");
-		File file = new File(url, ext, size, width, height);
+    private Post getPost(JSONObject obj) throws JSONException{
+        // File
+        String url = obj.getString("file_url");
+        String ext = obj.getString("file_ext");
+        int size = obj.getInt("file_size");
+        int width = obj.getInt("width");
+        int height = obj.getInt("height");
+        File file = new File(url, ext, size, width, height);
 
-		// Preview
-		url = obj.getString("preview_url");
-		width = obj.getInt("preview_width");
-		height = obj.getInt("preview_height");
-		Preview preview = new Preview(url, width, height);
+        // Preview
+        url = obj.getString("preview_url");
+        width = obj.getInt("preview_width");
+        height = obj.getInt("preview_height");
+        Preview preview = new Preview(url, width, height);
 
-		// Sample
-		url = obj.getString("sample_url");
-		size = obj.getInt("sample_file_size");
-		width = obj.getInt("sample_width");
-		height = obj.getInt("sample_height");
-		Sample sample = new Sample(url, size, width, height);
+        // Sample
+        url = obj.getString("sample_url");
+        size = obj.getInt("sample_file_size");
+        width = obj.getInt("sample_width");
+        height = obj.getInt("sample_height");
+        Sample sample = new Sample(url, size, width, height);
 
-		// Other
-		long id = obj.getLong("id");
-		long parent_id = obj.isNull("parent_id") ? -1 : obj.getLong("parent_id");
-		long change = obj.getLong("change");
+        // Other
+        long id = obj.getLong("id");
+        long parent_id = obj.isNull("parent_id") ? -1 : obj.getLong("parent_id");
+        long change = obj.getLong("change");
 
-		String[] tags = obj.getString("tags").split(" ");
+        String[] tags = obj.getString("tags").split(" ");
 
-		String creator_id = obj.getString("creator_id");
-		String approver_id = obj.getString("approver_id");
-		String author = obj.getString("author");
-		String source = obj.getString("source");
-		String md5 = obj.getString("md5");
-		String rating = obj.getString("rating");
-		String status = obj.getString("status");
+        String creator_id = obj.getString("creator_id");
+        String approver_id = obj.getString("approver_id");
+        String author = obj.getString("author");
+        String source = obj.getString("source");
+        String md5 = obj.getString("md5");
+        String rating = obj.getString("rating");
+        String status = obj.getString("status");
 
-		Date created_at = new Date(obj.getLong("created_at") * 1000);
-		Date updated_at = new Date(obj.getLong("updated_at") * 1000);
+        Date created_at = new Date(obj.getLong("created_at") * 1000);
+        Date updated_at = new Date(obj.getLong("updated_at") * 1000);
 
-		boolean is_shown_in_index = obj.getBoolean("is_shown_in_index");
-		boolean is_rating_locked = obj.getBoolean("is_rating_locked");
-		boolean has_children = obj.getBoolean("has_children");
-		boolean is_pending = obj.getBoolean("is_pending");
-		boolean is_held = obj.getBoolean("is_held");
-		boolean is_note_locked = obj.getBoolean("is_note_locked");
+        boolean is_shown_in_index = obj.getBoolean("is_shown_in_index");
+        boolean is_rating_locked = obj.getBoolean("is_rating_locked");
+        boolean has_children = obj.getBoolean("has_children");
+        boolean is_pending = obj.getBoolean("is_pending");
+        boolean is_held = obj.getBoolean("is_held");
+        boolean is_note_locked = obj.getBoolean("is_note_locked");
 
-		int score = obj.getInt("score");
-		int last_noted_at = obj.getInt("last_noted_at");
-		int last_commented_at = obj.getInt("last_commented_at");
+        int score = obj.getInt("score");
+        int last_noted_at = obj.getInt("last_noted_at");
+        int last_commented_at = obj.getInt("last_commented_at");
 
-		return new Post(file, preview, sample,
-				id, parent_id, change,
-				tags,
-				creator_id, approver_id, author, source, md5, rating, status,
-				created_at, updated_at,
-				is_shown_in_index, is_rating_locked, has_children, is_pending, is_held, is_note_locked,
-				score, last_noted_at, last_commented_at);
-	}
+        return new Post(file, preview, sample,
+                id, parent_id, change,
+                tags,
+                creator_id, approver_id, author, source, md5, rating, status,
+                created_at, updated_at,
+                is_shown_in_index, is_rating_locked, has_children, is_pending, is_held, is_note_locked,
+                score, last_noted_at, last_commented_at);
+    }
 
-	private Tag[] getTags(String json) throws JSONException{
-		JSONArray arr = new JSONArray(json);
-		Tag[] result = new Tag[arr.length()];
-		for(int i = 0; i < arr.length(); i++)
-			result[i] = getTag(arr.getJSONObject(i));
-		return result;
-	}
+    private Tag[] getTags(String json) throws JSONException{
+        JSONArray arr = new JSONArray(json);
+        Tag[] result = new Tag[arr.length()];
+        for(int i = 0; i < arr.length(); i++)
+            result[i] = getTag(arr.getJSONObject(i));
+        return result;
+    }
 
-	private Tag getTag(JSONObject obj) throws JSONException{
-		int id = obj.getInt("id");
-		String name = obj.getString("name");
-		int count = obj.getInt("count");
-		int type = obj.getInt("type");
-		boolean ambiguous = obj.getBoolean("ambiguous");
+    private Tag getTag(JSONObject obj) throws JSONException{
+        int id = obj.getInt("id");
+        String name = obj.getString("name");
+        int count = obj.getInt("count");
+        int type = obj.getInt("type");
+        boolean ambiguous = obj.getBoolean("ambiguous");
 
-		return new Tag(id, name, count, type, ambiguous);
-	}
+        return new Tag(id, name, count, type, ambiguous);
+    }
 
-	public String getServer(String url) throws MalformedURLException, IOException{
-		HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
-		conn.setRequestProperty("User-Agent", USER_AGENT);
-		conn.connect();
-		StringBuffer sb = new StringBuffer();
-		InputStream is = conn.getInputStream();
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		String line = null;
-		while((line = br.readLine()) != null)
-			sb.append(line);
-		is.close();
-		br.close();
-		conn.disconnect();
-		return sb.toString();
-	}
+    public String getServer(String url) throws MalformedURLException, IOException{
+        HttpURLConnection conn = (HttpURLConnection)new URL(url).openConnection();
+        conn.setRequestProperty("User-Agent", USER_AGENT);
+        conn.connect();
+        StringBuffer sb = new StringBuffer();
+        InputStream is = conn.getInputStream();
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        String line = null;
+        while((line = br.readLine()) != null)
+            sb.append(line);
+        is.close();
+        br.close();
+        conn.disconnect();
+        return sb.toString();
+    }
+
 }
