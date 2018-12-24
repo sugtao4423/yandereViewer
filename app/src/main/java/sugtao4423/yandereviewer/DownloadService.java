@@ -7,8 +7,8 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Arrays;
 
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -34,10 +34,10 @@ public class DownloadService extends Service{
 
     private NotificationManager notificationManager;
 
-    @TargetApi(26)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId){
-        Post[] posts = (Post[])intent.getSerializableExtra(INTENT_KEY_POSTS);
+        Object[] objects = (Object[])intent.getSerializableExtra(INTENT_KEY_POSTS);
+        Post[] posts = Arrays.copyOf(objects, objects.length, Post[].class);
         notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
