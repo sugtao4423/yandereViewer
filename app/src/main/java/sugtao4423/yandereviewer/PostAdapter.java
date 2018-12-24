@@ -79,51 +79,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
     }
 
     public void clear(){
-        final int size = data.size();
+        int size = data.size();
         data.clear();
-        handler.post(new Runnable(){
-
-            @Override
-            public void run(){
-                notifyItemRangeRemoved(0, size);
-            }
-        });
+        notifyItemRangeRemoved(0, size);
     }
 
-    public void add(final Post post){
-        handler.post(new Runnable(){
-
-            @Override
-            public void run(){
-                data.add(post);
-                notifyItemInserted(data.size() - 1);
-            }
-        });
+    public void add(Post post){
+        data.add(post);
+        notifyItemInserted(data.size() - 1);
     }
 
-    public void addAll(final Post[] posts){
-        final int pos = data.size();
+    public void addAll(Post[] posts){
+        int pos = data.size();
         for(Post p : posts)
             data.add(p);
-        handler.post(new Runnable(){
-
-            @Override
-            public void run(){
-                notifyItemRangeInserted(pos, posts.length);
-            }
-        });
+        notifyItemRangeInserted(pos, posts.length);
     }
 
     public void remove(Post post){
-        final int pos = data.indexOf(post);
+        int pos = data.indexOf(post);
         data.remove(post);
-        handler.post(new Runnable(){
-
-            @Override
-            public void run(){
-                notifyItemRemoved(pos);
-            }
-        });
+        notifyItemRemoved(pos);
     }
 
     public boolean isPostSelected(Post post){
