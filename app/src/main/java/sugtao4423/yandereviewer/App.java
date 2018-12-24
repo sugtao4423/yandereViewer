@@ -1,12 +1,5 @@
 package sugtao4423.yandereviewer;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -16,6 +9,13 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import yandere4j.Yandere4j;
 import yandere4j.data.Post;

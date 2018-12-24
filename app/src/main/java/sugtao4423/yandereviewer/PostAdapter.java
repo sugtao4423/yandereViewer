@@ -1,10 +1,5 @@
 package sugtao4423.yandereviewer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.loopj.android.image.SmartImageView;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
@@ -15,6 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.loopj.android.image.SmartImageView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import yandere4j.data.Post;
 

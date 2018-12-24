@@ -1,10 +1,5 @@
 package sugtao4423.yandereviewer;
 
-import java.io.File;
-import java.text.DecimalFormat;
-
-import com.loopj.android.image.WebImageCache;
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -17,7 +12,6 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,6 +20,11 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import com.loopj.android.image.WebImageCache;
+
+import java.io.File;
+import java.text.DecimalFormat;
 
 public class Settings extends AppCompatActivity{
 

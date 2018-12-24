@@ -1,9 +1,5 @@
 package sugtao4423.yandereviewer;
 
-import java.io.IOException;
-
-import org.json.JSONException;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +8,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+
+import org.json.JSONException;
+
+import java.io.IOException;
 
 import yandere4j.Yandere4j;
 import yandere4j.data.Tag;

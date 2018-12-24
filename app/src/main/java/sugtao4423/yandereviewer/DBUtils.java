@@ -1,10 +1,10 @@
 package sugtao4423.yandereviewer;
 
-import java.util.ArrayList;
-
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import java.util.ArrayList;
 
 import yandere4j.data.Tag;
 
