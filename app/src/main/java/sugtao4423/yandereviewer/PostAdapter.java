@@ -24,7 +24,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
     private long readedId = -1L;
     private ArrayList<Post> data;
     private LayoutInflater inflater;
-    private Handler handler;
     private HashMap<Post, Integer> multiSelectedItems;
     private int cardViewBGColor;
 
@@ -33,7 +32,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder>{
         data = new ArrayList<Post>();
         inflater = (LayoutInflater)mainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         readedId = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext()).getLong(Keys.READEDID, -1L);
-        handler = new Handler();
         multiSelectedItems = new HashMap<Post, Integer>();
         cardViewBGColor = new CardView(mainActivity).getCardBackgroundColor().getDefaultColor();
     }
