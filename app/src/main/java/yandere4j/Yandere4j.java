@@ -68,7 +68,7 @@ public class Yandere4j{
     }
 
     public String getShareText(Post post){
-        return getShareTitle(post) + " " + getShareURL(post);
+        return getShareTitle(post) + " | #" + post.getId() + " | yande.re " + getShareURL(post);
     }
 
     public String getShareTitle(Post post){
