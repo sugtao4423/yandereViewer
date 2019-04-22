@@ -16,6 +16,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -132,18 +133,11 @@ public class Settings extends AppCompatActivity{
                     String currentDir = pref.getString(Keys.SAVEDIR, defaultDir);
                     dirText.setText(currentDir);
 
-                    new AlertDialog.Builder(getActivity())
+                    AlertDialog changeSaveDirDialog = new AlertDialog.Builder(getActivity())
                             .setTitle(getString(R.string.changeSaveDir))
                             .setView(dialogLayout)
                             .setNegativeButton("Cancel", null)
-                            .setNeutralButton("Default", new OnClickListener(){
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which){
-                                    if(pref.edit().putString(Keys.SAVEDIR, defaultDir).commit())
-                                        changeSaveDir.setSummary(defaultDir);
-                                }
-                            })
+                            .setNeutralButton("Default", null)
                             .setPositiveButton("OK", new OnClickListener(){
 
                                 @Override
@@ -158,6 +152,12 @@ public class Settings extends AppCompatActivity{
                                         changeSaveDir.setSummary(current);
                                 }
                             }).show();
+                    changeSaveDirDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(new View.OnClickListener(){
+                        @Override
+                        public void onClick(View v){
+                            dirText.setText(defaultDir);
+                        }
+                    });
                     return true;
                 }
             });
