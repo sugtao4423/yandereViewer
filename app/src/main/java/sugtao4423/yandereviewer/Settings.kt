@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.preference.ListPreference
 import android.support.v7.preference.PreferenceFragmentCompat
 import android.text.InputType
+import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -21,8 +22,15 @@ class Settings : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         supportFragmentManager.beginTransaction().replace(android.R.id.content, PreferencesFragment()).commit()
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        if (item?.itemId == android.R.id.home) {
+            finish()
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     class PreferencesFragment : PreferenceFragmentCompat() {
