@@ -1,6 +1,5 @@
 package sugtao4423.yandereviewer
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.AsyncTask
@@ -8,6 +7,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import sugtao4423.support.progressdialog.ProgressDialog
 import twitter4j.Twitter
 import twitter4j.TwitterException
 import twitter4j.TwitterFactory

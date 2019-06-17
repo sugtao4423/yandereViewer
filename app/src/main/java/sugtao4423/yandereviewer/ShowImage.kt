@@ -1,6 +1,5 @@
 package sugtao4423.yandereviewer
 
-import android.app.ProgressDialog
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.AsyncTask
@@ -8,6 +7,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.tenthbit.view.ZoomImageView
+import sugtao4423.support.progressdialog.ProgressDialog
 import yandere4j.Yandere4j
 import java.io.ByteArrayOutputStream
 import java.io.IOException

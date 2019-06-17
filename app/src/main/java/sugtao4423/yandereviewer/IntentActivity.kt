@@ -1,11 +1,11 @@
 package sugtao4423.yandereviewer
 
-import android.app.ProgressDialog
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import sugtao4423.support.progressdialog.ProgressDialog
 import yandere4j.Post
 import yandere4j.Yandere4j
 import java.util.regex.Pattern

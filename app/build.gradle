@@ -19,6 +19,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    repositories {
+        maven {
+            url 'https://sugtao4423.github.io/android-ProgressDialog/repository'
+        }
+    }
 }
 
 dependencies {
@@ -36,4 +41,5 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'com.android.support:support-core-ui:28.0.0'
     implementation 'com.android.support:customtabs:28.0.0'
+    implementation 'sugtao4423.support:progressdialog:1.0.0'
 }
