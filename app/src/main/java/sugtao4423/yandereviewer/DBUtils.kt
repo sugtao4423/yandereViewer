@@ -1,10 +1,12 @@
 package sugtao4423.yandereviewer
 
 import android.content.ContentValues
-import android.database.sqlite.SQLiteDatabase
+import android.content.Context
 import yandere4j.Tag
 
-class DBUtils(private val db: SQLiteDatabase) {
+class DBUtils(context: Context) {
+
+    private val db = TagSQLiteHelper(context.applicationContext).writableDatabase
 
     fun writeTags(tags: Array<Tag>) {
         val contentValues = arrayListOf<ContentValues>()

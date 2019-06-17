@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.database.sqlite.SQLiteDatabase
 import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -49,7 +48,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     private lateinit var pref: SharedPreferences
     private var howView = ASK
-    private lateinit var db: SQLiteDatabase
 
     private var twitter: Twitter? = null
 
@@ -71,7 +69,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
         app = applicationContext as App
         pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        db = TagSQLiteHelper(applicationContext).writableDatabase
         loadSettings()
 
         searchQuery = intent.getStringExtra(INTENT_EXTRA_SEARCHQUERY)
@@ -324,7 +321,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             mactv.isEnabled = false
             object : AsyncTask<Unit, Unit, ArrayList<String>>() {
                 override fun doInBackground(vararg params: Unit?): ArrayList<String> {
-                    return DBUtils(db).loadTagNamesAsArrayList()
+                    val dbUtils = DBUtils(applicationContext)
+                    val tagNames = dbUtils.loadTagNamesAsArrayList()
+                    dbUtils.close()
+                    return tagNames
                 }
 
                 override fun onPostExecute(result: ArrayList<String>) {
@@ -392,11 +392,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             startActivity(Intent(this, Settings::class.java))
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        db.close()
     }
 
 }

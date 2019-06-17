@@ -45,9 +45,10 @@ class SaveTagActivity : AppCompatActivity() {
             }
 
             override fun onPostExecute(result: Array<Tag>?) {
-                val db = TagSQLiteHelper(applicationContext).writableDatabase
-                DBUtils(db).writeTags(result!!)
-                db.close()
+                DBUtils(applicationContext).apply {
+                    writeTags(result!!)
+                    close()
+                }
                 progressDialog.dismiss()
                 pref.edit().putBoolean(Keys.TAGSAVED, true).commit()
                 if (startMain) {

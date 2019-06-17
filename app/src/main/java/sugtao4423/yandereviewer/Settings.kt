@@ -138,8 +138,10 @@ class Settings : AppCompatActivity() {
                     setMessage(getString(R.string.is_this_okay))
                     setNegativeButton("Cancel", null)
                     setPositiveButton("OK") { _, _ ->
-                        val db = TagSQLiteHelper(activity.applicationContext).writableDatabase
-                        DBUtils(db).deleteAllTags()
+                        DBUtils(activity.applicationContext).apply {
+                            deleteAllTags()
+                            close()
+                        }
                         (activity.applicationContext as App).isRefreshTags = true
                         startActivity(Intent(activity, SaveTagActivity::class.java))
                     }
