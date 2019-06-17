@@ -4,10 +4,10 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
-import android.preference.ListPreference
-import android.preference.PreferenceFragment
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.preference.ListPreference
+import android.support.v7.preference.PreferenceFragmentCompat
 import android.text.InputType
 import android.view.ViewGroup
 import android.widget.EditText
@@ -22,14 +22,17 @@ class Settings : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        fragmentManager.beginTransaction().replace(android.R.id.content, MyPreferencesFragment()).commit()
+        supportFragmentManager.beginTransaction().replace(android.R.id.content, PreferencesFragment()).commit()
     }
 
-    class MyPreferencesFragment : PreferenceFragment() {
+    class PreferencesFragment : PreferenceFragmentCompat() {
 
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            addPreferencesFromResource(R.xml.settings)
+        override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
+            if (activity == null) {
+                return
+            }
+            val activity = activity!!
+            setPreferencesFromResource(R.xml.settings, rootKey)
 
             val pref = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
 
@@ -179,7 +182,7 @@ class Settings : AppCompatActivity() {
             DecimalFormat("#.#").let {
                 it.minimumFractionDigits = 2
                 it.maximumFractionDigits = 2
-                return it.format(WebImageCache(activity.applicationContext).cacheSize.toDouble() / 1024 / 1024) + "MB"
+                return it.format(WebImageCache(activity!!.applicationContext).cacheSize.toDouble() / 1024 / 1024) + "MB"
             }
         }
 
@@ -194,7 +197,7 @@ class Settings : AppCompatActivity() {
 
         private fun getEditTextDialogLayout(isTopMargin: Boolean): FrameLayout {
             val userEdit = EditText(activity)
-            val editContainer = FrameLayout(activity)
+            val editContainer = FrameLayout(activity!!)
             val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             val margin = ((24 * resources.displayMetrics.density) + 0.5).toInt()
             params.apply {
