@@ -5,6 +5,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import sugtao4423.support.progressdialog.ProgressDialog
 import yandere4j.Tag
 import yandere4j.Yandere4j
@@ -45,8 +46,13 @@ class SaveTagActivity : AppCompatActivity() {
             }
 
             override fun onPostExecute(result: Array<Tag>?) {
+                if (result == null) {
+                    Toast.makeText(this@SaveTagActivity, R.string.get_tags_failed, Toast.LENGTH_LONG).show()
+                    finish()
+                    return
+                }
                 DBUtils(applicationContext).apply {
-                    writeTags(result!!)
+                    writeTags(result)
                     close()
                 }
                 progressDialog.dismiss()
