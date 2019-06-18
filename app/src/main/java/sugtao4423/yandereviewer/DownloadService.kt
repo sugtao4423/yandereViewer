@@ -15,9 +15,9 @@ import yandere4j.Yandere4j
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URL
 import java.util.*
+import javax.net.ssl.HttpsURLConnection
 
 class DownloadService : Service() {
 
@@ -105,7 +105,7 @@ class DownloadService : Service() {
 
     @Throws(IOException::class)
     fun doDownload(post: Post, builder: NotificationCompat.Builder, notifiId: Int, savePath: String) {
-        val conn = URL(post.file.url).openConnection() as HttpURLConnection
+        val conn = URL(post.file.url).openConnection() as HttpsURLConnection
         conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT)
         conn.connect()
         val inputStream = conn.inputStream

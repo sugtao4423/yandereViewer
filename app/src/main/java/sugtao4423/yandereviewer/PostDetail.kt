@@ -19,12 +19,12 @@ import yandere4j.Post
 import yandere4j.Yandere4j
 import java.io.File
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URL
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
+import javax.net.ssl.HttpsURLConnection
 
 class PostDetail : AppCompatActivity() {
 
@@ -134,7 +134,7 @@ class PostDetail : AppCompatActivity() {
 
             override fun doInBackground(vararg params: Unit?): Drawable? {
                 return try {
-                    val conn = URL(post.preview.url).openConnection() as HttpURLConnection
+                    val conn = URL(post.preview.url).openConnection() as HttpsURLConnection
                     conn.connect()
                     val inputStream = conn.inputStream
                     val bmp = BitmapFactory.decodeStream(inputStream)

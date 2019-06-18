@@ -11,8 +11,8 @@ import sugtao4423.support.progressdialog.ProgressDialog
 import yandere4j.Yandere4j
 import java.io.ByteArrayOutputStream
 import java.io.IOException
-import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.HttpsURLConnection
 
 class ShowImage : AppCompatActivity() {
 
@@ -50,7 +50,7 @@ class ShowImage : AppCompatActivity() {
 
             override fun doInBackground(vararg params: Unit?): Bitmap? {
                 return try {
-                    val conn = URL(url).openConnection() as HttpURLConnection
+                    val conn = URL(url).openConnection() as HttpsURLConnection
                     conn.apply {
                         setRequestProperty("User-Agent", Yandere4j.USER_AGENT)
                         connect()

@@ -6,11 +6,11 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import java.net.HttpURLConnection
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLEncoder
 import java.util.*
+import javax.net.ssl.HttpsURLConnection
 
 class Yandere4j {
 
@@ -164,7 +164,7 @@ class Yandere4j {
 
     @Throws(MalformedURLException::class, IOException::class)
     private fun getServer(url: String): String {
-        val conn = URL(url).openConnection() as HttpURLConnection
+        val conn = URL(url).openConnection() as HttpsURLConnection
         conn.setRequestProperty("User-Agent", USER_AGENT)
         conn.connect()
         val inputStream = conn.inputStream
