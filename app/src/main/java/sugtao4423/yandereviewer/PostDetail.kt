@@ -57,12 +57,12 @@ class PostDetail : AppCompatActivity() {
             )
                     .matcher(post.source)
             if (pixivMatcher.find()) {
-                "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(4)
+                "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(4)
             } else {
                 post.source
             }
         } else {
-            "http://google.com/search?q=${post.source}"
+            "https://google.com/search?q=${post.source}"
         }
 
         val date = DateFormat.getDateFormat(applicationContext).format(post.createdAt)
