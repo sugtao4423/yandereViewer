@@ -21,7 +21,7 @@ android {
     }
     repositories {
         maven {
-            url 'https://sugtao4423.github.io/android-ProgressDialog/repository'
+            url 'https://jitpack.io'
         }
     }
 }
@@ -41,6 +41,6 @@ dependencies {
     implementation 'com.android.support:support-annotations:28.0.0'
     implementation 'com.android.support:support-core-ui:28.0.0'
     implementation 'com.android.support:customtabs:28.0.0'
-    implementation 'sugtao4423.support:progressdialog:1.0.0'
+    implementation 'com.github.sugtao4423:android-ProgressDialog:1.0.0'
     implementation 'org.twitter4j:twitter4j-core:4.0.7'
 }
