@@ -1,7 +1,10 @@
 package sugtao4423.yandereviewer
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.graphics.Canvas
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Environment
 import android.preference.PreferenceManager
@@ -88,8 +91,8 @@ class Settings : AppCompatActivity() {
             val requestLimit = findPreference("reqPostCount")
             requestLimit.summary = pref.getInt(Keys.REQUEST_POSTCOUNT, 50).toString()
             requestLimit.setOnPreferenceClickListener {
-                val dialogLayout = getEditTextDialogLayout(true)
-                val eLimit = dialogLayout.getChildAt(0) as EditText
+                val eLimit = EditText(activity)
+                val dialogLayout = getEditTextDialogLayout(eLimit, true)
                 eLimit.apply {
                     setText(pref.getInt(Keys.REQUEST_POSTCOUNT, 50).toString())
                     hint = "1 to 100"
@@ -108,12 +111,14 @@ class Settings : AppCompatActivity() {
             }
 
             val changeSaveDir = findPreference("changeSaveDir")
-            val defaultDir = Environment.getExternalStorageDirectory().absolutePath + "/" + Environment.DIRECTORY_DOWNLOADS + "/"
-            changeSaveDir.summary = pref.getString(Keys.SAVEDIR, defaultDir)
+            val externalStorageDir = Environment.getExternalStorageDirectory().absolutePath + "/"
+            val defaultSaveDir = Environment.DIRECTORY_DOWNLOADS + "/"
+            changeSaveDir.summary = externalStorageDir + pref.getString(Keys.SAVEDIR, defaultSaveDir)
             changeSaveDir.setOnPreferenceClickListener {
-                val dialogLayout = getEditTextDialogLayout(false)
-                val dirText = dialogLayout.getChildAt(0) as EditText
-                val currentDir = pref.getString(Keys.SAVEDIR, defaultDir)
+                val dirText = ChangeSaveDirEditText(activity)
+                dirText.prefix = externalStorageDir
+                val dialogLayout = getEditTextDialogLayout(dirText, false)
+                val currentDir = pref.getString(Keys.SAVEDIR, defaultSaveDir)
                 dirText.setText(currentDir)
 
                 val changeSaveDirDialog = AlertDialog.Builder(activity).run {
@@ -137,7 +142,7 @@ class Settings : AppCompatActivity() {
                     show()
                 }
                 changeSaveDirDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                    dirText.setText(defaultDir)
+                    dirText.setText(defaultSaveDir)
                 }
                 true
             }
@@ -203,8 +208,7 @@ class Settings : AppCompatActivity() {
             }
         }
 
-        private fun getEditTextDialogLayout(isTopMargin: Boolean): FrameLayout {
-            val userEdit = EditText(activity)
+        private fun getEditTextDialogLayout(editText: EditText, isTopMargin: Boolean): FrameLayout {
             val editContainer = FrameLayout(activity!!)
             val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             val margin = ((24 * resources.displayMetrics.density) + 0.5).toInt()
@@ -215,9 +219,31 @@ class Settings : AppCompatActivity() {
                 leftMargin = margin
                 rightMargin = margin
             }
-            userEdit.layoutParams = params
-            editContainer.addView(userEdit)
+            editText.layoutParams = params
+            editContainer.addView(editText)
             return editContainer
+        }
+
+    }
+
+    class ChangeSaveDirEditText(context: Context) : EditText(context) {
+
+        var prefix = ""
+        private val prefixRect = Rect()
+
+        override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+            paint.getTextBounds(prefix, 0, prefix.length, prefixRect)
+            prefixRect.right += paint.measureText("").toInt()
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        }
+
+        override fun onDraw(canvas: Canvas?) {
+            super.onDraw(canvas)
+            canvas?.drawText(prefix, super.getCompoundPaddingLeft().toFloat(), baseline.toFloat(), paint)
+        }
+
+        override fun getCompoundPaddingLeft(): Int {
+            return super.getCompoundPaddingLeft() + prefixRect.width()
         }
 
     }

@@ -1,23 +1,20 @@
 package sugtao4423.yandereviewer
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
-import android.os.*
+import android.os.Build
+import android.os.Environment
+import android.os.IBinder
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 import yandere4j.Post
-import yandere4j.Yandere4j
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.net.URL
+import java.net.URLDecoder
 import java.util.*
-import javax.net.ssl.HttpsURLConnection
 
 class DownloadService : Service() {
 
@@ -61,116 +58,34 @@ class DownloadService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
-    private fun saveImages(saveList: Array<Post>) {
-        object : AsyncTask<Unit, Unit, Unit>() {
-            private lateinit var saveDir: String
+    private fun saveImages(posts: Array<Post>) {
+        val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+        val defaultCanonicalDir = Environment.DIRECTORY_DOWNLOADS + "/"
+        val saveCanonicalDir = pref.getString(Keys.SAVEDIR, defaultCanonicalDir)
+                ?: defaultCanonicalDir
+        val dlManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-            override fun onPreExecute() {
-                val defaultPath = Environment.getExternalStorageDirectory().absolutePath + "/" + Environment.DIRECTORY_DOWNLOADS + "/"
-                saveDir = PreferenceManager.getDefaultSharedPreferences(applicationContext).getString(Keys.SAVEDIR, defaultPath)
-                        ?: defaultPath
-            }
-
-            override fun doInBackground(vararg params: Unit?) {
-                saveList.mapIndexed { i, it ->
-                    val time = System.currentTimeMillis()
-                    val notifiId = i
-                    val builder = NotificationCompat.Builder(applicationContext, "default").apply {
-                        setContentTitle("Saving... " + (i + 1) + "/" + saveList.size)
-                        setContentText(Yandere4j().getFileName(it))
-                        setSmallIcon(android.R.drawable.stat_sys_download)
-                        setProgress(100, 0, false)
-                        setOngoing(true)
-                        setWhen(time)
-                    }
-                    notificationManager.notify(notifiId, builder.build())
-
-                    val path = saveDir + Yandere4j().getFileName(it)
-                    try {
-                        doDownload(it, builder, notifiId, path)
-                    } catch (e: IOException) {
-                        onIOErrorNotification(it, builder, notifiId, path, i, saveList.size)
-                        return@mapIndexed
-                    }
-                    onSuccessNotification(builder, notifiId, path, i, saveList.size)
+        var currentPos = 0
+        val downloadReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (currentPos == posts.size) {
+                    unregisterReceiver(this)
+                    stopSelf()
+                    return
                 }
-            }
-
-            override fun onPostExecute(result: Unit?) {
-                stopSelf()
-            }
-
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
-    }
-
-    @Throws(IOException::class)
-    fun doDownload(post: Post, builder: NotificationCompat.Builder, notifiId: Int, savePath: String) {
-        val conn = URL(post.file.url).openConnection() as HttpsURLConnection
-        conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT)
-        conn.connect()
-        val inputStream = conn.inputStream
-        val fos = FileOutputStream(savePath)
-        val buffer = ByteArray(1024)
-        var len = inputStream.read(buffer)
-        var percentage = 0
-        var i = 1
-        while (len > 0) {
-            fos.write(buffer, 0, len)
-            val currentPer = Math.round(++i * 1024.toFloat() / post.file.size * 100)
-            if (percentage != currentPer) {
-                builder.setProgress(100, currentPer, false)
-                notificationManager.notify(notifiId, builder.build())
-                percentage = currentPer
-            }
-            len = inputStream.read(buffer)
-        }
-        try {
-            Thread.sleep(1000)
-        } catch (e: InterruptedException) {
-        }
-        builder.setProgress(0, 0, false)
-        notificationManager.notify(notifiId, builder.build())
-        fos.close()
-        inputStream.close()
-        conn.disconnect()
-    }
-
-    fun onIOErrorNotification(post: Post, builder: NotificationCompat.Builder, notifiId: Int, savePath: String, currentPos: Int, allPostSize: Int) {
-        val f = File(savePath)
-        if (f.exists()) {
-            f.delete()
-        }
-        val url = "https://yande.re/post/show/${post.id}"
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        val pendingIntent = PendingIntent.getActivity(applicationContext, notifiId, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        builder.apply {
-            setContentTitle(getString(R.string.save_failed) + " " + (currentPos + 1) + "/" + allPostSize)
-            setSmallIcon(android.R.drawable.stat_sys_download_done)
-            setOngoing(false)
-            setContentIntent(pendingIntent)
-            setAutoCancel(false)
-        }
-        notificationManager.notify(notifiId, builder.build())
-    }
-
-    fun onSuccessNotification(builder: NotificationCompat.Builder, notifiId: Int, savePath: String, currentPos: Int, allPostSize: Int) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            try {
-                val m = StrictMode::class.java.getMethod("disableDeathOnFileUriExposure")
-                m.invoke(null)
-            } catch (e: Exception) {
+                val post = posts[currentPos++]
+                val fileName = File(URLDecoder.decode(post.file.url, "UTF-8")).name
+                val dlRequest = DownloadManager.Request(Uri.parse(post.file.url)).apply {
+                    allowScanningByMediaScanner()
+                    setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                    setDestinationInExternalPublicDir(saveCanonicalDir, fileName)
+                }
+                dlManager.enqueue(dlRequest)
             }
         }
-        val picIntent = Intent(Intent.ACTION_VIEW).setDataAndType(Uri.fromFile(File(savePath)), "image/*")
-        val contentIntent = PendingIntent.getActivity(applicationContext, notifiId, picIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-        builder.apply {
-            setContentTitle(getString(R.string.save_success) + " " + (currentPos + 1) + "/" + allPostSize)
-            setSmallIcon(android.R.drawable.stat_sys_download_done)
-            setOngoing(false)
-            setContentIntent(contentIntent)
-            setAutoCancel(true)
-        }
-        notificationManager.notify(notifiId, builder.build())
+
+        registerReceiver(downloadReceiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
+        downloadReceiver.onReceive(null, null)
     }
 
     override fun onBind(intent: Intent?): IBinder? {
