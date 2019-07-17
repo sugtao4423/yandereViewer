@@ -27,8 +27,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation files('libs/android-smart-image-view.jar')
+    implementation 'com.github.sugtao4423:android-smart-image-view:1.0.0'
     implementation 'com.github.sugtao4423:ZoomImageView:1.0.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:28.0.0'
