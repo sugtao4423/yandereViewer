@@ -34,12 +34,6 @@ class PostAdapter(private val mainActivity: MainActivity) : RecyclerView.Adapter
         holder.itemView.setOnClickListener(mainActivity.getOnCardClickListener(item))
         holder.itemView.setOnLongClickListener(mainActivity.getOnCardLongClickListener())
 
-        if (item.md5 == "LOADMORE") {
-            holder.image.setImageResource(R.drawable.plus)
-            holder.imageSize.text = "Load More"
-            holder.imageSize.setBackgroundColor(Color.parseColor("#ffffff"))
-            return
-        }
         holder.image.userAgent = Yandere4j.USER_AGENT
         holder.image.setImageUrl(item.preview.url, null, R.drawable.ic_action_refresh)
         holder.imageSize.text = "${item.file.width}x${item.file.height}"
