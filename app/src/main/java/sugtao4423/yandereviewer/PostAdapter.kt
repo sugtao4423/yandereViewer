@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.loopj.android.image.SmartImageView
 import yandere4j.Post
+import yandere4j.Yandere4j
 
 class PostAdapter(private val mainActivity: MainActivity) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
 
@@ -39,6 +40,7 @@ class PostAdapter(private val mainActivity: MainActivity) : RecyclerView.Adapter
             holder.imageSize.setBackgroundColor(Color.parseColor("#ffffff"))
             return
         }
+        holder.image.userAgent = Yandere4j.USER_AGENT
         holder.image.setImageUrl(item.preview.url, null, R.drawable.ic_action_refresh)
         holder.imageSize.text = "${item.file.width}x${item.file.height}"
 
