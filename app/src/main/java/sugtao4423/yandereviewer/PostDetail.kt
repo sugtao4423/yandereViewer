@@ -135,6 +135,7 @@ class PostDetail : AppCompatActivity() {
             override fun doInBackground(vararg params: Unit?): Drawable? {
                 return try {
                     val conn = URL(post.preview.url).openConnection() as HttpsURLConnection
+                    conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT)
                     conn.connect()
                     val inputStream = conn.inputStream
                     val bmp = BitmapFactory.decodeStream(inputStream)
