@@ -46,7 +46,7 @@ class DownloadService : Service() {
             notificationManager.createNotificationChannel(channel)
             val notification = NotificationCompat.Builder(applicationContext, channelId).run {
                 setContentTitle(title)
-                setSmallIcon(R.drawable.ic_launcher)
+                setSmallIcon(android.R.drawable.stat_sys_download)
                 setAutoCancel(true)
                 setContentIntent(pendingIntent)
                 setWhen(System.currentTimeMillis())
