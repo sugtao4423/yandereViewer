@@ -136,7 +136,7 @@ class Settings : AppCompatActivity() {
                             fDir.mkdirs()
                         }
                         if (pref.edit().putString(Keys.SAVEDIR, current).commit()) {
-                            it.summary = current
+                            it.summary = externalStorageDir + current
                         }
                     }
                     show()
