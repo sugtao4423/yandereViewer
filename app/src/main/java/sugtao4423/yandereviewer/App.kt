@@ -8,8 +8,20 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.support.v4.content.ContextCompat
 import yandere4j.Post
+import java.text.DecimalFormat
 
 class App : Application() {
+
+    companion object {
+        @JvmStatic
+        fun getFileMB(fileByteSize: Int): String {
+            val df = DecimalFormat("#.#").apply {
+                minimumFractionDigits = 2
+                maximumFractionDigits = 2
+            }
+            return df.format(fileByteSize.toFloat() / 1024 / 1024) + "MB"
+        }
+    }
 
     var clearedHistory = false
     var isRefreshTags = false

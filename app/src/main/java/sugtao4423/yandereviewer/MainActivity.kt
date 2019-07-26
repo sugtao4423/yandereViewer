@@ -156,8 +156,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
             val openText = when (howView) {
                 ASK -> getString(R.string.open)
-                SAMPLE -> getString(R.string.view_sample_size) + " (" + getFileMB(post.sample.size) + ")"
-                FULL -> getString(R.string.view_full_size) + " (" + getFileMB(post.file.size) + ")"
+                SAMPLE -> getString(R.string.view_sample_size) + " (" + App.getFileMB(post.sample.size) + ")"
+                FULL -> getString(R.string.view_full_size) + " (" + App.getFileMB(post.file.size) + ")"
                 else -> ""
             }
 
@@ -186,8 +186,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                         val i = Intent(this, ShowImage::class.java)
                         when (howView) {
                             ASK -> {
-                                val sampleSize = " (" + getFileMB(post.sample.size) + ")"
-                                val fullSize = " (" + getFileMB(post.file.size) + ")"
+                                val sampleSize = " (" + App.getFileMB(post.sample.size) + ")"
+                                val fullSize = " (" + App.getFileMB(post.file.size) + ")"
                                 AlertDialog.Builder(this).apply {
                                     setItems(arrayOf(
                                             getString(R.string.open_sample_size) + sampleSize,
@@ -304,14 +304,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             twitter = null
         }
         yandere.requestPostCount = pref.getInt(Keys.REQUEST_POSTCOUNT, 50)
-    }
-
-    private fun getFileMB(fileSize: Int): String {
-        val df = DecimalFormat("#.#").apply {
-            minimumFractionDigits = 2
-            maximumFractionDigits = 2
-        }
-        return df.format(fileSize.toDouble() / 1024 / 1024) + "MB"
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

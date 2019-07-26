@@ -82,11 +82,11 @@ class PostDetail : AppCompatActivity() {
                 "<strong>Sample</strong><br>" +
                 "URL: <a href=\"${post.sample.url}\">${post.sample.url}</a><br>" +
                 "Size: ${post.sample.width}x${post.sample.height}<br>" +
-                "File Size: " + getMB(post.sample.size) + "<br><br>" +
+                "File Size: " + App.getFileMB(post.sample.size) + "<br><br>" +
                 "<strong>File</strong><br>" +
                 "URL: <a href=\"${post.file.url}\">${post.file.url}</a><br>" +
                 "Size: ${post.file.width}x${post.file.height}<br>" +
-                "File Size: " + getMB(post.file.size) + "</p>"
+                "File Size: " + App.getFileMB(post.file.size) + "</p>"
         text.text = fromHtml(str)
         text.movementMethod = MutableLinkMovementMethod().apply {
             setOnUrlClickListener(object : MutableLinkMovementMethod.OnUrlClickListener {
@@ -104,14 +104,6 @@ class PostDetail : AppCompatActivity() {
         } else {
             Html.fromHtml(source)
         }
-    }
-
-    private fun getMB(byteSize: Int): String {
-        val df = DecimalFormat("#.#").apply {
-            minimumFractionDigits = 2
-            maximumFractionDigits = 2
-        }
-        return df.format(byteSize.toFloat() / 1024 / 1024) + "MB"
     }
 
     private fun setActionbarIcon() {
