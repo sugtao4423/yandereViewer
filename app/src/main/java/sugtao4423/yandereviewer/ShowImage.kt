@@ -36,8 +36,9 @@ class ShowImage : AppCompatActivity() {
                     setMessage("Loading...")
                     isIndeterminate = false
                     setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-                    max = size
+                    max = size / 1024
                     progress = 0
+                    setProgressNumberFormat("%1d/%2d KB")
                     setCancelable(true)
                     setCanceledOnTouchOutside(false)
                     setOnCancelListener {
@@ -82,7 +83,7 @@ class ShowImage : AppCompatActivity() {
             }
 
             override fun onProgressUpdate(vararg values: Int?) {
-                progressDialog.progress = values[0]!!
+                progressDialog.progress = values[0]!! / 1024
             }
 
             override fun onPostExecute(result: Bitmap?) {
