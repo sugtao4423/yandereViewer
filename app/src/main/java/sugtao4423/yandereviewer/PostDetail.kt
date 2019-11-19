@@ -57,7 +57,7 @@ class PostDetail : AppCompatActivity() {
             )
                     .matcher(post.source)
             if (pixivMatcher.find()) {
-                "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=" + pixivMatcher.group(4)
+                "https://www.pixiv.net/artworks/" + pixivMatcher.group(4)
             } else {
                 post.source
             }
