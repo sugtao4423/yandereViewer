@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Rect
+import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.preference.PreferenceManager
@@ -17,7 +18,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
-import com.loopj.android.image.WebImageCache
+import com.bumptech.glide.Glide
 import java.io.File
 import java.text.DecimalFormat
 
@@ -184,18 +185,37 @@ class Settings : AppCompatActivity() {
             val clearCache = findPreference("clearCache")
             clearCache.summary = getString(R.string.cache, getCacheSize())
             clearCache.setOnPreferenceClickListener {
-                WebImageCache(activity.applicationContext).clear()
-                it.summary = getString(R.string.cache, getCacheSize())
-                Toast.makeText(activity.applicationContext, R.string.cache_cleared, Toast.LENGTH_SHORT).show()
+                object : AsyncTask<Void, Void, Void?>() {
+                    override fun doInBackground(vararg params: Void?): Void? {
+                        Glide.get(context!!).clearDiskCache()
+                        return null
+                    }
+
+                    override fun onPostExecute(result: Void?) {
+                        it.summary = getString(R.string.cache, getCacheSize())
+                        Toast.makeText(activity.applicationContext, R.string.cache_cleared, Toast.LENGTH_SHORT).show()
+                    }
+                }.execute()
                 true
             }
         }
 
         private fun getCacheSize(): String {
+            fun getDirSize(dir: File): Long {
+                var size = 0L
+                dir.listFiles().map {
+                    when {
+                        it == null -> return@map
+                        it.isDirectory -> size += getDirSize(it)
+                        it.isFile -> size += it.length()
+                    }
+                }
+                return size
+            }
             DecimalFormat("#.#").let {
                 it.minimumFractionDigits = 2
                 it.maximumFractionDigits = 2
-                return it.format(WebImageCache(activity!!.applicationContext).getCacheSize().toDouble() / 1024 / 1024) + "MB"
+                return it.format(getDirSize(context!!.cacheDir).toDouble() / 1024 / 1024) + "MB"
             }
         }
 

@@ -17,6 +17,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.MultiAutoCompleteTextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import sugtao4423.icondialog.IconDialog
 import sugtao4423.icondialog.IconItem
 import twitter4j.Twitter
@@ -25,7 +26,6 @@ import twitter4j.auth.AccessToken
 import twitter4j.conf.ConfigurationBuilder
 import yandere4j.Post
 import yandere4j.Yandere4j
-import java.text.DecimalFormat
 
 class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
@@ -283,6 +283,11 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             app.clearedHistory = false
             app.isRefreshTags = false
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Glide.get(this).clearMemory()
     }
 
     private fun loadSettings() {

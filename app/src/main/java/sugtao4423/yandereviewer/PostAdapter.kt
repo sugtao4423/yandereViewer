@@ -8,8 +8,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
-import com.loopj.android.image.SmartImageView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
 import yandere4j.Post
 import yandere4j.Yandere4j
 
@@ -34,8 +37,9 @@ class PostAdapter(private val mainActivity: MainActivity) : RecyclerView.Adapter
         holder.itemView.setOnClickListener(mainActivity.getOnCardClickListener(item))
         holder.itemView.setOnLongClickListener(mainActivity.getOnCardLongClickListener())
 
-        holder.image.userAgent = Yandere4j.USER_AGENT
-        holder.image.setImageUrl(item.preview.url, null, R.drawable.ic_action_refresh)
+        val glideHeader = LazyHeaders.Builder().addHeader("User-Agent", Yandere4j.USER_AGENT).build()
+        val glideUrl = GlideUrl(item.preview.url, glideHeader)
+        Glide.with(mainActivity).load(glideUrl).placeholder(R.drawable.ic_action_refresh).into(holder.image)
         holder.imageSize.text = "${item.file.width}x${item.file.height}"
 
         holder.imageSize.setBackgroundColor(
@@ -111,7 +115,7 @@ class PostAdapter(private val mainActivity: MainActivity) : RecyclerView.Adapter
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val image: SmartImageView = itemView.findViewById(R.id.postImage)
+        val image: ImageView = itemView.findViewById(R.id.postImage)
         val imageSize: TextView = itemView.findViewById(R.id.imageSize)
     }
 
