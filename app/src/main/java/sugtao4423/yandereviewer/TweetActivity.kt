@@ -1,6 +1,5 @@
 package sugtao4423.yandereviewer
 
-import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
@@ -13,6 +12,10 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import twitter4j.Twitter
 import twitter4j.TwitterException
 import twitter4j.TwitterFactory
@@ -60,25 +63,20 @@ class TweetActivity : AppCompatActivity() {
 
     fun tweet(@Suppress("UNUSED_PARAMETER") v: View) {
         tweetBtn.isEnabled = false
-        object : AsyncTask<Unit, Unit, Boolean>() {
-
-            override fun doInBackground(vararg params: Unit?): Boolean {
-                return try {
+        CoroutineScope(Dispatchers.Main).launch {
+            val result = withContext(Dispatchers.IO) {
+                try {
                     twitter.updateStatus(editText.text.toString())
-                    true
                 } catch (e: TwitterException) {
-                    false
+                    null
                 }
             }
-
-            override fun onPostExecute(result: Boolean) {
-                if (!result) {
-                    Toast.makeText(this@TweetActivity, R.string.tweet_failed, Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(this@TweetActivity, R.string.tweet_success, Toast.LENGTH_SHORT).show()
-                }
+            if (result == null) {
+                Toast.makeText(this@TweetActivity, R.string.tweet_failed, Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this@TweetActivity, R.string.tweet_success, Toast.LENGTH_SHORT).show()
             }
-        }.execute()
+        }
         finish()
     }
 

@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -15,12 +14,15 @@ import android.text.format.DateFormat
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import yandere4j.Post
 import yandere4j.Yandere4j
 import java.io.File
 import java.io.IOException
 import java.net.URL
-import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.regex.Pattern
@@ -122,10 +124,9 @@ class PostDetail : AppCompatActivity() {
             actionBar.setIcon(d)
             return
         }
-        object : AsyncTask<Unit, Unit, Drawable?>() {
-
-            override fun doInBackground(vararg params: Unit?): Drawable? {
-                return try {
+        CoroutineScope(Dispatchers.Main).launch {
+            val result = withContext(Dispatchers.IO) {
+                try {
                     val conn = URL(post.preview.url).openConnection() as HttpsURLConnection
                     conn.setRequestProperty("User-Agent", Yandere4j.USER_AGENT)
                     conn.connect()
@@ -138,13 +139,10 @@ class PostDetail : AppCompatActivity() {
                     null
                 }
             }
-
-            override fun onPostExecute(result: Drawable?) {
-                if (result != null) {
-                    actionBar.setIcon(result)
-                }
+            if (result != null) {
+                actionBar.setIcon(result)
             }
-        }.execute()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

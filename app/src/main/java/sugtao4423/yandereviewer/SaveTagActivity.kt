@@ -1,13 +1,15 @@
 package sugtao4423.yandereviewer
 
 import android.content.Intent
-import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sugtao4423.support.progressdialog.ProgressDialog
-import yandere4j.Tag
 import yandere4j.Yandere4j
 
 class SaveTagActivity : AppCompatActivity() {
@@ -24,45 +26,37 @@ class SaveTagActivity : AppCompatActivity() {
         val yandere = Yandere4j()
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
 
-        object : AsyncTask<Unit, Unit, Array<Tag>?>() {
-            private lateinit var progressDialog: ProgressDialog
-
-            override fun onPreExecute() {
-                progressDialog = ProgressDialog(this@SaveTagActivity).apply {
-                    setMessage("Loading all tags...\nWait a minute.")
-                    isIndeterminate = false
-                    setProgressStyle(ProgressDialog.STYLE_SPINNER)
-                    setCancelable(false)
-                    show()
-                }
+        CoroutineScope(Dispatchers.Main).launch {
+            val progressDialog = ProgressDialog(this@SaveTagActivity).apply {
+                setMessage("Loading all tags...\nWait a minute.")
+                isIndeterminate = false
+                setProgressStyle(ProgressDialog.STYLE_SPINNER)
+                setCancelable(false)
+                show()
             }
-
-            override fun doInBackground(vararg params: Unit?): Array<Tag>? {
-                return try {
+            val result = withContext(Dispatchers.IO) {
+                try {
                     yandere.getTags(true)
                 } catch (e: Exception) {
                     null
                 }
             }
-
-            override fun onPostExecute(result: Array<Tag>?) {
-                if (result == null) {
-                    Toast.makeText(this@SaveTagActivity, R.string.get_tags_failed, Toast.LENGTH_LONG).show()
-                    finish()
-                    return
-                }
-                DBUtils(applicationContext).apply {
-                    writeTags(result)
-                    close()
-                }
-                progressDialog.dismiss()
-                pref.edit().putBoolean(Keys.TAGSAVED, true).commit()
-                if (startMain) {
-                    startActivity(Intent(this@SaveTagActivity, MainActivity::class.java))
-                }
+            if (result == null) {
+                Toast.makeText(this@SaveTagActivity, R.string.get_tags_failed, Toast.LENGTH_LONG).show()
                 finish()
+                return@launch
             }
-        }.execute()
+            DBUtils(applicationContext).apply {
+                writeTags(result)
+                close()
+            }
+            progressDialog.dismiss()
+            pref.edit().putBoolean(Keys.TAGSAVED, true).commit()
+            if (startMain) {
+                startActivity(Intent(this@SaveTagActivity, MainActivity::class.java))
+            }
+            finish()
+        }
     }
 
 }

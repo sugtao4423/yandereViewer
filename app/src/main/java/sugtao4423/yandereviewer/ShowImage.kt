@@ -1,12 +1,14 @@
 package sugtao4423.yandereviewer
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import com.tenthbit.view.ZoomImageView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sugtao4423.support.progressdialog.ProgressDialog
 import yandere4j.Yandere4j
 import java.io.ByteArrayOutputStream
@@ -28,29 +30,25 @@ class ShowImage : AppCompatActivity() {
         val url = intent.getStringExtra(INTENT_EXTRA_URL)
         val size = intent.getIntExtra(INTENT_EXTRA_FILESIZE, -1)
 
-        object : AsyncTask<Unit, Int, Bitmap?>() {
-            private lateinit var progressDialog: ProgressDialog
-
-            override fun onPreExecute() {
-                progressDialog = ProgressDialog(this@ShowImage).apply {
-                    setMessage("Loading...")
-                    isIndeterminate = false
-                    setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-                    max = size / 1024
-                    progress = 0
-                    setProgressNumberFormat("%1d/%2d KB")
-                    setCancelable(true)
-                    setCanceledOnTouchOutside(false)
-                    setOnCancelListener {
-                        cancel(true)
-                        finish()
-                    }
-                    show()
+        CoroutineScope(Dispatchers.Main).launch {
+            var isCancelled = false
+            val progressDialog = ProgressDialog(this@ShowImage).apply {
+                setMessage("Loading...")
+                isIndeterminate = false
+                setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+                max = size / 1024
+                progress = 0
+                setProgressNumberFormat("%1d/%2d KB")
+                setCancelable(true)
+                setCanceledOnTouchOutside(false)
+                setOnCancelListener {
+                    isCancelled = true
+                    finish()
                 }
+                show()
             }
-
-            override fun doInBackground(vararg params: Unit?): Bitmap? {
-                return try {
+            val result = withContext(Dispatchers.IO) {
+                try {
                     val conn = URL(url).openConnection() as HttpsURLConnection
                     conn.apply {
                         setRequestProperty("User-Agent", Yandere4j.USER_AGENT)
@@ -70,7 +68,9 @@ class ShowImage : AppCompatActivity() {
                         }
                         bout.write(buffer, 0, len)
                         len = inputStream.read(buffer)
-                        publishProgress(++i * 1024)
+                        withContext(Dispatchers.Main) {
+                            progressDialog.progress = ++i
+                        }
                     }
                     val tmp = bout.toByteArray()
                     val bitmap = BitmapFactory.decodeByteArray(tmp, 0, tmp.size)
@@ -81,25 +81,18 @@ class ShowImage : AppCompatActivity() {
                     null
                 }
             }
-
-            override fun onProgressUpdate(vararg values: Int?) {
-                progressDialog.progress = values[0]!! / 1024
-            }
-
-            override fun onPostExecute(result: Bitmap?) {
-                progressDialog.dismiss()
-                if (result == null) {
-                    Toast.makeText(this@ShowImage, R.string.could_not_open, Toast.LENGTH_LONG).show()
-                    finish()
-                    return
-                }
-                image.setImageBitmap(result)
-            }
-
-            override fun onCancelled() {
+            progressDialog.dismiss()
+            if (isCancelled) {
                 Toast.makeText(this@ShowImage, R.string.cancelled, Toast.LENGTH_SHORT).show()
+                return@launch
             }
-        }.execute()
+            if (result == null) {
+                Toast.makeText(this@ShowImage, R.string.could_not_open, Toast.LENGTH_LONG).show()
+                finish()
+                return@launch
+            }
+            image.setImageBitmap(result)
+        }
     }
 
 }

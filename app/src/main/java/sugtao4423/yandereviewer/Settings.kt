@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Canvas
 import android.graphics.Rect
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.preference.PreferenceManager
@@ -19,6 +18,10 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.text.DecimalFormat
 
@@ -185,17 +188,13 @@ class Settings : AppCompatActivity() {
             val clearCache = findPreference("clearCache")
             clearCache.summary = getString(R.string.cache, getCacheSize())
             clearCache.setOnPreferenceClickListener {
-                object : AsyncTask<Void, Void, Void?>() {
-                    override fun doInBackground(vararg params: Void?): Void? {
+                CoroutineScope(Dispatchers.Main).launch {
+                    withContext(Dispatchers.IO) {
                         Glide.get(context!!).clearDiskCache()
-                        return null
                     }
-
-                    override fun onPostExecute(result: Void?) {
-                        it.summary = getString(R.string.cache, getCacheSize())
-                        Toast.makeText(activity.applicationContext, R.string.cache_cleared, Toast.LENGTH_SHORT).show()
-                    }
-                }.execute()
+                    it.summary = getString(R.string.cache, getCacheSize())
+                    Toast.makeText(activity.applicationContext, R.string.cache_cleared, Toast.LENGTH_SHORT).show()
+                }
                 true
             }
         }

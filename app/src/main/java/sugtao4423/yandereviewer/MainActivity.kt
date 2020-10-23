@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.widget.SwipeRefreshLayout
@@ -18,6 +17,10 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.MultiAutoCompleteTextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import sugtao4423.icondialog.IconDialog
 import sugtao4423.icondialog.IconItem
 import twitter4j.Twitter
@@ -93,14 +96,10 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             adapter.clear()
             yanderePage = 1
         }
-        object : AsyncTask<Unit, Unit, Array<Post>?>() {
-
-            override fun onPreExecute() {
-                swipeRefresh.isRefreshing = true
-            }
-
-            override fun doInBackground(vararg params: Unit?): Array<Post>? {
-                return try {
+        CoroutineScope(Dispatchers.Main).launch {
+            swipeRefresh.isRefreshing = true
+            val result = withContext(Dispatchers.IO) {
+                try {
                     if (searchQuery == null) {
                         yandere.getPosts(yanderePage)
                     } else {
@@ -110,23 +109,20 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                     null
                 }
             }
-
-            override fun onPostExecute(result: Array<Post>?) {
-                swipeRefresh.isRefreshing = false
-                if (result == null) {
-                    Toast.makeText(this@MainActivity, R.string.get_error, Toast.LENGTH_LONG).show()
-                    return
-                }
-                adapter.addAll(result)
-                if (result.size < yandere.requestPostCount) {
-                    scrollListener.stopOnLoadMore = true
-                }
-                if (yanderePage == 1 && searchQuery == null) {
-                    pref.edit().putLong(Keys.READEDID, result[0].id).commit()
-                }
-                yanderePage++
+            swipeRefresh.isRefreshing = false
+            if (result == null) {
+                Toast.makeText(this@MainActivity, R.string.get_error, Toast.LENGTH_LONG).show()
+                return@launch
             }
-        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            adapter.addAll(result)
+            if (result.size < yandere.requestPostCount) {
+                scrollListener.stopOnLoadMore = true
+            }
+            if (yanderePage == 1 && searchQuery == null) {
+                pref.edit().putLong(Keys.READEDID, result[0].id).commit()
+            }
+            yanderePage++
+        }
     }
 
     override fun onRefresh() {
@@ -316,19 +312,16 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             MenuInflater(this).inflate(R.menu.menu_both, menu)
             val mactv = (menu!!.findItem(R.id.search_view).actionView).findViewById(R.id.cactv) as MultiAutoCompleteTextView
             mactv.isEnabled = false
-            object : AsyncTask<Unit, Unit, ArrayList<String>>() {
-                override fun doInBackground(vararg params: Unit?): ArrayList<String> {
+            CoroutineScope(Dispatchers.Main).launch {
+                val result = withContext(Dispatchers.IO) {
                     val dbUtils = DBUtils(applicationContext)
                     val tagNames = dbUtils.loadTagNamesAsArrayList()
                     dbUtils.close()
-                    return tagNames
+                    tagNames
                 }
-
-                override fun onPostExecute(result: ArrayList<String>) {
-                    prepareSuggest(result, mactv)
-                    mactv.isEnabled = true
-                }
-            }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+                prepareSuggest(result, mactv)
+                mactv.isEnabled = true
+            }
         } else {
             MenuInflater(this).inflate(R.menu.menu_settings, menu)
         }
