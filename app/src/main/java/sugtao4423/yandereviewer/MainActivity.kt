@@ -291,16 +291,16 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             else -> ASK
         }
 
-        if (pref.getString(Keys.TWITTER_USERNAME, "") != "") {
+        twitter = if (pref.getString(Keys.TWITTER_USERNAME, "") != "") {
             val conf = ConfigurationBuilder().run {
                 setOAuthConsumerKey(getString(R.string.twitter_ck))
                 setOAuthConsumerSecret(getString(R.string.twitter_cs))
                 build()
             }
             val at = AccessToken(pref.getString(Keys.TWITTER_AT, null), pref.getString(Keys.TWITTER_ATS, null))
-            twitter = TwitterFactory(conf).getInstance(at)
+            TwitterFactory(conf).getInstance(at)
         } else {
-            twitter = null
+            null
         }
         yandere.requestPostCount = pref.getInt(Keys.REQUEST_POSTCOUNT, 50)
     }
