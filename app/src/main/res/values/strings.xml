@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">yande.re viewer</string>
+    <string name="app_name" translatable="false">yande.re viewer</string>
     <string name="search">Search</string>
     <string name="settings">Settings</string>
     <string name="image_display_method">Image Display Method</string>
@@ -59,6 +59,6 @@
     <string name="acquisition_of_access_token_failed">Acquisition of AccessToken Failed…</string>
     <string name="is_this_okay">Is this okay?</string>
 
-    <string name="permission_rejected">(๑•﹏•๑*)</string>
+    <string name="permission_rejected" translatable="false">(๑•﹏•๑*)</string>
 
 </resources>
