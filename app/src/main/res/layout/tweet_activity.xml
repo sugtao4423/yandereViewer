@@ -11,11 +11,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/tweetButton"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:ems="10"
-        android:gravity="top|left"
+        android:gravity="top|start"
         android:inputType="textMultiLine">
 
         <requestFocus />
@@ -27,7 +29,9 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
+        android:layout_toStartOf="@+id/text140"
         android:layout_toLeftOf="@+id/text140"
         android:background="#00000000"
         android:onClick="tweet" />
@@ -37,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/tweetText"
+        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:text="tweetAccount" />
 
@@ -45,7 +50,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/tweetButton"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
+        android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:text="140"
         android:textAppearance="?android:attr/textAppearanceMedium" />
