@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.post_detail.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,12 +39,9 @@ class PostDetail : AppCompatActivity() {
     private lateinit var post: Post
     private var onIntent = false
 
-    private lateinit var text: TextView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.post_detail)
-        text = findViewById(R.id.postDetailText)
         post = intent.getSerializableExtra(INTENT_EXTRA_POSTDATA) as Post
         onIntent = intent.getBooleanExtra(INTENT_EXTRA_ONINTENT, false)
 
@@ -89,8 +87,8 @@ class PostDetail : AppCompatActivity() {
                 "URL: <a href=\"${post.file.url}\">${post.file.url}</a><br>" +
                 "Size: ${post.file.width}x${post.file.height}<br>" +
                 "File Size: " + App.getFileMB(post.file.size) + "</p>"
-        text.text = fromHtml(str)
-        text.movementMethod = MutableLinkMovementMethod().apply {
+        postDetailText.text = fromHtml(str)
+        postDetailText.movementMethod = MutableLinkMovementMethod().apply {
             setOnUrlClickListener(object : MutableLinkMovementMethod.OnUrlClickListener {
                 override fun onUrlClick(widget: TextView, uri: Uri) {
                     ChromeIntent(this@PostDetail, uri)

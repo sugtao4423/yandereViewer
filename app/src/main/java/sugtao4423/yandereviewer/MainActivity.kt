@@ -17,6 +17,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,7 +44,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     private var multiSelectMode: ActionMode? = null
     private lateinit var scrollListener: EndlessScrollListener
-    private lateinit var swipeRefresh: SwipeRefreshLayout
     private lateinit var adapter: PostAdapter
     private val yandere = Yandere4j()
     private var yanderePage = 1
@@ -57,15 +57,13 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
-        val grid = findViewById<PostGridView>(R.id.grid)
+        setSupportActionBar(toolbar)
         adapter = PostAdapter(this)
         grid.adapter = adapter
 
         scrollListener = getScrollListener(grid.gridLayoutManager)
         grid.addOnScrollListener(scrollListener)
 
-        swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
                 android.R.color.holo_orange_light, android.R.color.holo_red_light)
         swipeRefresh.setOnRefreshListener(this)

@@ -6,12 +6,10 @@ import android.text.TextWatcher
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import kotlinx.android.synthetic.main.tweet_activity.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,9 +33,6 @@ class TweetActivity : AppCompatActivity() {
 
     private lateinit var yandere: Yandere4j
 
-    private lateinit var editText: EditText
-    private lateinit var tweetBtn: ImageButton
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tweet_activity)
@@ -53,20 +48,18 @@ class TweetActivity : AppCompatActivity() {
         twitter = TwitterFactory(conf).getInstance(at)
         yandere = Yandere4j()
 
-        tweetBtn = findViewById(R.id.tweetButton)
-        editText = findViewById(R.id.tweetText)
-        addTextWatcher(findViewById(R.id.text140))
-        findViewById<TextView>(R.id.tweetAccount).text = pref.getString(Keys.TWITTER_USERNAME, null)
+        addTextWatcher()
+        tweetAccount.text = pref.getString(Keys.TWITTER_USERNAME, null)
 
-        editText.setText(yandere.getShareText(post))
+        tweetText.setText(yandere.getShareText(post))
     }
 
     fun tweet(@Suppress("UNUSED_PARAMETER") v: View) {
-        tweetBtn.isEnabled = false
+        tweetButton.isEnabled = false
         CoroutineScope(Dispatchers.Main).launch {
             val result = withContext(Dispatchers.IO) {
                 try {
-                    twitter.updateStatus(editText.text.toString())
+                    twitter.updateStatus(tweetText.text.toString())
                 } catch (e: TwitterException) {
                     null
                 }
@@ -80,11 +73,11 @@ class TweetActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun addTextWatcher(textView: TextView) {
-        editText.addTextChangedListener(object : TextWatcher {
+    private fun addTextWatcher() {
+        tweetText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 s?.length?.let {
-                    textView.text = (140 - it).toString()
+                    text140.text = (140 - it).toString()
                 }
             }
 
@@ -97,7 +90,7 @@ class TweetActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (editText.text.toString().length > 140) {
+        if (tweetText.text.toString().length > 140) {
             menu?.add(Menu.NONE, Menu.FIRST, Menu.NONE, R.string.undo)?.apply {
                 setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
             }
@@ -111,14 +104,14 @@ class TweetActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             Menu.FIRST -> {
-                editText.setText(yandere.getShareText(post))
+                tweetText.setText(yandere.getShareText(post))
             }
             Menu.FIRST + 1 -> {
-                val text = editText.text.toString()
+                val text = tweetText.text.toString()
                 var shortenTitle = yandere.getShareTitle(post)
                 val otherLetterLength = text.length - shortenTitle.length - 1
                 shortenTitle = shortenTitle.substring(0, 140 - otherLetterLength - 4) + "..."
-                editText.setText(text.replace(yandere.getShareTitle(post), shortenTitle))
+                tweetText.setText(text.replace(yandere.getShareTitle(post), shortenTitle))
             }
         }
         return super.onOptionsItemSelected(item)
