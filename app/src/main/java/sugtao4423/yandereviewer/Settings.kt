@@ -73,8 +73,8 @@ class Settings : AppCompatActivity() {
                     requireActivity().finish()
                 } else {
                     AlertDialog.Builder(requireContext()).apply {
-                        it.title = getString(R.string.cancel_collaboration)
-                        setMessage(getString(R.string.is_this_okay))
+                        setTitle(R.string.cancel_collaboration)
+                        setMessage(R.string.is_this_okay)
                         setNegativeButton("Cancel", null)
                         setPositiveButton("OK") { _, _ ->
                             pref.edit().apply {
@@ -126,7 +126,7 @@ class Settings : AppCompatActivity() {
                 dirText.setText(currentDir)
 
                 val changeSaveDirDialog = AlertDialog.Builder(requireContext()).run {
-                    setTitle(getString(R.string.changeSaveDir))
+                    setTitle(R.string.changeSaveDir)
                     setMessage(R.string.changeSaveDirDescription)
                     setView(dialogLayout)
                     setNegativeButton("Cancel", null)
@@ -155,8 +155,8 @@ class Settings : AppCompatActivity() {
             val refreshAllTags = findPreference<Preference>("refreshAllTags")!!
             refreshAllTags.setOnPreferenceClickListener {
                 AlertDialog.Builder(requireContext()).apply {
-                    setTitle(getString(R.string.refreshAllTags))
-                    setMessage(getString(R.string.is_this_okay))
+                    setTitle(R.string.refreshAllTags)
+                    setMessage(R.string.is_this_okay)
                     setNegativeButton("Cancel", null)
                     setPositiveButton("OK") { _, _ ->
                         DBUtils(requireContext().applicationContext).apply {
@@ -174,8 +174,8 @@ class Settings : AppCompatActivity() {
             val clearHistory = findPreference<Preference>("clearHistory")!!
             clearHistory.setOnPreferenceClickListener {
                 AlertDialog.Builder(requireContext()).apply {
-                    setTitle(getString(R.string.history_clear))
-                    setMessage(getString(R.string.is_this_okay))
+                    setTitle(R.string.history_clear)
+                    setMessage(R.string.is_this_okay)
                     setNegativeButton("Cancel", null)
                     setPositiveButton("OK") { _, _ ->
                         (requireContext().applicationContext as App).clearedHistory = pref.edit().remove(Keys.SEARCH_HISTORY).commit()
