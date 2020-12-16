@@ -45,8 +45,6 @@
     <string name="open_full_size">Open Full Size</string>
     <string name="view_sample_size">View Sample Size</string>
     <string name="view_full_size">View Full Size</string>
-    <string name="save_success">Saved!</string>
-    <string name="save_failed">Save Failed…</string>
     <string name="cancelled">Cancelled</string>
     <string name="failed_acquire_details">Failed Acquire Details</string>
     <string name="did_not_match_regular_expression">Did not Match Regular Expression</string>
@@ -58,7 +56,5 @@
     <string name="acquisition_of_request_token_failed">Acquisition of RequestToken Failed…</string>
     <string name="acquisition_of_access_token_failed">Acquisition of AccessToken Failed…</string>
     <string name="is_this_okay">Is this okay?</string>
-
-    <string name="permission_rejected" translatable="false">(๑•﹏•๑*)</string>
 
 </resources>

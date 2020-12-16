@@ -44,8 +44,6 @@
     <string name="open_full_size">フルサイズで開く</string>
     <string name="view_sample_size">サンプルサイズを表示</string>
     <string name="view_full_size">フルサイズを表示</string>
-    <string name="save_success">保存しました</string>
-    <string name="save_failed">保存に失敗しました…</string>
     <string name="cancelled">キャンセルしました</string>
     <string name="failed_acquire_details">詳細の取得に失敗しました</string>
     <string name="did_not_match_regular_expression">正規表現にマッチしませんでした</string>
