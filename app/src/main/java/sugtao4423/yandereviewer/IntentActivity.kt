@@ -2,8 +2,8 @@ package sugtao4423.yandereviewer
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +24,7 @@ class IntentActivity : AppCompatActivity() {
         val url = intent.data!!.toString()
         val matcher = Pattern.compile("http(s)?://yande.re/post/show/([0-9]+)").matcher(url)
         if (matcher.find()) {
-            val id = matcher.group(2).toLong()
+            val id = matcher.group(2)!!.toLong()
             CoroutineScope(Dispatchers.Main).launch {
                 val progressDialog = ProgressDialog(this@IntentActivity).apply {
                     setMessage("Loading...")

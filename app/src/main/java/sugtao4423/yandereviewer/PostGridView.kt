@@ -2,10 +2,10 @@ package sugtao4423.yandereviewer
 
 import android.content.Context
 import android.graphics.Rect
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 class PostGridView(context: Context, attrs: AttributeSet?) : RecyclerView(context, attrs) {
 

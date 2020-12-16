@@ -9,8 +9,8 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
-import android.preference.PreferenceManager
-import android.support.v4.app.NotificationCompat
+import androidx.core.app.NotificationCompat
+import androidx.preference.PreferenceManager
 import yandere4j.Post
 import java.io.File
 import java.net.URLDecoder
@@ -60,11 +60,14 @@ class DownloadService : Service() {
 
     private fun saveImages(posts: Array<Post>) {
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val defaultCanonicalDir = Environment.DIRECTORY_DOWNLOADS + "/"
-        val saveCanonicalDir = pref.getString(Keys.SAVEDIR, defaultCanonicalDir)
-                ?: defaultCanonicalDir
-        val dlManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val saveCanonicalDir = let {
+            val defaultCanonicalDir = Environment.DIRECTORY_DOWNLOADS + "/"
+            pref.getString(Keys.SAVEDIR, defaultCanonicalDir) ?: defaultCanonicalDir
+        }
+        val firstDirectory = saveCanonicalDir.split("/")[0]
+        val saveFileAbsPath = saveCanonicalDir.replace(firstDirectory, "/") + "/"
 
+        val dlManager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         var currentPos = 0
         val downloadReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -76,9 +79,8 @@ class DownloadService : Service() {
                 val post = posts[currentPos++]
                 val fileName = File(URLDecoder.decode(post.file.url, "UTF-8")).name
                 val dlRequest = DownloadManager.Request(Uri.parse(post.file.url)).apply {
-                    allowScanningByMediaScanner()
                     setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                    setDestinationInExternalPublicDir(saveCanonicalDir, fileName)
+                    setDestinationInExternalPublicDir(firstDirectory, saveFileAbsPath + fileName)
                 }
                 dlManager.enqueue(dlRequest)
             }

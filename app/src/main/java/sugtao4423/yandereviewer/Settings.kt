@@ -7,16 +7,18 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Environment
-import android.preference.PreferenceManager
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.preference.ListPreference
-import android.support.v7.preference.PreferenceFragmentCompat
 import android.text.InputType
 import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.commit
+import androidx.preference.ListPreference
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceManager
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +31,14 @@ class Settings : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        supportFragmentManager.beginTransaction().replace(android.R.id.content, PreferencesFragment()).commit()
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportFragmentManager.commit {
+            replace(android.R.id.content, PreferencesFragment())
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        if (item?.itemId == android.R.id.home) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == android.R.id.home) {
             finish()
         }
         return super.onOptionsItemSelected(item)
@@ -43,15 +47,11 @@ class Settings : AppCompatActivity() {
     class PreferencesFragment : PreferenceFragmentCompat() {
 
         override fun onCreatePreferences(bundle: Bundle?, rootKey: String?) {
-            if (activity == null) {
-                return
-            }
-            val activity = activity!!
             setPreferencesFromResource(R.xml.settings, rootKey)
 
-            val pref = PreferenceManager.getDefaultSharedPreferences(activity.applicationContext)
+            val pref = PreferenceManager.getDefaultSharedPreferences(requireContext().applicationContext)
 
-            val howView = findPreference("how_view") as ListPreference
+            val howView = findPreference<ListPreference>("how_view")!!
             howView.summary = getHowViewSummary(pref.getString(Keys.HOWVIEW, Keys.VAL_FULL)
                     ?: Keys.VAL_FULL)
             howView.setOnPreferenceChangeListener { preference, newValue ->
@@ -59,7 +59,7 @@ class Settings : AppCompatActivity() {
                 true
             }
 
-            val twitter = findPreference("twitter")
+            val twitter = findPreference<Preference>("twitter")!!
             val username = pref.getString(Keys.TWITTER_USERNAME, "")
             if (username == "") {
                 twitter.title = getString(R.string.cooperate_with_twitter)
@@ -69,10 +69,10 @@ class Settings : AppCompatActivity() {
             }
             twitter.setOnPreferenceClickListener {
                 if (username == "") {
-                    startActivity(Intent(activity, TwitterOAuth::class.java))
-                    activity.finish()
+                    startActivity(Intent(requireContext(), TwitterOAuth::class.java))
+                    requireActivity().finish()
                 } else {
-                    AlertDialog.Builder(activity).apply {
+                    AlertDialog.Builder(requireContext()).apply {
                         it.title = getString(R.string.cancel_collaboration)
                         setMessage(getString(R.string.is_this_okay))
                         setNegativeButton("Cancel", null)
@@ -83,8 +83,8 @@ class Settings : AppCompatActivity() {
                                 putString(Keys.TWITTER_ATS, "")
                                 commit()
                             }
-                            Toast.makeText(activity.applicationContext, R.string.cancelled_collaboration, Toast.LENGTH_SHORT).show()
-                            activity.finish()
+                            Toast.makeText(requireContext().applicationContext, R.string.cancelled_collaboration, Toast.LENGTH_SHORT).show()
+                            requireActivity().finish()
                         }
                         show()
                     }
@@ -92,17 +92,17 @@ class Settings : AppCompatActivity() {
                 true
             }
 
-            val requestLimit = findPreference("reqPostCount")
+            val requestLimit = findPreference<Preference>("reqPostCount")!!
             requestLimit.summary = pref.getInt(Keys.REQUEST_POSTCOUNT, 50).toString()
             requestLimit.setOnPreferenceClickListener {
-                val eLimit = EditText(activity)
+                val eLimit = EditText(requireContext())
                 val dialogLayout = getEditTextDialogLayout(eLimit, true)
                 eLimit.apply {
                     setText(pref.getInt(Keys.REQUEST_POSTCOUNT, 50).toString())
                     hint = "1 to 100"
                     inputType = InputType.TYPE_CLASS_NUMBER
                 }
-                AlertDialog.Builder(activity).apply {
+                AlertDialog.Builder(requireContext()).apply {
                     setView(dialogLayout)
                     setNegativeButton("Cancel", null)
                     setPositiveButton("OK") { _, _ ->
@@ -114,18 +114,18 @@ class Settings : AppCompatActivity() {
                 true
             }
 
-            val changeSaveDir = findPreference("changeSaveDir")
+            val changeSaveDir = findPreference<Preference>("changeSaveDir")!!
             val externalStorageDir = Environment.getExternalStorageDirectory().absolutePath + "/"
             val defaultSaveDir = Environment.DIRECTORY_DOWNLOADS + "/"
             changeSaveDir.summary = externalStorageDir + pref.getString(Keys.SAVEDIR, defaultSaveDir)
             changeSaveDir.setOnPreferenceClickListener {
-                val dirText = ChangeSaveDirEditText(activity)
+                val dirText = ChangeSaveDirEditText(requireContext())
                 dirText.prefix = externalStorageDir
                 val dialogLayout = getEditTextDialogLayout(dirText, false)
                 val currentDir = pref.getString(Keys.SAVEDIR, defaultSaveDir)
                 dirText.setText(currentDir)
 
-                val changeSaveDirDialog = AlertDialog.Builder(activity).run {
+                val changeSaveDirDialog = AlertDialog.Builder(requireContext()).run {
                     setTitle(getString(R.string.changeSaveDir))
                     setView(dialogLayout)
                     setNegativeButton("Cancel", null)
@@ -151,49 +151,49 @@ class Settings : AppCompatActivity() {
                 true
             }
 
-            val refreshAllTags = findPreference("refreshAllTags")
+            val refreshAllTags = findPreference<Preference>("refreshAllTags")!!
             refreshAllTags.setOnPreferenceClickListener {
-                AlertDialog.Builder(activity).apply {
+                AlertDialog.Builder(requireContext()).apply {
                     setTitle(getString(R.string.refreshAllTags))
                     setMessage(getString(R.string.is_this_okay))
                     setNegativeButton("Cancel", null)
                     setPositiveButton("OK") { _, _ ->
-                        DBUtils(activity.applicationContext).apply {
+                        DBUtils(requireContext().applicationContext).apply {
                             deleteAllTags()
                             close()
                         }
-                        (activity.applicationContext as App).isRefreshTags = true
-                        startActivity(Intent(activity, SaveTagActivity::class.java))
+                        (requireContext().applicationContext as App).isRefreshTags = true
+                        startActivity(Intent(requireContext(), SaveTagActivity::class.java))
                     }
                     show()
                 }
                 true
             }
 
-            val clearHistory = findPreference("clearHistory")
+            val clearHistory = findPreference<Preference>("clearHistory")!!
             clearHistory.setOnPreferenceClickListener {
-                AlertDialog.Builder(activity).apply {
+                AlertDialog.Builder(requireContext()).apply {
                     setTitle(getString(R.string.history_clear))
                     setMessage(getString(R.string.is_this_okay))
                     setNegativeButton("Cancel", null)
                     setPositiveButton("OK") { _, _ ->
-                        (activity.applicationContext as App).clearedHistory = pref.edit().remove(Keys.SEARCH_HISTORY).commit()
-                        Toast.makeText(activity, R.string.history_cleared, Toast.LENGTH_SHORT).show()
+                        (requireContext().applicationContext as App).clearedHistory = pref.edit().remove(Keys.SEARCH_HISTORY).commit()
+                        Toast.makeText(requireContext().applicationContext, R.string.history_cleared, Toast.LENGTH_SHORT).show()
                     }
                     show()
                 }
                 true
             }
 
-            val clearCache = findPreference("clearCache")
+            val clearCache = findPreference<Preference>("clearCache")!!
             clearCache.summary = getString(R.string.cache, getCacheSize())
             clearCache.setOnPreferenceClickListener {
                 CoroutineScope(Dispatchers.Main).launch {
                     withContext(Dispatchers.IO) {
-                        Glide.get(context!!).clearDiskCache()
+                        Glide.get(requireContext()).clearDiskCache()
                     }
                     it.summary = getString(R.string.cache, getCacheSize())
-                    Toast.makeText(activity.applicationContext, R.string.cache_cleared, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext().applicationContext, R.string.cache_cleared, Toast.LENGTH_SHORT).show()
                 }
                 true
             }
@@ -214,7 +214,7 @@ class Settings : AppCompatActivity() {
             DecimalFormat("#.#").let {
                 it.minimumFractionDigits = 2
                 it.maximumFractionDigits = 2
-                return it.format(getDirSize(context!!.cacheDir).toDouble() / 1024 / 1024) + "MB"
+                return it.format(getDirSize(requireContext().cacheDir).toDouble() / 1024 / 1024) + "MB"
             }
         }
 
@@ -228,7 +228,7 @@ class Settings : AppCompatActivity() {
         }
 
         private fun getEditTextDialogLayout(editText: EditText, isTopMargin: Boolean): FrameLayout {
-            val editContainer = FrameLayout(activity!!)
+            val editContainer = FrameLayout(requireContext())
             val params = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             val margin = ((24 * resources.displayMetrics.density) + 0.5).toInt()
             params.apply {
@@ -245,7 +245,7 @@ class Settings : AppCompatActivity() {
 
     }
 
-    class ChangeSaveDirEditText(context: Context) : EditText(context) {
+    class ChangeSaveDirEditText(context: Context) : androidx.appcompat.widget.AppCompatEditText(context) {
 
         var prefix = ""
         private val prefixRect = Rect()
