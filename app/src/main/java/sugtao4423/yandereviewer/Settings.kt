@@ -127,6 +127,7 @@ class Settings : AppCompatActivity() {
 
                 val changeSaveDirDialog = AlertDialog.Builder(requireContext()).run {
                     setTitle(getString(R.string.changeSaveDir))
+                    setMessage(R.string.changeSaveDirDescription)
                     setView(dialogLayout)
                     setNegativeButton("Cancel", null)
                     setNeutralButton("Default", null)

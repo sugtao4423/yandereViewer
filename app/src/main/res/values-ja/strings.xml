@@ -10,6 +10,7 @@
     <string name="cancelled_collaboration">連携を解除しました</string>
     <string name="reqPostCount">取得件数</string>
     <string name="changeSaveDir">保存先の変更</string>
+    <string name="changeSaveDirDescription">保存先は \"Download\" や \"Pictures\" などAndroid標準のものから始めてください。</string>
     <string name="refreshAllTags">タグを全て更新</string>
     <string name="cache">キャッシュ: %1$s</string>
     <string name="cache_clear">キャッシュクリア</string>

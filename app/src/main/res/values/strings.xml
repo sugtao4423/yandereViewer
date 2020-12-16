@@ -11,6 +11,7 @@
     <string name="cancelled_collaboration">Cancelled Collaboration</string>
     <string name="reqPostCount">Number of acquisitions</string>
     <string name="changeSaveDir">Change Save Directory</string>
+    <string name="changeSaveDirDescription">Start with the standard Android storage such as \"Download\" or \"Pictures\".</string>
     <string name="refreshAllTags">Refresh all tags</string>
     <string name="cache">Cache: %1$s</string>
     <string name="cache_clear">Clear Cache</string>
