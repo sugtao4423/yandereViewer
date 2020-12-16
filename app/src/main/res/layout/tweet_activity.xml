@@ -28,7 +28,7 @@
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_marginRight="20dp"
-        android:layout_toLeftOf="@+id/moji140"
+        android:layout_toLeftOf="@+id/text140"
         android:background="#00000000"
         android:onClick="tweet" />
 
@@ -41,7 +41,7 @@
         android:text="tweetAccount" />
 
     <TextView
-        android:id="@+id/moji140"
+        android:id="@+id/text140"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/tweetButton"

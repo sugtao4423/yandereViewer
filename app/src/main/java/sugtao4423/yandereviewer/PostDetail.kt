@@ -43,7 +43,7 @@ class PostDetail : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.post_detail)
-        text = findViewById(R.id.postDetail_text)
+        text = findViewById(R.id.postDetailText)
         post = intent.getSerializableExtra(INTENT_EXTRA_POSTDATA) as Post
         onIntent = intent.getBooleanExtra(INTENT_EXTRA_ONINTENT, false)
 

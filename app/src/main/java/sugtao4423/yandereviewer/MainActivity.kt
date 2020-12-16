@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         scrollListener = getScrollListener(grid.gridLayoutManager)
         grid.addOnScrollListener(scrollListener)
 
-        swipeRefresh = findViewById(R.id.swipe_refresh)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
         swipeRefresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light,
                 android.R.color.holo_orange_light, android.R.color.holo_red_light)
         swipeRefresh.setOnRefreshListener(this)

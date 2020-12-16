@@ -46,8 +46,8 @@ class IconDialogAdapter(context: Context, items: Array<IconItem>) :
         val holder: ViewHolder
         if (view == null) {
             view = mInflater.inflate(R.layout.item_dialog_icontext, parent, false)
-            val image = view.findViewById<ImageView>(R.id.dialog_image)
-            val text = view.findViewById<TextView>(R.id.dialog_text)
+            val image = view.findViewById<ImageView>(R.id.dialogImage)
+            val text = view.findViewById<TextView>(R.id.dialogText)
 
             holder = ViewHolder(image, text)
             view.tag = holder

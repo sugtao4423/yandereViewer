@@ -55,7 +55,7 @@ class TweetActivity : AppCompatActivity() {
 
         tweetBtn = findViewById(R.id.tweetButton)
         editText = findViewById(R.id.tweetText)
-        addTextWatcher(findViewById(R.id.moji140))
+        addTextWatcher(findViewById(R.id.text140))
         findViewById<TextView>(R.id.tweetAccount).text = pref.getString(Keys.TWITTER_USERNAME, null)
 
         editText.setText(yandere.getShareText(post))

@@ -23,8 +23,8 @@ class SuggestAdapter(context: Context) : ArrayAdapter<SearchItem>(context, andro
         val holder: ViewHolder
         if (view == null) {
             view = mInflater.inflate(R.layout.item_dialog_icontext, parent, false)
-            val icon = view.findViewById<ImageView>(R.id.dialog_image)
-            val text = view.findViewById<TextView>(R.id.dialog_text)
+            val icon = view.findViewById<ImageView>(R.id.dialogImage)
+            val text = view.findViewById<TextView>(R.id.dialogText)
 
             holder = ViewHolder(icon, text)
             view.tag = holder
