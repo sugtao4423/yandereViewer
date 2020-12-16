@@ -3,7 +3,6 @@
     package="sugtao4423.yandereviewer">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
@@ -76,10 +75,6 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".RequestPermissionActivity"
-            android:configChanges="orientation|screenSize"
-            android:theme="@style/Theme.FullTransparent" />
 
         <service
             android:name="DownloadService"
