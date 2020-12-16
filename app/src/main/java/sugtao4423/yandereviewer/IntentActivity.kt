@@ -43,7 +43,7 @@ class IntentActivity : AppCompatActivity() {
                 }
                 progressDialog.dismiss()
                 if (result == null) {
-                    Toast.makeText(this@IntentActivity, getString(R.string.failed_acquire_details), Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@IntentActivity, R.string.failed_acquire_details, Toast.LENGTH_LONG).show()
                     finish()
                     return@launch
                 }
@@ -55,7 +55,7 @@ class IntentActivity : AppCompatActivity() {
                 finish()
             }
         } else {
-            Toast.makeText(this, getString(R.string.did_not_match_regular_expression), Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.did_not_match_regular_expression, Toast.LENGTH_LONG).show()
             finish()
         }
     }
