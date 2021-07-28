@@ -298,7 +298,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         if (searchQuery == null) {
-            MenuInflater(this).inflate(R.menu.menu_both, menu)
+            MenuInflater(this).inflate(R.menu.menu_all, menu)
             val mactv = (menu!!.findItem(R.id.search_view).actionView).findViewById(R.id.cactv) as MultiAutoCompleteTextView
             mactv.isEnabled = false
             CoroutineScope(Dispatchers.Main).launch {
@@ -312,7 +312,7 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 mactv.isEnabled = true
             }
         } else {
-            MenuInflater(this).inflate(R.menu.menu_settings, menu)
+            MenuInflater(this).inflate(R.menu.menu_wo_search, menu)
         }
         return super.onCreateOptionsMenu(menu)
     }
