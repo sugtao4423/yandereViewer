@@ -16,7 +16,11 @@ import androidx.appcompat.view.ActionMode
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.model.GlideUrl
+import com.bumptech.glide.load.model.LazyHeaders
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -237,7 +241,24 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
-    fun getOnCardLongClickListener(): View.OnLongClickListener {
+    fun getOnCardLongClickListener(post: Post): View.OnLongClickListener {
+        return View.OnLongClickListener {
+            val glideHeader = LazyHeaders.Builder().addHeader("User-Agent", Yandere4j.USER_AGENT).build()
+            val glideUrl = GlideUrl(post.preview.url, glideHeader)
+            Glide.with(this).load(glideUrl).into(zoomImageView)
+            val transition = Fade().apply {
+                duration = 300
+                addTarget(zoomImageView)
+            }
+            TransitionManager.beginDelayedTransition(postGridContainer, transition)
+            zoomImageView.visibility = View.VISIBLE
+            zoomImageView.setOnClickListener {
+                TransitionManager.beginDelayedTransition(postGridContainer, transition)
+                zoomImageView.visibility = View.GONE
+            }
+            true
+        }
+
         return View.OnLongClickListener {
             startSupportActionMode(object : ActionMode.Callback {
 

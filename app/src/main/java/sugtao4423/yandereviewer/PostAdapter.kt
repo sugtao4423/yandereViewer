@@ -35,7 +35,7 @@ class PostAdapter(private val mainActivity: MainActivity) : RecyclerView.Adapter
         val item = data[position]
 
         holder.itemView.setOnClickListener(mainActivity.getOnCardClickListener(item))
-        holder.itemView.setOnLongClickListener(mainActivity.getOnCardLongClickListener())
+        holder.itemView.setOnLongClickListener(mainActivity.getOnCardLongClickListener(item))
 
         val glideHeader = LazyHeaders.Builder().addHeader("User-Agent", Yandere4j.USER_AGENT).build()
         val glideUrl = GlideUrl(item.preview.url, glideHeader)
