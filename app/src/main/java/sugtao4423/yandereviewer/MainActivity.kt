@@ -53,6 +53,8 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private var yanderePage = 1
     private var searchQuery: String? = null
 
+    private lateinit var zoomImageViewTransition: Fade
+
     private lateinit var pref: SharedPreferences
     private var howView = ASK
 
@@ -75,6 +77,14 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         app = applicationContext as App
         pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         loadSettings()
+
+        zoomImageViewTransition = Fade().apply {
+            duration = 300
+            addTarget(zoomImageView)
+        }
+        zoomImageView.setOnClickListener {
+            closeZoomImageView()
+        }
 
         searchQuery = intent.getStringExtra(INTENT_EXTRA_SEARCHQUERY)
         if (searchQuery != null) {
@@ -241,22 +251,31 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         }
     }
 
+    private fun openZoomImageView() {
+        TransitionManager.beginDelayedTransition(postGridContainer, zoomImageViewTransition)
+        zoomImageView.visibility = View.VISIBLE
+    }
+
+    private fun closeZoomImageView() {
+        TransitionManager.beginDelayedTransition(postGridContainer, zoomImageViewTransition)
+        zoomImageView.visibility = View.GONE
+    }
+
     fun getOnCardLongClickListener(post: Post): View.OnLongClickListener {
         return View.OnLongClickListener {
             val glideHeader = LazyHeaders.Builder().addHeader("User-Agent", Yandere4j.USER_AGENT).build()
             val glideUrl = GlideUrl(post.preview.url, glideHeader)
             Glide.with(this).load(glideUrl).into(zoomImageView)
-            val transition = Fade().apply {
-                duration = 300
-                addTarget(zoomImageView)
-            }
-            TransitionManager.beginDelayedTransition(postGridContainer, transition)
-            zoomImageView.visibility = View.VISIBLE
-            zoomImageView.setOnClickListener {
-                TransitionManager.beginDelayedTransition(postGridContainer, transition)
-                zoomImageView.visibility = View.GONE
-            }
+            openZoomImageView()
             true
+        }
+    }
+
+    override fun onBackPressed() {
+        if (zoomImageView.visibility == View.VISIBLE) {
+            closeZoomImageView()
+        } else {
+            super.onBackPressed()
         }
     }
 
