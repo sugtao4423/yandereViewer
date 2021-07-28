@@ -258,36 +258,6 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             }
             true
         }
-
-        return View.OnLongClickListener {
-            startSupportActionMode(object : ActionMode.Callback {
-
-                override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                    multiSelectMode = mode
-                    menu?.add(Menu.NONE, Menu.FIRST, Menu.NONE, "Save All")?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                    it.callOnClick()
-                    return true
-                }
-
-                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                    return false
-                }
-
-                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
-                    if (item?.itemId == Menu.FIRST) {
-                        app.saveImages(this@MainActivity, adapter.getSelectedPosts())
-                        mode?.finish()
-                    }
-                    return true
-                }
-
-                override fun onDestroyActionMode(mode: ActionMode?) {
-                    multiSelectMode = null
-                    adapter.clearSelectedPosts()
-                }
-            })
-            true
-        }
     }
 
     override fun onResume() {
@@ -397,10 +367,39 @@ class MainActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.order == Menu.FIRST + 1) {
-            startActivity(Intent(this, Settings::class.java))
+        when (item.order) {
+            Menu.FIRST + 1 -> startMultiSelect()
+            Menu.FIRST + 2 -> startActivity(Intent(this, Settings::class.java))
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun startMultiSelect() {
+        startSupportActionMode(object : ActionMode.Callback {
+
+            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                multiSelectMode = mode
+                menu?.add(Menu.NONE, Menu.FIRST, Menu.NONE, "Save All")?.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                return true
+            }
+
+            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                return false
+            }
+
+            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?): Boolean {
+                if (item?.itemId == Menu.FIRST) {
+                    app.saveImages(this@MainActivity, adapter.getSelectedPosts())
+                    mode?.finish()
+                }
+                return true
+            }
+
+            override fun onDestroyActionMode(mode: ActionMode?) {
+                multiSelectMode = null
+                adapter.clearSelectedPosts()
+            }
+        })
     }
 
 }

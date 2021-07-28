@@ -2,6 +2,7 @@
 <resources>
 
     <string name="search">検索</string>
+    <string name="select">選択</string>
     <string name="settings">設定</string>
     <string name="image_display_method">画像の表示方法</string>
     <string name="cooperate_with_twitter">Twitterと連携</string>

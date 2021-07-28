@@ -3,6 +3,7 @@
 
     <string name="app_name" translatable="false">yande.re viewer</string>
     <string name="search">Search</string>
+    <string name="select">Select</string>
     <string name="settings">Settings</string>
     <string name="image_display_method">Image Display Method</string>
     <string name="cooperate_with_twitter">Cooperate with Twitter</string>
